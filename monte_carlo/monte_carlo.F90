@@ -17,11 +17,11 @@
             implicit none
 
 
-            character(256)::name
+            character(256),public::name
 
 
-            class(time(KK)),allocatable::s
-            class(time(KK)),allocatable::t
+            class(time(KK)),allocatable,public::s
+            class(time(KK)),allocatable,public::t
 
 
             interface make_monte_carlo

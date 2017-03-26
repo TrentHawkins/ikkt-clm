@@ -7,6 +7,7 @@
 
 #     include "tools/conjugate_gradient.F90"
 
+#     include "ikkt/constants.F90"
 #     include "ikkt/fields.F90"
 
 
@@ -14,8 +15,10 @@
 
 
          use conjugate_gradient_method
+
          use monte_carlo
 
+         use constants
          use fields
 
 
@@ -30,33 +33,6 @@
                                   1:boson_degrees_of_freedom)::noise
 
       contains
-
-
-            function determinant_degree(d) result(c)
-
-
-                  implicit none
-
-
-                  integer::d
-
-                  real(KK)::c
-
-
-                  select case(d)
-
-                  case(4,6)
-
-                     c=+.10000e+1
-
-                  case(10)
-
-                     c=+.50000e+0
-
-              end select!case(d)
-
-
-        end function determinant_degree!d
 
 
             subroutine make_drift()
@@ -87,9 +63,9 @@
                            call make_fermion_noise()
 
                              drift(i,j,mu) &
-                          =  drift(i,j,mu) -        determinant_degree(d)*(fermion_noise &
-                         .o.ma(:,:,i,j,mu).o.conjugate_gradient_K(cmm,cm.o.fermion_noise,&
-                                                                           fermion_noise))
+                          =  drift(i,j,mu) -determinant_degree(boson_degrees_of_freedom)*(fermion_noise &
+                         .o.ma(:,:,i,j,mu).o.               conjugate_gradient_K(cmm,cm.o.fermion_noise,&
+                                                                                          fermion_noise))
 
               end       do!i =1,inner_degrees_of_freedom,+1
 

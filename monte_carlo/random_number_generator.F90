@@ -10,8 +10,8 @@
             implicit none
 
 
-            character(*),parameter::           format_integer=INTEGERG2
-            character(*),parameter::text_field_format_integer=INTEGERA2
+            character(*),private,parameter::           format_integer=INTEGERG2
+            character(*),private,parameter::text_field_format_integer=INTEGERA2
 
             integer            ,private::       size_seed
             integer,allocatable,private::seed( :         )

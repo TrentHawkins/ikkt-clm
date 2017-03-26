@@ -15,33 +15,33 @@
             implicit none
 
 
-            complex(KK),parameter::   zero=( 00.00, 00.00)
-            complex(KK),parameter::re_unit=(+01.00, 00.00)
-            complex(KK),parameter::im_unit=( 00.00,+01.00)
+            complex(KK),public,parameter::   zero=( 00.00, 00.00)
+            complex(KK),public,parameter::re_unit=(+01.00, 00.00)
+            complex(KK),public,parameter::im_unit=( 00.00,+01.00)
 
-            complex(KK),parameter::sigma(1:2,&
-                                         1:2,&
-                                         0:3)=[[[+re_unit,    zero],[    zero,+re_unit]],&
-                                               [[    zero,+re_unit],[+re_unit,    zero]],&
-                                               [[    zero,+im_unit],[-im_unit,    zero]],&
-                                               [[+re_unit,    zero],[    zero,-re_unit]]]
+            complex(KK),public,parameter::sigma(1:2,&
+                                                1:2,&
+                                                0:3)=[[[+re_unit,    zero],[    zero,+re_unit]],&
+                                                      [[    zero,+re_unit],[+re_unit,    zero]],&
+                                                      [[    zero,+im_unit],[-im_unit,    zero]],&
+                                                      [[+re_unit,    zero],[    zero,-re_unit]]]
 
-            complex(KK),parameter::delta(1:2,&
-                                         1:2)=sigma(:,:,0)
+            complex(KK),public,parameter::delta(1:2,&
+                                                1:2)=sigma(:,:,0)
 
-            complex(KK),allocatable,protected::gamma(:,:,:)
+            complex(KK),allocatable,public,protected::gamma(:,:,:)
 
 
             contains
 
 
-            subroutine make_gamma(d)
+            subroutine make_gamma(boson_degrees_of_freedom)
 
 
                   implicit none
 
 
-                  integer::d
+                  integer::boson_degrees_of_freedom
 
 
                   if(allocated(gamma)) then
@@ -50,7 +50,7 @@
 
               end if!allocated(gamma)
 
-                  select case(d)
+                  select case(boson_degrees_of_freedom)
 
                   case( 4)
 
@@ -94,10 +94,40 @@
                      gamma(:,:, 9)=im_unit*(sigma(:,:,3).x.sigma(:,:,0).x.sigma(:,:,0).x.sigma(:,:,0))
                      gamma(:,:,10)=        (sigma(:,:,0).x.sigma(:,:,0).x.sigma(:,:,0).x.sigma(:,:,0))
 
-              end select!case(d)
+              end select!case(boson_degrees_of_freedom)
 
 
-        end subroutine make_gamma!d
+        end subroutine make_gamma!boson_degrees_of_freedom
+
+
+            function determinant_degree(boson_degrees_of_freedom)
+
+
+                  implicit none
+
+
+                  integer::boson_degrees_of_freedom
+
+                  real(KK)::determinant_degree
+
+
+                  select case(boson_degrees_of_freedom)
+
+                  case(4,6)
+
+                     determinant_degree=+01.00
+
+                  case(10)
+
+                     determinant_degree=+00.50
+
+              end select!case(boson_degrees_of_freedom)
+
+
+        end function determinant_degree!d
+
+
+
 
 
   end module constants

@@ -1,3 +1,7 @@
+!     ifort v2017.2
+
+!     ifort -module "ifort/module" -c -w main.F90 -mkl=sequential -lmkl_lapack95 -lmkl_intel_ilp64 -lmkl_core -lpthread -lm -ldl
+
 #     include "getopts.F90"
 #     include "precision.F90"
 
@@ -15,3 +19,4 @@
 #     include "ikkt/constants.F90"
 #     include "ikkt/fields.F90"
 #     include "ikkt/complex_langevin.F90"
+#     include "ikkt/observables.F90"

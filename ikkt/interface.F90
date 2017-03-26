@@ -10,15 +10,15 @@
             implicit none
 
 
-            character(252),parameter::name="IKKT-CLM"
+            character(252),public,parameter::name="IKKT-CLM"
 
-            real(KK)::time_setting= .00000e+0
-            real(KK)::average_step= .10000e-4
+            real(KK),public::time_setting= .00000e+0
+            real(KK),public::average_step= .10000e-4
 
-            integer,parameter::inner_degrees_of_freedom=4
-            integer,parameter::boson_degrees_of_freedom=4
-            integer,parameter::fermi_degrees_of_freedom&
-                          =2**(boson_degrees_of_freedom/2-1)
+            integer,public,parameter::inner_degrees_of_freedom=4
+            integer,public,parameter::boson_degrees_of_freedom=4
+            integer,public,parameter::fermi_degrees_of_freedom&
+                                 =2**(boson_degrees_of_freedom/2-1)
 
 
 

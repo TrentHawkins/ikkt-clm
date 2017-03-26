@@ -10,8 +10,8 @@
             implicit none
 
 
-            character(*),parameter::           format_average_K=COMPLEXGK
-            character(*),parameter::text_field_format_average_K=COMPLEXAK
+            character(*),private,parameter::           format_average_K=COMPLEXGK
+            character(*),private,parameter::text_field_format_average_K=COMPLEXAK
 
             type::average(precision)
 

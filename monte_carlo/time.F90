@@ -15,8 +15,8 @@
             implicit none
 
 
-            character(*),parameter::           format_time_K=REALGK
-            character(*),parameter::text_field_format_time_K=REALAK
+            character(*),private,parameter::           format_time_K=REALGK
+            character(*),private,parameter::text_field_format_time_K=REALAK
 
             character(*),parameter::           format_step=INTEGERG2
             character(*),parameter::text_field_format_step=INTEGERG2

@@ -12,39 +12,41 @@
       module fields
 
 
+         use lapack95,only:geev
+
          use tensor_type
-         use constants
 
          use interface
+         use constants
 
 
             implicit none
 
 
-            integer,parameter::n=inner_degrees_of_freedom
-            integer,parameter::d=boson_degrees_of_freedom
-            integer,parameter::p=fermi_degrees_of_freedom
+            integer,public,parameter::n=inner_degrees_of_freedom
+            integer,public,parameter::d=boson_degrees_of_freedom
+            integer,public,parameter::p=fermi_degrees_of_freedom
 
-            integer,parameter::n_size= inner_degrees_of_freedom&
+            integer,public,parameter::n_size= inner_degrees_of_freedom&
                                      * inner_degrees_of_freedom
-            integer,parameter::a_size= boson_degrees_of_freedom* n_size
-            integer,parameter::f_size= fermi_degrees_of_freedom*(n_size-1)
+            integer,public,parameter::a_size= boson_degrees_of_freedom* n_size
+            integer,public,parameter::f_size= fermi_degrees_of_freedom*(n_size-1)
 
             complex(KK),dimension(1:inner_degrees_of_freedom,&
                                   1:inner_degrees_of_freedom,&
-                                  1:boson_degrees_of_freedom)::a,boson_noise
+                                  1:boson_degrees_of_freedom),public::a,boson_noise
 
-            complex(KK),dimension(1:f_size)::fermion_noise
+            complex(KK),dimension(1:f_size),public::m_eigenvalues,fermion_noise
             complex(KK),dimension(1:f_size,&
-                                  1:f_size)::m,cm,cmm
+                                  1:f_size),public::m,cm,cmm
 
             complex(KK),dimension(1:f_size,&
                                   1:f_size,1:inner_degrees_of_freedom,&
                                            1:inner_degrees_of_freedom,&
-                                           1:boson_degrees_of_freedom)::ma
+                                           1:boson_degrees_of_freedom),public::ma
 
 
-            contains
+      contains
 
 
             subroutine make_m()
@@ -134,7 +136,6 @@
                                                    delta_31,&
                                                    delta_32
 
-                  m= .00000e+0
 
                   do mu=1,boson_degrees_of_freedom,+1
 
@@ -220,6 +221,18 @@
 
 
         end subroutine make_boson_noise
+
+
+            subroutine make_m_eigenvalues
+
+
+                  implicit none
+
+
+                  call geev(m,m_eigenvalues)
+
+
+        end subroutine make_m_eigenvalues
 
 
   end module fields
