@@ -28,15 +28,15 @@
             integer,public,parameter::p=fermi_degrees_of_freedom
 
             integer,public,parameter::n_size= inner_degrees_of_freedom&
-                                     * inner_degrees_of_freedom
+                                            * inner_degrees_of_freedom
             integer,public,parameter::a_size= boson_degrees_of_freedom* n_size
             integer,public,parameter::f_size= fermi_degrees_of_freedom*(n_size-1)
 
             complex(KK),dimension(1:inner_degrees_of_freedom,&
                                   1:inner_degrees_of_freedom,&
-                                  1:boson_degrees_of_freedom),public::a,boson_noise
+                                  1:boson_degrees_of_freedom),public::a
 
-            complex(KK),dimension(1:f_size),public::m_eigenvalues,fermion_noise
+            complex(KK),dimension(1:f_size),public::m_eigenvalues
             complex(KK),dimension(1:f_size,&
                                   1:f_size),public::m,cm,cmm
 
@@ -44,6 +44,17 @@
                                   1:f_size,1:inner_degrees_of_freedom,&
                                            1:inner_degrees_of_freedom,&
                                            1:boson_degrees_of_freedom),public::ma
+
+
+            private::make_m
+            private::make_cm
+            private::make_cmm
+
+            private::make_ma
+
+            private::make_m_eigenvalues
+
+            public::update_fields
 
 
       contains
@@ -192,23 +203,30 @@
         end subroutine make_ma
 
 
-            subroutine make_fermion_noise()
+            function fermion_noise()
 
 
                   implicit none
+
+
+                  complex(KK),dimension(1:f_size)::fermion_noise
 
 
                   call random_number(fermion_noise(:))
 
 
-        end subroutine make_fermion_noise
+        end function fermion_noise
 
 
-            subroutine make_boson_noise()
+            function boson_noise()
 
 
                   implicit none
 
+
+                  complex(KK),dimension(1:inner_degrees_of_freedom,&
+                                        1:inner_degrees_of_freedom,&
+                                        1:boson_degrees_of_freedom)::boson_noise
 
                   integer::mu
 
@@ -220,7 +238,7 @@
               end do!mu=1,boson_degrees_of_freedom,+1
 
 
-        end subroutine make_boson_noise
+        end function boson_noise
 
 
             subroutine make_m_eigenvalues
@@ -233,6 +251,24 @@
 
 
         end subroutine make_m_eigenvalues
+
+
+            subroutine update_fields()
+
+
+                  implicit none
+
+
+                  call make_m()
+                  call make_cm()
+                  call make_cmm()
+
+                  call make_ma()
+
+                  call make_m_eigenvalues()
+
+
+        end subroutine update_fields
 
 
   end module fields

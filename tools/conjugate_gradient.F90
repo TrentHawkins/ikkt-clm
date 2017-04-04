@@ -34,17 +34,17 @@
                   implicit none
 
 
-                  complex(KK),intent(in   ):: b( :             )
-                  complex(KK),intent(in   ):: a(1:size(b,dim=1),&
+                  complex(KK):: b( :             )
+                  complex(KK):: a(1:size(b,dim=1),&
                                                 1:size(b,dim=1))
-                  complex(KK),intent(inout)::x0(1:size(b,dim=1))
-                  complex(KK)              ::r0(1:size(b,dim=1))
-                  complex(KK)              ::p0(1:size(b,dim=1))
+                  complex(KK)::x0(1:size(b,dim=1))
+                  complex(KK)::r0(1:size(b,dim=1))
+                  complex(KK)::p0(1:size(b,dim=1))
                   real(   KK)              ::cb(1:size(b,dim=1))
-                  complex(KK)              ::x1(1:size(b,dim=1))
-                  complex(KK)              ::r1(1:size(b,dim=1))
+                  complex(KK)::x1(1:size(b,dim=1))
+                  complex(KK)::r1(1:size(b,dim=1))
                   real(   KK)              ::ca(1:size(b,dim=1))
-                  complex(KK)              ::p1(1:size(b,dim=1))
+                  complex(KK)::p1(1:size(b,dim=1))
 
                   integer,intent(  out),optional::count
 

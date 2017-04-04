@@ -16,6 +16,12 @@
             integer            ,private::       size_seed
             integer,allocatable,private::seed( :         )
 
+            private::prepare_seed
+
+            public::make_seed
+            public::load_seed
+            public::save_seed
+
 
       contains
 

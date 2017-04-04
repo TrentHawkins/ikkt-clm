@@ -2,7 +2,7 @@
 #     define GETOPTS_F90
 
 
-      module options
+      module get_options
 
 
             implicit none
@@ -488,7 +488,7 @@
         end subroutine
 
 
-  end module
+  end module get_options
 
 
 #  endif

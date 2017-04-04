@@ -27,10 +27,17 @@
 
             complex(KK),dimension(1:inner_degrees_of_freedom,&
                                   1:inner_degrees_of_freedom,&
-                                  1:boson_degrees_of_freedom)::drift
+                                  1:boson_degrees_of_freedom),public::drift
             complex(KK),dimension(1:inner_degrees_of_freedom,&
                                   1:inner_degrees_of_freedom,&
-                                  1:boson_degrees_of_freedom)::noise
+                                  1:boson_degrees_of_freedom),public::noise
+
+            public::make_drift
+            public::make_noise
+
+            public::initialize_fields
+
+            public::langevin_step
 
       contains
 
@@ -60,12 +67,10 @@
 
                         do i =1,inner_degrees_of_freedom,+1
 
-                           call make_fermion_noise()
-
                              drift(i,j,mu) &
-                          =  drift(i,j,mu) -determinant_degree(boson_degrees_of_freedom)*(fermion_noise &
-                         .o.ma(:,:,i,j,mu).o.               conjugate_gradient_K(cmm,cm.o.fermion_noise,&
-                                                                                          fermion_noise))
+                          =  drift(i,j,mu) -determinant_degree(boson_degrees_of_freedom)*(fermion_noise() &
+                         .o.ma(:,:,i,j,mu).o.               conjugate_gradient_K(cmm,cm.o.fermion_noise(),&
+                                                                                          fermion_noise()))
 
               end       do!i =1,inner_degrees_of_freedom,+1
 
@@ -83,13 +88,36 @@
                   implicit none
 
 
-                  noise=boson_noise
+                  noise=boson_noise()
 
 
         end subroutine make_noise
 
 
-            subroutine update_fields()
+            subroutine initialize_fields(is_hot)
+
+
+                  implicit none
+
+
+                  logical::is_hot
+
+
+                  if(is_hot==.true.) then
+
+                     a=boson_noise()
+
+                  else
+
+                     a= .00000e+0
+
+              end if!is_hot==.true.
+
+
+        end subroutine initialize_fields
+
+
+            subroutine langevin_step()
 
 
                   implicit none
@@ -98,7 +126,7 @@
                   a=a+drift*t%time_step()+noise*sqrt(t%time_step())
 
 
-        end subroutine update_fields
+        end subroutine langevin_step
 
 
   end module complex_langevin

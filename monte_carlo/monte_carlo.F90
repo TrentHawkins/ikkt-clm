@@ -23,6 +23,18 @@
             class(time(KK)),allocatable,public::s
             class(time(KK)),allocatable,public::t
 
+            private::prepare_time_K
+
+            public::make_monte_carlo_K
+            public::load_monte_carlo_K
+            public::save_monte_carlo_K
+
+
+            interface prepare_time
+
+               module procedure prepare_time_K
+
+        end interface prepare_time
 
             interface make_monte_carlo
 
@@ -30,8 +42,57 @@
 
         end interface make_monte_carlo
 
+            interface load_monte_carlo
+
+               module procedure load_monte_carlo_K
+
+        end interface load_monte_carlo
+
+            interface save_monte_carlo
+
+               module procedure save_monte_carlo_K
+
+        end interface save_monte_carlo
+
 
       contains
+
+
+            subroutine prepare_time_K(dynamic)
+
+
+                  implicit none
+
+
+                  logical,intent(in   )::dynamic
+
+
+                  if(allocated(s)) then
+
+                     deallocate(s)
+
+              end if!allocated(s)
+
+                  allocate(time(KK)::s)
+
+                  if(allocated(t)) then
+
+                     deallocate(t)
+
+              end if!allocated(t)
+
+                  if(dynamic==.true.) then
+
+                     allocate(dynamic_time(KK)::t)
+
+                  else
+
+                     allocate(        time(KK)::t)
+
+              end if!dynamic==.true.
+
+
+        end subroutine prepare_time_K!dynamic
 
 
             subroutine make_monte_carlo_K(new_name,time_setting,average_step,time_skip,dynamic)
@@ -51,114 +112,54 @@
 
                   name=new_name
 
-                  allocate(time(KK)::s);call s%make_time(time_setting,time_skip)
+                  call prepare_time(dynamic)
 
-                  if(dynamic.eq..true.) then
+                  call   make_seed()
 
-                     allocate(dynamic_time(KK)::t);call t%make_time(time_skip,average_step)
-
-                  else
-
-                     allocate(        time(KK)::t);call t%make_time(time_skip,average_step)
-
-              end if!dynamic.eq..true.
+                  call s%make_time(time_setting,time_skip)
+                  call t%make_time(time_skip,average_step)
 
 
-        end subroutine make_monte_carlo_K!name,time_setting,average_step,average_skip,dynamic_flag
+        end subroutine make_monte_carlo_K!new_name,time_setting,average_step,time_skip,dynamic
+
+
+            subroutine load_monte_carlo_K(file_name)
+
+
+                  implicit none
+
+
+                  character(*),intent(in   )::file_name
+
+
+                  call   load_seed(file_name)
+
+                  call s%load_time(file_name)
+                  call t%load_time(file_name)
+
+
+        end subroutine load_monte_carlo_K!file_name
+
+
+            subroutine save_monte_carlo_K(file_name)
+
+
+                  implicit none
+
+
+                  character(*),intent(in   )::file_name
+
+
+                  call   save_seed(file_name)
+
+                  call s%save_time(file_name)
+                  call t%save_time(file_name)
+
+
+        end subroutine save_monte_carlo_K!file_name
 
 
   end module monte_carlo
-
-
-      module monte_carlo_type
-
-
-         use random_number_generator
-
-         use time_type
-
-
-            implicit none
-
-
-            type::monte_carlo(precision)
-
-               integer,kind,public::precision
-
-               character(256)::name
-
-               class(time(precision)),allocatable,private::s
-               class(time(precision)),allocatable,private::t
-
-            contains
-
-               procedure,private::initialize_monte_carlo_K;generic::initialize_monte_carlo=>initialize_monte_carlo_K
-
-        end type  monte_carlo
-
-
-      contains
-
-
-            subroutine initialize_monte_carlo_K(this,name,time_setting,average_step,time_skip,dynamic)
-
-
-                  implicit none
-
-
-                  class(monte_carlo(KK)),intent(inout)::this
-
-                  character(*),intent(in   )::name
-
-                  real(KK),intent(in   )::time_setting
-                  real(KK),intent(in   )::average_step
-                  real(KK),intent(in   )::time_skip
-
-                  logical,intent(in   )::dynamic
-
-
-                  this%name=name
-
-                  allocate(time(KK)::this%s);call this%s%make_time(time_setting,time_skip)
-
-                  if(dynamic.eq..true.) then
-
-                     allocate(dynamic_time(KK)::this%t);call this%t%make_time(time_skip,average_step)
-
-                  else
-
-                     allocate(        time(KK)::this%t);call this%t%make_time(time_skip,average_step)
-
-              end if!dynamic.eq..true.
-
-
-        end subroutine initialize_monte_carlo_K!this,name,time_setting,average_step,average_skip,dynamic_flag
-
-
-            function monte_carlo_constructor_K(name,time_setting,average_step,time_skip,dynamic) result(that)
-
-
-                  implicit none
-
-
-                  character(*),intent(in   )::name
-
-                  real(KK),intent(in   )::time_setting
-                  real(KK),intent(in   )::average_step
-                  real(KK),intent(in   )::time_skip
-
-                  logical,intent(in   )::dynamic
-
-                  type(monte_carlo(KK))::that
-
-
-                  call initialize_monte_carlo(name,time_setting,average_step,time_skip,dynamic)
-
-
-        end function monte_carlo_constructor_K!name,time_setting,average_step,time_skip,dynamic
-
-
-  end module monte_carlo_type
 
 
 #  endif
