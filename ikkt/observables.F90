@@ -2,6 +2,7 @@
 #     define IKKT_OBSERVABLES_F90
 
 #     include "precision.F90"
+#     include "interface.F90"
 
 #     include "tensor/tensor.F90"
 
@@ -11,9 +12,11 @@
       module observables
 
 
-         use tensor_type
+            use interface
 
-         use fields
+            use tensor_type
+
+            use fields
 
 
             implicit none

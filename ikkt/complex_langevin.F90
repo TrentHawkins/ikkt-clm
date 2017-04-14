@@ -2,6 +2,7 @@
 #     define IKKT_COMPLEX_LANGEVIN_F90
 
 #     include "precision.F90"
+#     include "interface.F90"
 
 #     include "monte_carlo/monte_carlo.F90"
 
@@ -14,12 +15,14 @@
       module complex_langevin
 
 
-         use conjugate_gradient_method
+            use interface
 
-         use monte_carlo
+            use monte_carlo
 
-         use constants
-         use fields
+            use conjugate_gradient_method
+
+            use constants
+            use fields
 
 
             implicit none

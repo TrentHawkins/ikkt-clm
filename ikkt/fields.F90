@@ -2,22 +2,23 @@
 #     define IKKT_FIELDS_F90
 
 #     include "precision.F90"
+#     include "interface.F90"
 
 #     include "tensor/tensor.F90"
 
-#     include "ikkt/interface.F90"
 #     include "ikkt/constants.F90"
 
 
       module fields
 
 
-         use lapack95,only:geev
+            use lapack95,only:geev
 
-         use tensor_type
+            use interface
 
-         use interface
-         use constants
+            use tensor_type
+
+            use constants
 
 
             implicit none
@@ -46,6 +47,10 @@
                                            1:boson_degrees_of_freedom),public::ma
 
 
+            public::make_fields
+            public::load_fields
+            public::save_fields
+
             private::make_m
             private::make_cm
             private::make_cmm
@@ -54,10 +59,127 @@
 
             private::make_m_eigenvalues
 
-            public::update_fields
+            public::update_fermion_matrix
 
 
       contains
+
+
+            function fermion_noise()
+
+
+                  implicit none
+
+
+                  complex(KK),dimension(1:f_size)::fermion_noise
+
+
+                  call random_number(fermion_noise(:))
+
+
+        end function fermion_noise
+
+
+            function boson_noise()
+
+
+                  implicit none
+
+
+                  complex(KK),dimension(1:inner_degrees_of_freedom,&
+                                        1:inner_degrees_of_freedom,&
+                                        1:boson_degrees_of_freedom)::boson_noise
+
+                  integer::mu
+
+
+                  do mu=1,boson_degrees_of_freedom,+1
+
+                     call random_number(boson_noise(:,:,mu))
+
+              end do!mu=1,boson_degrees_of_freedom,+1
+
+
+        end function boson_noise
+
+
+            subroutine make_fields(is_hot)
+
+
+                  implicit none
+
+
+                  logical,intent(in   )::is_hot
+
+
+                  if(is_hot) then
+
+                     a=boson_noise()
+
+                  else
+
+                     a= .00000e+0
+
+              end if!is_hot
+
+
+        end subroutine make_fields!is_hot
+
+
+            subroutine load_fields(conf_file_name)
+
+
+                  implicit none
+
+
+                  character(*),intent(in   )::conf_file_name
+
+                  integer::unit
+                  integer::mu
+
+
+                   open(newunit=unit,file=conf_file_name)
+
+                  do mu=1,boson_degrees_of_freedom,+1
+
+                     call  read(unit,a(:,:,mu))
+
+              end do!mu=1,boson_degrees_of_freedom,+1
+
+                   read(*)
+
+                  close(unit)
+
+
+        end subroutine load_fields!conf_file_name
+
+
+            subroutine save_fields(conf_file_name)
+
+
+                  implicit none
+
+
+                  character(*),intent(in   )::conf_file_name
+
+                  integer::unit
+                  integer::mu
+
+
+                   open(newunit=unit,file=conf_file_name)
+
+                  do mu=1,boson_degrees_of_freedom,+1
+
+                     call write(unit,a(:,:,mu))
+
+              end do!mu=1,boson_degrees_of_freedom,+1
+
+                  write(*)
+
+                  close(unit)
+
+
+        end subroutine save_fields!conf_file_name
 
 
             subroutine make_m()
@@ -203,44 +325,6 @@
         end subroutine make_ma
 
 
-            function fermion_noise()
-
-
-                  implicit none
-
-
-                  complex(KK),dimension(1:f_size)::fermion_noise
-
-
-                  call random_number(fermion_noise(:))
-
-
-        end function fermion_noise
-
-
-            function boson_noise()
-
-
-                  implicit none
-
-
-                  complex(KK),dimension(1:inner_degrees_of_freedom,&
-                                        1:inner_degrees_of_freedom,&
-                                        1:boson_degrees_of_freedom)::boson_noise
-
-                  integer::mu
-
-
-                  do mu=1,boson_degrees_of_freedom,+1
-
-                     call random_number(boson_noise(:,:,mu))
-
-              end do!mu=1,boson_degrees_of_freedom,+1
-
-
-        end function boson_noise
-
-
             subroutine make_m_eigenvalues
 
 
@@ -253,7 +337,7 @@
         end subroutine make_m_eigenvalues
 
 
-            subroutine update_fields()
+            subroutine update_fermion_matrix()
 
 
                   implicit none
@@ -268,7 +352,7 @@
                   call make_m_eigenvalues()
 
 
-        end subroutine update_fields
+        end subroutine update_fermion_matrix
 
 
   end module fields

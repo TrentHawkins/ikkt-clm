@@ -1,9 +1,10 @@
 !     ifort v2017.2
 
-!     ifort -module "ifort/module" -w main.F90 -mkl=sequential -lmkl_lapack95_lp64 -lmkl_core -lpthread -lm -ldl
+!     ifort -module "ifort/modules" -w main.F90 -mkl=sequential -lmkl_lapack95_lp64 -lmkl_core -lpthread -lm -ldl
 
 #     include "getopts.F90"
 #     include "precision.F90"
+#     include "interface.F90"
 
 #     include "tensor/tensor.F90"
 
@@ -15,7 +16,6 @@
 #     include "tools/brent_minimization.F90"
 #     include "tools/conjugate_gradient.F90"
 
-#     include "ikkt/interface.F90"
 #     include "ikkt/constants.F90"
 #     include "ikkt/fields.F90"
 #     include "ikkt/complex_langevin.F90"
@@ -26,8 +26,18 @@
 
 
             use get_options
-
             use interface
+
+            use tensor_type
+
+            use random_number_generator
+            use average_type
+            use time_type
+            use monte_carlo
+
+            use brent_minimization
+            use conjugate_gradient_method
+
             use constants
             use fields
             use complex_langevin
@@ -37,28 +47,47 @@
             implicit none
 
 
-            logical::configuration_loaded
-            logical::timestep_is_variable
-            logical::start_field_is_hot
+            call begin_ikkt_simulation()
 
 
       contains
 
 
-            subroutine begin_ikkt_simulation(file_base_name,argind,argnum)
+            subroutine begin_ikkt_simulation()
 
 
                   implicit none
 
 
-                  character(len=500),intent(  out)::file_base_name
+                  call read_options()
+                  call set_file_names()
 
-                  character                       ::opchar ! currently parsed option
-                  character(len=500)              ::optarg ! currently parsed argument value if not an option
-                  integer                         ::arglen ! currently parsed argument true length
-                  integer                         ::status ! status of parsing option
-                  integer           ,intent(  out)::argind ! current argument running index starting where the options end
-                  integer           ,intent(  out)::argnum ! number of remaining indices options aside
+                  if(configuration_loaded) then
+
+                     call load_monte_carlo(time_setting,average_step,time_skip,timestep_is_variable,seed_file_name,time_file_name)
+
+                  else
+
+                     call make_monte_carlo(time_setting,average_step,time_skip,timestep_is_variable)
+
+              end if!configuration_loaded
+
+
+        end subroutine begin_ikkt_simulation!base_file_name
+
+
+            subroutine read_options()
+
+
+                  implicit none
+
+
+                  character     ::optchar ! currently parsed option
+                  character(500)::optarg  ! currently parsed argument value if not an option
+                  integer       ::arglen  ! currently parsed argument true length
+                  integer       ::stat    ! stat of parsing option
+                  integer       ::argind  ! current argument running index starting where the options end
+                  integer       ::argnum  ! number of remaining indices options aside
 
                   type(option)::options(3) ! list of long options
 
@@ -71,20 +100,20 @@
 
                      call getopt(options='cta'  ,&
                                 longopts=options,&
-                                 optchar=opchar ,&
+                                 optchar=optchar,&
                                   optarg=optarg ,&
                                   arglen=arglen ,&
-                                    stat=status ,&
+                                    stat=stat   ,&
                                   offset=argind ,&
                                   remain=argnum)
 
-                     if(status==1)then
+                     if(stat==1)then
 
                         exit
 
-              end    if!status==1
+              end    if!stat==1
 
-                     select case(opchar)
+                     select case(optchar)
 
                      case('c')
 
@@ -108,38 +137,52 @@
 
                         case default
 
-                           stop 'Error: You must define initial field configuration temperature (not implied).'
+                           stop 'Error: an initial field configuration temperature must be explicitely defined'
 
               end       select!case(optarg)
 
                      case default
 
-              end    select!case(opchar)
+              end    select!case(optchar)
 
               end do
 
-                  call get_command_argument(argind+1,optarg,status)
+                  call get_command_argument(argind+1,optarg,stat)
 
-                  select case(status)
+                  select case(stat)
 
                   case(-1)
 
-                     print *,'Warning: file base-name too long and was truncated'
+                     print *,'Warning: file base name provided is too long and was truncated'
 
-                     file_base_name=optarg
+                     base_file_name=trim(adjustl(optarg))
 
                   case( 0)
 
-                     file_base_name=optarg
+                     base_file_name=trim(adjustl(optarg))
 
                   case(+1)
 
-                     stop 'Error: file base-name must be provided to store simulation status'
+                     stop 'Error: a file base name must be provided to store simulation stat'
 
-              end select!case(opchar)
+              end select!case(optchar)
 
 
-        end subroutine begin_ikkt_simulation!file_base_name
+        end subroutine read_options
+
+
+            subroutine set_file_names()
+
+
+                  implicit none
+
+
+                  seed_file_name=trim(adjustl(base_file_name))//'.seed'
+                  time_file_name=trim(adjustl(base_file_name))//'.time'
+                  conf_file_name=trim(adjustl(base_file_name))//'.conf'
+
+
+        end subroutine set_file_names
 
 
   end program main

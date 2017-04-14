@@ -9,15 +9,12 @@
       module monte_carlo
 
 
-         use random_number_generator
-         use average_type
-         use time_type
+            use random_number_generator
+            use average_type
+            use time_type
 
 
             implicit none
-
-
-            character(256),public::name
 
 
             class(time(KK)),allocatable,public::s
@@ -58,13 +55,13 @@
       contains
 
 
-            subroutine prepare_time_K(dynamic)
+            subroutine prepare_time_K(is_dynamic)
 
 
                   implicit none
 
 
-                  logical,intent(in   )::dynamic
+                  logical,intent(in   )::is_dynamic
 
 
                   if(allocated(s)) then
@@ -81,7 +78,7 @@
 
               end if!allocated(t)
 
-                  if(dynamic==.true.) then
+                  if(is_dynamic==.true.) then
 
                      allocate(dynamic_time(KK)::t)
 
@@ -89,74 +86,77 @@
 
                      allocate(        time(KK)::t)
 
-              end if!dynamic==.true.
+              end if!is_dynamic==.true.
 
 
-        end subroutine prepare_time_K!dynamic
+        end subroutine prepare_time_K!is_dynamic
 
 
-            subroutine make_monte_carlo_K(new_name,time_setting,average_step,time_skip,dynamic)
+            subroutine make_monte_carlo_K(time_setting,average_step,time_skip,is_dynamic)
 
 
                   implicit none
 
-
-                  character(*),intent(in   )::new_name
 
                   real(KK),intent(in   )::time_setting
                   real(KK),intent(in   )::average_step
                   real(KK),intent(in   )::time_skip
 
-                  logical,intent(in   )::dynamic
+                  logical,intent(in   )::is_dynamic
 
 
-                  name=new_name
+                  call prepare_time(is_dynamic)
 
-                  call prepare_time(dynamic)
-
-                  call   make_seed()
-
+                  call   make_seed(                      )
                   call s%make_time(time_setting,time_skip)
                   call t%make_time(time_skip,average_step)
 
 
-        end subroutine make_monte_carlo_K!new_name,time_setting,average_step,time_skip,dynamic
+        end subroutine make_monte_carlo_K!time_setting,average_step,time_skip,is_dynamic
 
 
-            subroutine load_monte_carlo_K(file_name)
-
-
-                  implicit none
-
-
-                  character(*),intent(in   )::file_name
-
-
-                  call   load_seed(file_name)
-
-                  call s%load_time(file_name)
-                  call t%load_time(file_name)
-
-
-        end subroutine load_monte_carlo_K!file_name
-
-
-            subroutine save_monte_carlo_K(file_name)
+            subroutine load_monte_carlo_K(time_setting,average_step,time_skip,is_dynamic,seed_file_name,time_file_name)
 
 
                   implicit none
 
 
-                  character(*),intent(in   )::file_name
+                  real(KK),intent(in   )::time_setting
+                  real(KK),intent(in   )::average_step
+                  real(KK),intent(in   )::time_skip
+
+                  logical,intent(in   )::is_dynamic
+
+                  character(*),intent(in   )::seed_file_name
+                  character(*),intent(in   )::time_file_name
 
 
-                  call   save_seed(file_name)
+                  call prepare_time(is_dynamic)
 
-                  call s%save_time(file_name)
-                  call t%save_time(file_name)
+                  call   load_seed(                       trim(adjustl(seed_file_name)))
+                  call s%load_time(time_setting,time_skip,trim(adjustl(time_file_name)))
+                  call t%load_time(time_skip,average_step,trim(adjustl(time_file_name)))
 
 
-        end subroutine save_monte_carlo_K!file_name
+        end subroutine load_monte_carlo_K!time_setting,average_step,time_skip,is_dynamic,seed_file_name,time_file_name
+
+
+            subroutine save_monte_carlo_K(seed_file_name,time_file_name)
+
+
+                  implicit none
+
+
+                  character(*),intent(in   )::seed_file_name
+                  character(*),intent(in   )::time_file_name
+
+
+                  call   save_seed(trim(adjustl(seed_file_name)))
+                  call s%save_time(trim(adjustl(time_file_name)))
+                  call t%save_time(trim(adjustl(time_file_name)))
+
+
+        end subroutine save_monte_carlo_K!seed_file_name,time_file_name
 
 
   end module monte_carlo

@@ -10,6 +10,10 @@
             implicit none
 
 
+            character(*),private,parameter::           format_tensor_K=COMPLEXGK
+            character(*),private,parameter::text_field_format_tensor_K=COMPLEXAK
+
+
             interface vector
 
                module procedure vector_matrix_constructor_K
@@ -117,6 +121,20 @@
                module procedure matrix_random_number_K
 
         end interface random_number
+
+            interface  read
+
+               module procedure  read_vector_K
+               module procedure  read_matrix_K
+
+        end interface  read
+
+            interface write
+
+               module procedure write_vector_K
+               module procedure write_matrix_K
+
+        end interface write
 
 
       contains
@@ -770,6 +788,118 @@
 
 
         end subroutine matrix_random_number_K!matrix0
+
+
+            subroutine  read_vector_K(unit,vector0)
+
+
+                  implicit none
+
+
+                  integer    ,intent(in   )::unit
+                  complex(KK),intent(inout)::vector0(1:)
+
+                  integer::i
+
+
+                  do i=1,size(vector0,dim=1),+1
+
+                      read(unit,format_tensor_K) vector0(i)
+
+              end do!i=1,size(vector0,dim=1),+1
+
+                   read(unit,*)
+
+
+        end subroutine  read_vector_K!unit,vector0
+
+
+            subroutine  read_matrix_K(unit,matrix0)
+
+
+                  implicit none
+
+
+                  integer    ,intent(in   )::unit
+                  complex(KK),intent(inout)::matrix0(1:,&
+                                                     1:)
+
+                  integer::i
+                  integer::j
+
+
+                  do j=1,size(matrix0,dim=2),+1
+
+                     do i=1,size(matrix0,dim=1),+1
+
+                         read(unit,format_tensor_K) matrix0(i,j)
+
+              end    do!i=1,size(matrix0,dim=1),+1
+
+                      read(unit,*)
+
+              end do!j=1,size(matrix0,dim=2),+1
+
+                   read(unit,*)
+
+
+        end subroutine  read_matrix_K!unit,matrix0
+
+
+            subroutine write_vector_K(unit,vector0)
+
+
+                  implicit none
+
+
+                  integer    ,intent(in   )::unit
+                  complex(KK),intent(in   )::vector0(1:)
+
+                  integer::i
+
+
+                  do i=1,size(vector0,dim=1),+1
+
+                     write(unit,format_tensor_K) vector0(i)
+
+              end do!i=1,size(vector0,dim=1),+1
+
+                  write(unit,*)
+
+
+        end subroutine write_vector_K!unit,vector0
+
+
+            subroutine write_matrix_K(unit,matrix0)
+
+
+                  implicit none
+
+
+                  integer    ,intent(in   )::unit
+                  complex(KK),intent(in   )::matrix0(1:,&
+                                                     1:)
+
+                  integer::i
+                  integer::j
+
+
+                  do j=1,size(matrix0,dim=2),+1
+
+                     do i=1,size(matrix0,dim=1),+1
+
+                        write(unit,format_tensor_K) matrix0(i,j)
+
+              end    do!i=1,size(matrix0,dim=1),+1
+
+                     write(unit,*)
+
+              end do!j=1,size(matrix0,dim=2),+1
+
+                  write(unit,*)
+
+
+        end subroutine write_matrix_K!unit,matrix0
 
 
   end module tensor_type

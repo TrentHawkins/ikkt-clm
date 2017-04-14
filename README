@@ -1,0 +1,3 @@
+IKKT Matrix model: Complex Langevin method (object-oriented-implementation)
+
+compile with: ifort -module "ifort/modules" -w main.F90 -mkl=sequential -lmkl_lapack95_lp64 -lmkl_core -lpthread -lm -ldl

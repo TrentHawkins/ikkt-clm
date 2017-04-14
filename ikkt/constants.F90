@@ -9,7 +9,7 @@
       module constants
 
 
-         use tensor_type
+            use tensor_type
 
 
             implicit none
@@ -115,11 +115,11 @@
 
                   case(4,6)
 
-                     determinant_degree=+01.00
+                     determinant_degree= 01.00
 
                   case(10)
 
-                     determinant_degree=+00.50
+                     determinant_degree= 00.50
 
               end select!case(boson_degrees_of_freedom)
 

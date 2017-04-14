@@ -64,38 +64,38 @@
         end subroutine make_seed
 
 
-            subroutine load_seed(file_name)
+            subroutine load_seed(seed_file_name)
 
 
                   implicit none
 
 
-                  character(*),intent(in   )::file_name
+                  character(*),intent(in   )::seed_file_name
 
                   integer::unit
 
 
                   call prepare_seed()
 
-                   open(newunit=unit,file=file_name)
-                   read(        unit,format_integer) seed
-                  close(        unit)
+                   open(newunit=unit,file=seed_file_name)
+                   read(        unit,     format_integer) seed
+                  close(        unit                    )
 
                   call random_seed(put=seed)
 
                   deallocate(seed)
 
 
-        end subroutine load_seed!file_name
+        end subroutine load_seed!seed_file_name
 
 
-            subroutine save_seed(file_name)
+            subroutine save_seed(seed_file_name)
 
 
                   implicit none
 
 
-                  character(*),intent(in   )::file_name
+                  character(*),intent(in   )::seed_file_name
 
                   integer::unit
 
@@ -104,14 +104,14 @@
 
                   call random_seed(get=seed)
 
-                   open(newunit=unit,file=file_name)
-                  write(        unit,format_integer) seed
-                  close(        unit)
+                   open(newunit=unit,file=seed_file_name)
+                  write(        unit,     format_integer) seed
+                  close(        unit                    )
 
                   deallocate(seed)
 
 
-        end subroutine save_seed!unit,file_name
+        end subroutine save_seed!unit,seed_file_name
 
 
   end module random_number_generator

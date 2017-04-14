@@ -9,7 +9,7 @@
       module time_type
 
 
-         use average_type
+            use average_type
 
 
             implicit none
@@ -202,7 +202,7 @@
         end subroutine time_assignment_K!this,that
 
 
-            subroutine load_time_K(this,file_name)
+            subroutine load_time_K(this,time_setting,average_step,time_file_name)
 
 
                   implicit none
@@ -210,21 +210,26 @@
 
                   class(time(KK)),intent(inout)::this
 
-                  character(*),intent(in   )::file_name
+                  real(KK),intent(in   )::time_setting
+                  real(KK),intent(in   )::average_step
+
+                  character(*),intent(in   )::time_file_name
 
                   integer::unit
 
 
-                   open(newunit=unit,file=file_name)
-                   read(        unit,             *) this
-                  close(        unit               )
+                  call this%make_time(time_setting,average_step)
+
+                   open(newunit=unit,file=time_file_name)
+                   read(        unit,                  *) this
+                  close(        unit                    )
 
 
 
-        end subroutine load_time_K!this,file_name
+        end subroutine load_time_K!this,time_setting,average_step,time_file_name
 
 
-            subroutine save_time_K(this,file_name)
+            subroutine save_time_K(this,time_file_name)
 
 
                   implicit none
@@ -232,17 +237,17 @@
 
                   class(time(KK)),intent(in   )::this
 
-                  character(*),intent(in   )::file_name
+                  character(*),intent(in   )::time_file_name
 
                   integer::unit
 
 
-                   open(newunit=unit,file=file_name)
-                  write(        unit,             *) this
-                  close(        unit               )
+                   open(newunit=unit,file=time_file_name)
+                  write(        unit,                  *) this
+                  close(        unit                    )
 
 
-        end subroutine save_time_K!this,file_name
+        end subroutine save_time_K!this,time_file_name
 
 
             logical function time_left_K(this)
