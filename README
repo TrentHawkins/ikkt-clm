@@ -1,3 +1,16 @@
 IKKT Matrix model: Complex Langevin method (object-oriented-implementation)
 
-compile with: ifort -module "ifort/modules" -w main.F90 -mkl=sequential -lmkl_lapack95_lp64 -lmkl_core -lpthread -lm -ldl
+compile with:
+ifort -module "ifort/modules" -w main.F90 -mkl=sequential -lmkl_lapack95_lp64
+
+pending simulation work:
+- add simulation command body (simulation core is complete, referring to main)
+- add simulation end (wrapper)
+- add more observables
+- add gauge-cooling
+- add several method alterations to facilitate IKKT CLM study
+
+pending technical work:
+- add LAPACK support for multiplication
+- implement machine parallel support (openMP)
+- implement cluster parallel support (MPI)
