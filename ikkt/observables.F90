@@ -6,23 +6,55 @@
 
 #     include "tensor/tensor.F90"
 
+#     include "monte_carlo/time.F90"
+
 #     include "ikkt/fields.F90"
+#     include "ikkt/complex_langevin.F90"
 
 
       module observables
 
 
-            use interface
+            use::interface
 
-            use tensor_type
+            use::tensor_type
 
-            use fields
+            use::time_type
+
+            use::fields
+            use::complex_langevin
 
 
             implicit none
 
 
+            character(*),private,parameter::           format_observables_K=COMPLEXGK
+            character(*),private,parameter::text_field_format_observables_K=COMPLEXAK
+
+            public::print_observables
+
+            private::  boson_action
+            private::fermion_action
+
+
       contains
+
+
+            subroutine print_observables(unit,measurement_time)
+
+
+                  implicit none
+
+
+                  integer        ,intent(in   )::unit
+                  class(time(KK)),intent(in   )::measurement_time
+
+
+                  write(unit,                   *) measurement_time
+                  write(unit,format_observables_K) boson_action(),fermion_action()
+
+
+        end subroutine print_observables
 
 
             function boson_action()
@@ -31,12 +63,12 @@
                   implicit none
 
 
-                  complex(KK)::boson_action
+                  real(KK)::boson_action
 
                   integer::mu,nu
 
 
-                  boson_action= .00000e+0
+                  boson_action=+.00000e+0
 
                   do mu=1,inner_degrees_of_freedom,+1
 

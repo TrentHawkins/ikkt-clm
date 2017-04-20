@@ -32,7 +32,7 @@
 
 !           do
 !              call getopt (...,optchar=c,...)
-!              if(stat/=0)then
+!              if(stat/=0) then
 !      !          optional error handling
 !                 exit
 !       end    if
@@ -45,7 +45,7 @@
             subroutine getopt(options,longopts,optchar,optarg,arglen,stat,offset,remain,err)
 
 
-                  use iso_fortran_env,only:error_unit
+                  use::iso_fortran_env,only:error_unit
 
 
                   implicit none
@@ -117,7 +117,7 @@
                   logical::long
 
 
-                  if(cnt==0)then
+                  if(cnt==0) then
 
                      cnt=command_argument_count()
 
@@ -127,7 +127,7 @@
 
             !     no more arguments left
 
-                  if(pos>cnt)then
+                  if(pos>cnt) then
 
                      pos=pos-1
                      st=1
@@ -139,13 +139,13 @@
 
             !     is argument an option?
 
-                  if(arg(1:1)=='-')then
+                  if(arg(1:1)=='-') then
 
                      chr=arg(2:2)
 
                !     too long ('-xxxx...') for one dash?
 
-                     if(chr/='-'.and.len_trim(arg)>2)then
+                     if(chr/='-'.and.len_trim(arg)>2) then
 
                         st=-1
                         goto 10
@@ -154,7 +154,7 @@
 
             !        forced stop ('--')
 
-                     if(chr=='-'.and.arg(3:3)==' ')then
+                     if(chr=='-'.and.arg(3:3)==' ') then
 
                         st=1
                         goto 10
@@ -163,7 +163,7 @@
 
             !        long option ('--xxx...')
 
-                     if(chr=='-')then
+                     if(chr=='-') then
 
                         long=.true.
 
@@ -173,7 +173,7 @@
 
             !           option is invalid, stop
 
-                        if(id==0)then
+                        if(id==0) then
 
                            st=-1
                            goto 10
@@ -184,7 +184,7 @@
 
             !           check if option requires an argument
 
-                        if(.not.longopts(id)%has_arg)then
+                        if(.not.longopts(id)%has_arg) then
 
                            st=0
                            goto 10
@@ -193,7 +193,7 @@
 
             !           check if there are still arguments left
 
-                        if(pos==cnt)then
+                        if(pos==cnt) then
 
                            st=-2
                            goto 10
@@ -210,7 +210,7 @@
 
             !           make sure it is not an option
 
-                        if(arg(1:1)=='-')then
+                        if(arg(1:1)=='-') then
 
                            st=-2
                            pos=pos-1
@@ -224,7 +224,7 @@
 
             !        check if valid
 
-                     if(present(options))then
+                     if(present(options)) then
 
                         chrpos=scan(options,chr)
 
@@ -236,7 +236,7 @@
 
             !        option is invalid, stop
 
-                     if(chrpos==0)then
+                     if(chrpos==0) then
 
                         st=-1
                         goto 10
@@ -245,15 +245,17 @@
 
             !        look for argument requirement
 
-                     if(chrpos<len_trim(options))then
+                     if(chrpos<len_trim(options)) then
 
-                        if(options(chrpos+1:chrpos+1)==':')then
+                        if(options(chrpos+1:chrpos+1)==':') then
 
             !              check if there are still arguments left
 
-                           if(pos==cnt)then
+                           if(pos==cnt) then
+
                               st=-2
                               goto 10
+
               end          if!pos==cnt
 
             !              go to next position
@@ -262,11 +264,11 @@
 
             !              get argument
 
-                           call get_command_argument (pos,arg,length)
+                           call get_command_argument(pos,arg,length)
 
             !              make sure it is not an option
 
-                           if(arg(1:1)=='-')then
+                           if(arg(1:1)=='-') then
 
                               st=-2
                               pos=pos-1
@@ -280,6 +282,7 @@
 
             !        if we get to this point, no error happened
             !        return option and the argument (if there is one)
+
                      st=0
                      goto 10
 
@@ -298,9 +301,9 @@
 
    10             continue
 
-                  if(present(err))then
+                  if(present(err)) then
 
-                     if(err)then
+                     if(err) then
 
                         select case(st)
 
@@ -310,7 +313,7 @@
 
                                case(-2)
 
-                           if(.not.long)then
+                           if(.not.long) then
 
                               write (error_unit,*) "error: option -"//chr//" requires an argument"
 
@@ -326,37 +329,37 @@
 
               end if!present(err)
 
-                  if(present(optchar))then
+                  if(present(optchar)) then
 
                      optchar=chr
 
               end if!present(optchar)
 
-                  if(present(optarg))then
+                  if(present(optarg)) then
 
                      optarg=arg
 
               end if!present(optarg)
 
-                  if(present(arglen))then
+                  if(present(arglen)) then
 
                      arglen=length
 
               end if!present(arglen)
 
-                  if(present(stat))then
+                  if(present(stat)) then
 
                      stat=st
 
               end if!present(stat)
 
-                  if(present(offset))then
+                  if(present(offset)) then
 
                      offset=pos
 
               end if!present(offset)
 
-                  if(present(remain))then
+                  if(present(remain)) then
 
                      remain=cnt-pos
 
@@ -381,7 +384,7 @@
 
                   !     if there are no long options,skip the loop
 
-                        if(.not.present(longopts))then
+                        if(.not.present(longopts)) then
 
                            goto 20
 
@@ -389,7 +392,7 @@
 
                         do i=1,size(longopts)
 
-                           if(name==longopts(i)%name)then
+                           if(name==longopts(i)%name) then
 
                               lookup=i
                               return
@@ -428,7 +431,7 @@
                   integer,intent(in)::unit
                   integer::l,c1,c2
 
-                  if(opt%has_arg)then
+                  if(opt%has_arg) then
 
                      write (unit,'(1x,"-",a,1x,a)') opt%chr,trim(opt%argname)
                      write (unit,'(1x,"--",a,1x,a)') trim(opt%name),trim(opt%argname)
@@ -449,7 +452,7 @@
 
                   do
 
-                     if(c1>l)then
+                     if(c1>l) then
 
                         exit
 
@@ -461,13 +464,13 @@
 
             !        if not at the end of the whole string
 
-                     if(c2/=500)then
+                     if(c2/=500) then
 
             !           find the end of a word
 
                         do
 
-                           if(opt%descr(c2:c2)==' ')then
+                           if(opt%descr(c2:c2)==' ') then
 
                               exit
 

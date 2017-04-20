@@ -9,9 +9,9 @@
       module monte_carlo
 
 
-            use random_number_generator
-            use average_type
-            use time_type
+            use::random_number_generator
+            use::average_type
+            use::time_type
 
 
             implicit none
@@ -72,6 +72,8 @@
 
                   allocate(time(KK)::s)
 
+                  write(*,*) s!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
                   if(allocated(t)) then
 
                      deallocate(t)
@@ -92,7 +94,7 @@
         end subroutine prepare_time_K!is_dynamic
 
 
-            subroutine make_monte_carlo_K(time_setting,average_step,time_skip,is_dynamic)
+            subroutine make_monte_carlo_K(time_setting,average_step,ac_time_skip,is_dynamic)
 
 
                   implicit none
@@ -100,22 +102,22 @@
 
                   real(KK),intent(in   )::time_setting
                   real(KK),intent(in   )::average_step
-                  real(KK),intent(in   )::time_skip
+                  real(KK),intent(in   )::ac_time_skip
 
                   logical,intent(in   )::is_dynamic
 
 
                   call prepare_time(is_dynamic)
 
-                  call   make_seed(                      )
-                  call s%make_time(time_setting,time_skip)
-                  call t%make_time(time_skip,average_step)
+                  call   make_seed(                         )
+                  call s%make_time(time_setting,ac_time_skip)
+                  call t%make_time(ac_time_skip,average_step)
 
 
-        end subroutine make_monte_carlo_K!time_setting,average_step,time_skip,is_dynamic
+        end subroutine make_monte_carlo_K!time_setting,average_step,ac_time_skip,is_dynamic
 
 
-            subroutine load_monte_carlo_K(time_setting,average_step,time_skip,is_dynamic,seed_file_name,time_file_name)
+            subroutine load_monte_carlo_K(time_setting,average_step,ac_time_skip,is_dynamic,seed_file_name,time_file_name)
 
 
                   implicit none
@@ -123,7 +125,7 @@
 
                   real(KK),intent(in   )::time_setting
                   real(KK),intent(in   )::average_step
-                  real(KK),intent(in   )::time_skip
+                  real(KK),intent(in   )::ac_time_skip
 
                   logical,intent(in   )::is_dynamic
 
@@ -133,12 +135,12 @@
 
                   call prepare_time(is_dynamic)
 
-                  call   load_seed(                       trim(adjustl(seed_file_name)))
-                  call s%load_time(time_setting,time_skip,trim(adjustl(time_file_name)))
-                  call t%load_time(time_skip,average_step,trim(adjustl(time_file_name)))
+                  call   load_seed(                          trim(adjustl(seed_file_name)))
+                  call s%load_time(time_setting,ac_time_skip,trim(adjustl(time_file_name)))
+                  call t%load_time(ac_time_skip,average_step,trim(adjustl(time_file_name)))
 
 
-        end subroutine load_monte_carlo_K!time_setting,average_step,time_skip,is_dynamic,seed_file_name,time_file_name
+        end subroutine load_monte_carlo_K!time_setting,average_step,ac_time_skip,is_dynamic,seed_file_name,time_file_name
 
 
             subroutine save_monte_carlo_K(seed_file_name,time_file_name)

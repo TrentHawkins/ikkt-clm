@@ -12,13 +12,13 @@
       module fields
 
 
-            use lapack95,only:geev
+            use::lapack95,only:geev
 
-            use interface
+            use::interface
 
-            use tensor_type
+            use::tensor_type
 
-            use constants
+            use::constants
 
 
             implicit none
@@ -118,7 +118,7 @@
 
                   else
 
-                     a= .00000e+0
+                     a=+.00000e+0
 
               end if!is_hot
 
@@ -195,7 +195,7 @@
                                                    a_delta1,&
                                                    a_delta2
 
-                  m= .00000e+0
+                  m=+.00000e+0
 
                   do mu=1,boson_degrees_of_freedom,+1
 
@@ -270,9 +270,7 @@
                                                    delta_32
 
 
-                  do mu=1,boson_degrees_of_freedom,+1
-
-                     do j =1,inner_degrees_of_freedom,+1
+                  do j =1,inner_degrees_of_freedom,+1
 
                         do i =1,inner_degrees_of_freedom,+1
 
@@ -311,15 +309,17 @@
 
               end          do!j2=1,inner_degrees_of_freedom,+1
 
+                        do mu=1,boson_degrees_of_freedom,+1
+
                            ma(:,:,i,j,mu)=gamma(:,:,mu).x.(delta_30(:,:) &
                                                         -  delta_31(:,:) &
                                                         -  delta_32(:,:))
 
-              end       do!i =1,inner_degrees_of_freedom,+1
+              end       do!mu=1,boson_degrees_of_freedom,+1
 
-              end    do!j =1,inner_degrees_of_freedom,+1
+              end    do!i =1,inner_degrees_of_freedom,+1
 
-              end do!mu=1,boson_degrees_of_freedom,+1
+              end do!j =1,inner_degrees_of_freedom,+1
 
 
         end subroutine make_ma

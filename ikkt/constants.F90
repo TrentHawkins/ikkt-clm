@@ -9,7 +9,7 @@
       module constants
 
 
-            use tensor_type
+            use::tensor_type
 
 
             implicit none

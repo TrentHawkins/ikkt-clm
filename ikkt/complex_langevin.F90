@@ -15,14 +15,14 @@
       module complex_langevin
 
 
-            use interface
+            use::interface
 
-            use monte_carlo
+            use::monte_carlo
 
-            use conjugate_gradient_method
+            use::conjugate_gradient_method
 
-            use constants
-            use fields
+            use::constants
+            use::fields
 
 
             implicit none
@@ -35,14 +35,26 @@
                                   1:inner_degrees_of_freedom,&
                                   1:boson_degrees_of_freedom),public::noise
 
+            public::langevin_step
+
             public::make_drift
             public::make_noise
 
-            public::initialize_fields
-
-            public::langevin_step
+            public::drift_norm
 
       contains
+
+
+            subroutine langevin_step()
+
+
+                  implicit none
+
+
+                  a=a+drift*t%time_step()+noise*sqrt(t%time_step())
+
+
+        end subroutine langevin_step
 
 
             subroutine make_drift()
@@ -54,7 +66,7 @@
                   integer::mu,nu,i,j
 
 
-                  drift= .00000e+0
+                  drift=+.00000e+0
 
                   do mu=1,boson_degrees_of_freedom,+1
 
@@ -97,39 +109,31 @@
         end subroutine make_noise
 
 
-            subroutine initialize_fields(is_hot)
+            function drift_norm()
 
 
                   implicit none
 
 
-                  logical::is_hot
+                  real(KK)::drift_norm
+
+                  integer::mu
 
 
-                  if(is_hot==.true.) then
+                  drift_norm=+.00000e+0
 
-                     a=boson_noise()
+                  do mu=1,inner_degrees_of_freedom,+1
 
-                  else
+                     drift_norm&
+                    =drift_norm+norm(drift(:,:,mu))
 
-                     a= .00000e+0
+              end do!mu=1,inner_degrees_of_freedom,+1
 
-              end if!is_hot==.true.
-
-
-        end subroutine initialize_fields
-
-
-            subroutine langevin_step()
+                  drift_norm&
+                 =drift_norm/a_size
 
 
-                  implicit none
-
-
-                  a=a+drift*t%time_step()+noise*sqrt(t%time_step())
-
-
-        end subroutine langevin_step
+        end function drift_norm
 
 
   end module complex_langevin
