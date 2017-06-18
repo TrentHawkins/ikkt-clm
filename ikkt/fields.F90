@@ -1,8 +1,7 @@
 #     ifndef IKKT_FIELDS_F90
 #     define IKKT_FIELDS_F90
 
-#     include "precision.F90"
-#     include "interface.F90"
+#     include "main/precision.F90"
 
 #     include "tensor/tensor.F90"
 
@@ -12,9 +11,7 @@
       module fields
 
 
-            use::lapack95,only:geev
-
-            use::interface
+            use::lapack95,only:ggev
 
             use::tensor_type
 
@@ -24,27 +21,45 @@
             implicit none
 
 
-            integer,public,parameter::n=inner_degrees_of_freedom
-            integer,public,parameter::d=boson_degrees_of_freedom
-            integer,public,parameter::p=fermi_degrees_of_freedom
+            logical,public::configuration_loaded=.false.
+            logical,public::start_field_is_hot
 
-            integer,public,parameter::n_size= inner_degrees_of_freedom&
-                                            * inner_degrees_of_freedom
-            integer,public,parameter::a_size= boson_degrees_of_freedom* n_size
-            integer,public,parameter::f_size= fermi_degrees_of_freedom*(n_size-1)
+            character(:),allocatable,public::conf_file_name
 
-            complex(KK),dimension(1:inner_degrees_of_freedom,&
-                                  1:inner_degrees_of_freedom,&
-                                  1:boson_degrees_of_freedom),public::a
+            integer,public,parameter::inner_degrees_of_freedom=4,&
+                                      boson_degrees_of_freedom=6,&
+                                      fermi_degrees_of_freedom=2 &
+                                   **(boson_degrees_of_freedom/2 &
+                                                              -1)
 
-            complex(KK),dimension(1:f_size),public::m_eigenvalues
-            complex(KK),dimension(1:f_size,&
-                                  1:f_size),public::m,cm,cmm
+            integer,public,parameter::n=inner_degrees_of_freedom,&
+                                      d=boson_degrees_of_freedom,&
+                                      p=fermi_degrees_of_freedom
 
-            complex(KK),dimension(1:f_size,&
-                                  1:f_size,1:inner_degrees_of_freedom,&
-                                           1:inner_degrees_of_freedom,&
-                                           1:boson_degrees_of_freedom),public::ma
+            integer,public,parameter::n_size=inner_degrees_of_freedom &
+                                            *inner_degrees_of_freedom,&
+                                      a_size=boson_degrees_of_freedom &
+                                            *inner_degrees_of_freedom &
+                                            *inner_degrees_of_freedom,&
+                                      f_size=fermi_degrees_of_freedom &
+                                            *inner_degrees_of_freedom &
+                                            *inner_degrees_of_freedom
+
+            complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                  0:inner_degrees_of_freedom-1,&
+                                  0:boson_degrees_of_freedom-1),public::a,boson_noise
+
+            complex(KK),dimension(0:f_size-1),public::m_eigenvalues0,&
+                                                      m_eigenvalues1,fermion_noise
+            complex(KK),dimension(0:f_size-1,&
+                                  0:f_size-1),public::m,&
+                                                     cm,&
+                                                    cmm,&
+                                                      m_kernel
+            complex(KK),dimension(0:f_size-1,&
+                                  0:f_size-1,0:inner_degrees_of_freedom-1,&
+                                             0:inner_degrees_of_freedom-1,&
+                                             0:boson_degrees_of_freedom-1),public::ma
 
 
             public::make_fields
@@ -59,80 +74,74 @@
 
             private::make_m_eigenvalues
 
+            public::make_m_kernel
             public::update_fermion_matrix
 
 
       contains
 
 
-            function fermion_noise()
+            subroutine make_boson_noise()
 
 
                   implicit none
 
 
-                  complex(KK),dimension(1:f_size)::fermion_noise
+                  integer::mu
+
+
+                  do mu=0,boson_degrees_of_freedom-1,+1
+
+                     call random_number(boson_noise(:,:,mu))
+
+              end do!mu=0,boson_degrees_of_freedom-1,+1
+
+
+        end subroutine make_boson_noise
+
+
+            subroutine make_fermion_noise()
+
+
+                  implicit none
 
 
                   call random_number(fermion_noise(:))
 
 
-        end function fermion_noise
+        end subroutine make_fermion_noise
 
 
-            function boson_noise()
-
-
-                  implicit none
-
-
-                  complex(KK),dimension(1:inner_degrees_of_freedom,&
-                                        1:inner_degrees_of_freedom,&
-                                        1:boson_degrees_of_freedom)::boson_noise
-
-                  integer::mu
-
-
-                  do mu=1,boson_degrees_of_freedom,+1
-
-                     call random_number(boson_noise(:,:,mu))
-
-              end do!mu=1,boson_degrees_of_freedom,+1
-
-
-        end function boson_noise
-
-
-            subroutine make_fields(is_hot)
+            subroutine make_fields(start_field_is_hot)
 
 
                   implicit none
 
 
-                  logical,intent(in   )::is_hot
+                  logical,intent(in   )::start_field_is_hot
 
 
-                  if(is_hot) then
+                  if(start_field_is_hot) then
 
-                     a=boson_noise()
+                     call make_boson_noise()
+
+                     a=boson_noise
 
                   else
 
                      a=+.00000e+0
 
-              end if!is_hot
+              end if!start_field_is_hot
 
 
-        end subroutine make_fields!is_hot
+        end subroutine make_fields!start_field_is_hot
 
 
-            subroutine load_fields(conf_file_name)
+            subroutine load_fields()
 
 
                   implicit none
 
-
-                  character(*),intent(in   )::conf_file_name
 
                   integer::unit
                   integer::mu
@@ -140,27 +149,25 @@
 
                    open(newunit=unit,file=conf_file_name)
 
-                  do mu=1,boson_degrees_of_freedom,+1
+                  do mu=0,boson_degrees_of_freedom-1,+1
 
                      call  read(unit,a(:,:,mu))
 
-              end do!mu=1,boson_degrees_of_freedom,+1
+              end do!mu=0,boson_degrees_of_freedom-1,+1
 
-                   read(*)
+                   read(unit,*)
 
                   close(unit)
 
 
-        end subroutine load_fields!conf_file_name
+        end subroutine load_fields
 
 
-            subroutine save_fields(conf_file_name)
+            subroutine save_fields()
 
 
                   implicit none
 
-
-                  character(*),intent(in   )::conf_file_name
 
                   integer::unit
                   integer::mu
@@ -168,18 +175,18 @@
 
                    open(newunit=unit,file=conf_file_name)
 
-                  do mu=1,boson_degrees_of_freedom,+1
+                  do mu=0,boson_degrees_of_freedom-1,+1
 
                      call write(unit,a(:,:,mu))
 
-              end do!mu=1,boson_degrees_of_freedom,+1
+              end do!mu=0,boson_degrees_of_freedom-1,+1
 
-                  write(*)
+                  write(unit,*)
 
                   close(unit)
 
 
-        end subroutine save_fields!conf_file_name
+        end subroutine save_fields
 
 
             subroutine make_m()
@@ -190,43 +197,35 @@
 
                   integer::mu,j2,i2,j1,i1
 
-                  complex(KK),dimension(1:n_size,&
-                                        1:n_size)::a_delta0,&
-                                                   a_delta1,&
-                                                   a_delta2
+                  complex(KK),dimension(0:n_size-1,&
+                                        0:n_size-1)::a_delta
 
                   m=+.00000e+0
 
-                  do mu=1,boson_degrees_of_freedom,+1
+                  do mu=0,boson_degrees_of_freedom-1,+1
 
-                     do j2=1,inner_degrees_of_freedom,+1
+                     do i2=0,inner_degrees_of_freedom-1,+1
 
-                        do i2=1,inner_degrees_of_freedom,+1
+                        do j2=0,inner_degrees_of_freedom-1,+1
 
-                           do j1=1,inner_degrees_of_freedom,+1
+                           do i1=0,inner_degrees_of_freedom-1,+1
 
-                              do i1=1,inner_degrees_of_freedom,+1
+                              do j1=0,inner_degrees_of_freedom-1,+1
 
-                                 a_delta0(n*i1+j1,n*i2+j2)= a(j1,i2,mu)*delta(j2,i1) &
-                                                          - a(j2,i1,mu)*delta(j1,i2)
-                                 a_delta1(n*i1+j1,n*i2+j2)=(a(n ,i2,mu)*delta(j2,n ) &
-                                                          - a(j2,n ,mu)*delta(n ,i2))*delta(i1,j1)
-                                 a_delta2(n*i1+j1,n*i2+j2)=(a(j1,n ,mu)*delta(n ,i1) &
-                                                          - a(n ,i1,mu)*delta(j1,n ))*delta(i2,j2)
+                                 a_delta(n*i1+j1,n*i2+j2)=a(j1,i2,mu)*delta(j2,i1)&
+                                                         -a(j2,i1,mu)*delta(j1,i2)
 
-              end             do!i1=1,inner_degrees_of_freedom,+1
+              end             do!j1=0,inner_degrees_of_freedom-1,+1
 
-              end          do!j1=1,inner_degrees_of_freedom,+1
+              end          do!i1=0,inner_degrees_of_freedom-1,+1
 
-              end       do!i2=1,inner_degrees_of_freedom,+1
+              end       do!j2=0,inner_degrees_of_freedom-1,+1
 
-              end    do!j2=1,inner_degrees_of_freedom,+1
+              end    do!i2=0,inner_degrees_of_freedom-1,+1
 
-                     m(:,:)=m(:,:)+gamma(:,:,mu).x.(a_delta0(:,:) &
-                                  -                 a_delta1(:,:) &
-                                  -                 a_delta2(:,:))
+                     m(:,:)=m(:,:)+(gamma(:,:,mu).x.a_delta(:,:))
 
-              end do!mu=1,boson_degrees_of_freedom,+1
+              end do!mu=0,boson_degrees_of_freedom-1,+1
 
 
         end subroutine make_m
@@ -264,62 +263,42 @@
 
                   integer::i ,j ,mu,j2,i2,a2,j1,i1,a1
 
-                  complex(KK),dimension(1:n_size,&
-                                        1:n_size)::delta_30,&
-                                                   delta_31,&
-                                                   delta_32
+                  complex(KK),dimension(0:n_size-1,&
+                                        0:n_size-1)::delta_3
 
 
-                  do j =1,inner_degrees_of_freedom,+1
+                  do j=0,inner_degrees_of_freedom-1,+1
 
-                        do i =1,inner_degrees_of_freedom,+1
+                     do i=0,inner_degrees_of_freedom-1,+1
 
-                           do j2=1,inner_degrees_of_freedom,+1
+                           do i2=0,inner_degrees_of_freedom-1,+1
 
-                              do i2=1,inner_degrees_of_freedom,+1
+                              do j2=0,inner_degrees_of_freedom-1,+1
 
-                                 do j1=1,inner_degrees_of_freedom,+1
+                                 do i1=0,inner_degrees_of_freedom-1,+1
 
-                                    do i1=1,inner_degrees_of_freedom,+1
+                                    do j1=0,inner_degrees_of_freedom-1,+1
 
-                                       delta_30(n*i1+j1,n*i2+j2)= delta(j1,j ) &
-                                                                * delta(i ,i2) &
-                                                                * delta(j2,i1) &
-                                                                - delta(j2,j ) &
-                                                                * delta(i ,i1) &
-                                                                * delta(j1,i2)
-                                       delta_31(n*i1+j1,n*i2+j2)=(delta(n ,j ) &
-                                                                * delta(i ,i2) &
-                                                                * delta(j2,n ) &
-                                                                - delta(j2,j ) &
-                                                                * delta(i ,n ) &
-                                                                * delta(n ,i2))*delta(i1,j1)
-                                       delta_32(n*i1+j1,n*i2+j2)=(delta(j1,j ) &
-                                                                * delta(i ,n ) &
-                                                                * delta(n ,i1) &
-                                                                - delta(n ,j ) &
-                                                                * delta(i ,i1) &
-                                                                * delta(j1,n ))*delta(i2,j2)
+                                       delta_3(n*i1+j1,n*i2+j2)=delta(j1,j)*delta(i,i2)*delta(j2,i1)&
+                                                               -delta(j2,j)*delta(i,i1)*delta(j1,i2)
 
-              end                   do!i1=1,inner_degrees_of_freedom,+1
+              end                   do!j1=0,inner_degrees_of_freedom-1,+1
 
-              end                do!j1=1,inner_degrees_of_freedom,+1
+              end                do!i1=0,inner_degrees_of_freedom-1,+1
 
-              end             do!i2=1,inner_degrees_of_freedom,+1
+              end             do!j2=0,inner_degrees_of_freedom-1,+1
 
-              end          do!j2=1,inner_degrees_of_freedom,+1
+              end          do!i2=0,inner_degrees_of_freedom-1,+1
 
-                        do mu=1,boson_degrees_of_freedom,+1
+                        do mu=0,boson_degrees_of_freedom-1,+1
 
-                           ma(:,:,i,j,mu)=gamma(:,:,mu).x.(delta_30(:,:) &
-                                                        -  delta_31(:,:) &
-                                                        -  delta_32(:,:))
+                           ma(:,:,i,j,mu)=gamma(:,:,mu).x.delta_3(:,:)
 
-              end       do!mu=1,boson_degrees_of_freedom,+1
+              end       do!mu=0,boson_degrees_of_freedom-1,+1
 
-              end    do!i =1,inner_degrees_of_freedom,+1
+              end    do!i=0,inner_degrees_of_freedom-1,+1
 
-              end do!j =1,inner_degrees_of_freedom,+1
+              end do!j=0,inner_degrees_of_freedom-1,+1
 
 
         end subroutine make_ma
@@ -331,10 +310,22 @@
                   implicit none
 
 
-                  call geev(m,m_eigenvalues)
+                  call ggev(m,m_kernel,m_eigenvalues0,m_eigenvalues1)
 
 
         end subroutine make_m_eigenvalues
+
+
+            subroutine make_m_kernel()
+
+
+                  implicit none
+
+
+                  m_kernel=matrix(fermi_degrees_of_freedom,re_unit).x.delta_super_traceless
+
+
+        end subroutine make_m_kernel
 
 
             subroutine update_fermion_matrix()
@@ -353,6 +344,27 @@
 
 
         end subroutine update_fermion_matrix
+
+
+            subroutine print_fermion_matrix()
+
+
+                  implicit none
+
+
+                  integer::unit
+
+
+                   open(newunit=unit,file="fermion.matrix")
+
+                  call write(   unit,m)
+            !     call write(   unit,cm)
+            !     call write(   unit,cmm)
+
+                  close(        unit                      )
+
+
+        end subroutine print_fermion_matrix!unit
 
 
   end module fields

@@ -1,7 +1,7 @@
 #     ifndef MONTE_CARLO_AVERAGE_F90
 #     define MONTE_CARLO_AVERAGE_F90
 
-#     include "precision.F90"
+#     include "main/precision.F90"
 
 
       module average_type
@@ -10,15 +10,15 @@
             implicit none
 
 
-            character(*),private,parameter::           format_average_K=COMPLEXGK
-            character(*),private,parameter::text_field_format_average_K=COMPLEXAK
+            character(*),private,parameter::           format_average_K=REALGK
+            character(*),private,parameter::text_field_format_average_K=REALAK
 
             type::average(precision)
 
                integer,kind::precision
 
-               real(precision),private::weight
-               real(precision),private::value = 00.00
+               real(precision),private::weight=+.10000e+1
+               real(precision),private::value =+.00000e+0
 
             contains
 
@@ -33,9 +33,6 @@
                procedure,private::            is_not_equal_to_K;generic::            is_not_equal_to=>            is_not_equal_to_K
                procedure,private::is_greater_than_or_equal_to_K;generic::is_greater_than_or_equal_to=>is_greater_than_or_equal_to_K
                procedure,private::            is_greater_than_K;generic::            is_greater_than=>            is_greater_than_K
-
-               procedure,private:: read_average_K;generic:: read(formatted)=> read_average_K
-               procedure,private::write_average_K;generic::write(formatted)=>write_average_K
 
         end type  average!precision
 
@@ -143,6 +140,18 @@
 
         end interface operator(> )
 
+            interface  read
+
+               module procedure  read_average_K
+
+        end interface  read
+
+            interface write
+
+               module procedure write_average_K
+
+        end interface write
+
 
       contains
 
@@ -154,17 +163,21 @@
 
 
                   type(average(KK)),intent(inout)         ::this
-                  real(        KK ),intent(in   )         ::weight
+                  real(        KK ),intent(in   ),optional::weight
                   real(        KK ),intent(in   ),optional::value
 
 
-                     this%weight=weight
+                  if(present(value)) then
 
-                     if(present(value)) then
+                     this%value=value
 
-                        this%value=value
+                     if(present(weight)) then
 
-              end    if!present(value)
+                        this%weight=weight
+
+              end    if!present(weight)
+
+              end if!present(value)
 
 
         end subroutine initialize_average_K!this,weight,value
@@ -176,12 +189,14 @@
                   implicit none
 
 
-                  real(        KK ),intent(in   )         ::weight
+                  real(        KK ),intent(in   ),optional::weight
                   real(        KK ),intent(in   ),optional::value
                   type(average(KK))                       ::that
 
 
-                     if(present(value)) then
+                  if(present(value)) then
+
+                     if(present(weight)) then
 
                         call that%initialize_average(weight,value)
 
@@ -189,7 +204,13 @@
 
                         call that%initialize_average(weight)
 
-              end    if!present(value)
+              end    if!present(weight)
+
+                  else
+
+                     call that%initialize_average()
+
+              end if!present(value)
 
 
         end function average_constructor_K!weight,value
@@ -225,6 +246,202 @@
 
 
         end function value__K!this
+
+
+            function average_average__plus_K(average0) result(average_)
+
+
+                  implicit none
+
+
+                  type(average(KK)),intent(in   )::average0
+                  type(average(KK))              ::average_
+
+
+                  average_%weight&
+                = average0%weight
+                  average_%value &
+                =+average0%value
+
+
+        end function average_average__plus_K!average0
+
+
+            function average_average_average__plus_K(average1,average2) result(average_)
+
+
+                  implicit none
+
+
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
+                  type(average(KK))              ::average_
+
+
+                  average_%weight&
+                 =average1%weight&
+                 +average2%weight
+
+                  average_%value &
+                 =average1%weight&
+                 *average1%value &
+                 +average2%weight&
+                 *average2%value
+
+                  average_%value &
+                 =average_%value &
+                 /average_%weight
+
+
+        end function average_average_average__plus_K!average1,average2
+
+
+            function average_average_minus_K(average0) result(average_)
+
+
+                  implicit none
+
+
+                  type(average(KK)),intent(in   )::average0
+                  type(average(KK))              ::average_
+
+
+                  average_%weight&
+                = average0%weight
+
+                  average_%value &
+                =-average0%value
+
+
+        end function average_average_minus_K!average0
+
+
+            function average_average_average_minus_K(average1,average2) result(average_)
+
+
+                  implicit none
+
+
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
+                  type(average(KK))              ::average_
+
+
+                  average_%weight&
+                 =average1%weight&
+                 +average2%weight
+
+                  average_%value &
+                 =average1%weight&
+                 *average1%value &
+                 -average2%weight&
+                 *average2%value
+
+                  average_%value &
+                 =average_%value &
+                 /average_%weight
+
+
+        end function average_average_average_minus_K!average1,average2
+
+
+            function real_average_average_times_value_K(real1,average2) result(average_)
+
+
+                  implicit none
+
+
+                  real(        KK ),intent(in   )::   real1
+                  type(average(KK)),intent(in   )::average2
+                  type(average(KK))              ::average_
+
+
+                  average_%weight&
+                 =average2%weight
+
+                  average_%value =real1&
+                 *average2%value
+
+
+        end function real_average_average_times_value_K!real1,average2
+
+
+            function average_real_average_times_value_K(average1,real2) result(average_)
+
+
+                  implicit none
+
+
+                  type(average(KK)),intent(in   )::average1
+                  real(        KK ),intent(in   )::   real2
+                  type(average(KK))              ::average_
+
+
+                  average_%weight&
+                 =average1%weight
+
+                  average_%value &
+                 =average1%value *real2
+
+
+        end function average_real_average_times_value_K!average1,real2
+
+
+            function average_average_real_times_value_K(average1,average2) result(real_)
+
+
+                  implicit none
+
+
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
+                  real(        KK )              ::   real_
+
+
+                  real_=average1%value&
+                       *average2%value
+
+
+        end function average_average_real_times_value_K!average1,average2
+
+
+            function average_real_average_division_by_K(average1,real2) result(average_)
+
+
+                  implicit none
+
+
+                  type(average(KK)),intent(in   )::average1
+                  real(        KK ),intent(in   )::   real2
+                  type(average(KK))              ::average_
+
+
+                  average_%weight&
+                 =average1%weight
+
+                  average_%value &
+                 =average1%value /real2
+
+
+        end function average_real_average_division_by_K!average1,real2
+
+
+            function average_average_real_division_by_K(average1,average2) result(real_)
+
+
+                  implicit none
+
+
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
+                  real(        KK )              ::   real_
+
+
+                 real_=average1%value&
+                      /average2%value
+
+
+        end function average_average_real_division_by_K!average1,average2
 
 
           logical function is_equal_to_K(this,value)
@@ -707,258 +924,38 @@
         end         function average_average_greater_than_K!average1,average2
 
 
-            subroutine  read_average_K(dtv,unit,iotype,v_list,iostat,iomsg)
+            subroutine  read_average_K(unit,this)
 
 
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::dtv
                   integer          ,intent(in   )::unit
-                  character(     *),intent(in   )::iotype
-                  integer          ,intent(in   )::v_list(:)
-                  integer          ,intent(  out)::iostat
-                  character(     *),intent(inout)::iomsg
+                  type(average(KK)),intent(inout)::this
 
 
-                  if(iotype=='listdirected') then
-
-                      read(unit=unit,fmt=format_average_K,iostat=iostat,iomsg=iomsg) dtv%weight,dtv%value
-
-                  else
-
-                     iostat=1
-                     iomsg='read(average): specific input format or namelist not supported'
-
-              end if!iotype=='listdirected'
+                   read(unit,format_average_K,advance="no") this%weight
+                   read(unit,format_average_K,advance="no") this%value
 
 
-        end subroutine  read_average_K!dtv,unit,iotype,v_list,iostat,iomsg
+        end subroutine  read_average_K!unit,this
 
 
-            subroutine write_average_K(dtv,unit,iotype,v_list,iostat,iomsg)
+            subroutine write_average_K(unit,this)
 
 
                   implicit none
 
 
-                  type(average(KK)),intent(in   )::dtv
                   integer          ,intent(in   )::unit
-                  character(     *),intent(in   )::iotype
-                  integer          ,intent(in   )::v_list(:)
-                  integer          ,intent(  out)::iostat
-                  character(     *),intent(inout)::iomsg
+                  type(average(KK)),intent(in   )::this
 
 
-                  if(iotype=='listdirected') then
+                  write(unit,format_average_K,advance="no") this%weight
+                  write(unit,format_average_K,advance="no") this%value
 
-                     write(unit=unit,fmt=format_average_K,iostat=iostat,iomsg=iomsg) dtv%weight,dtv%value
 
-                  else
-
-                     iostat=1
-                     iomsg='write(average): specific input format or namelist not supported'
-
-              end if!iotype=='listdirected'
-
-
-        end subroutine write_average_K!dtv,unit,iotype,v_list,iostat,iomsg
-
-
-            function average_average__plus_K(average0) result(average_)
-
-
-                  implicit none
-
-
-                  type(average(KK)),intent(in   )::average0
-                  type(average(KK))              ::average_
-
-
-                  average_%weight&
-                = average0%weight
-                  average_%value &
-                =+average0%value
-
-
-        end function average_average__plus_K!average0
-
-
-            function average_average_average__plus_K(average1,average2) result(average_)
-
-
-                  implicit none
-
-
-                  type(average(KK)),intent(in   )::average1
-                  type(average(KK)),intent(in   )::average2
-                  type(average(KK))              ::average_
-
-
-                  average_%weight&
-                 =average1%weight&
-                 +average2%weight
-
-                  average_%value &
-                 =average1%weight&
-                 *average1%value &
-                 +average2%weight&
-                 *average2%value
-
-                  average_%value &
-                 =average_%value &
-                 /average_%weight
-
-
-        end function average_average_average__plus_K!average1,average2
-
-
-            function average_average_minus_K(average0) result(average_)
-
-
-                  implicit none
-
-
-                  type(average(KK)),intent(in   )::average0
-                  type(average(KK))              ::average_
-
-
-                  average_%weight&
-                = average0%weight
-
-                  average_%value &
-                =-average0%value
-
-
-        end function average_average_minus_K!average0
-
-
-            function average_average_average_minus_K(average1,average2) result(average_)
-
-
-                  implicit none
-
-
-                  type(average(KK)),intent(in   )::average1
-                  type(average(KK)),intent(in   )::average2
-                  type(average(KK))              ::average_
-
-
-                  average_%weight&
-                 =average1%weight&
-                 +average2%weight
-
-                  average_%value &
-                 =average1%weight&
-                 *average1%value &
-                 -average2%weight&
-                 *average2%value
-
-                  average_%value &
-                 =average_%value &
-                 /average_%weight
-
-
-        end function average_average_average_minus_K!average1,average2
-
-
-            function real_average_average_times_value_K(real1,average2) result(average_)
-
-
-                  implicit none
-
-
-                  real(        KK ),intent(in   )::   real1
-                  type(average(KK)),intent(in   )::average2
-                  type(average(KK))              ::average_
-
-
-                  average_%weight&
-                 =average2%weight
-
-                  average_%value =real1&
-                 *average2%value
-
-
-        end function real_average_average_times_value_K!real1,average2
-
-
-            function average_real_average_times_value_K(average1,real2) result(average_)
-
-
-                  implicit none
-
-
-                  type(average(KK)),intent(in   )::average1
-                  real(        KK ),intent(in   )::   real2
-                  type(average(KK))              ::average_
-
-
-                  average_%weight&
-                 =average1%weight
-
-                  average_%value &
-                 =average1%value *real2
-
-
-        end function average_real_average_times_value_K!average1,real2
-
-
-            function average_average_real_times_value_K(average1,average2) result(real_)
-
-
-                  implicit none
-
-
-                  type(average(KK)),intent(in   )::average1
-                  type(average(KK)),intent(in   )::average2
-                  real(        KK )              ::   real_
-
-
-                  real_=average1%value&
-                       *average2%value
-
-
-        end function average_average_real_times_value_K!average1,average2
-
-
-            function average_real_average_division_by_K(average1,real2) result(average_)
-
-
-                  implicit none
-
-
-                  type(average(KK)),intent(in   )::average1
-                  real(        KK ),intent(in   )::   real2
-                  type(average(KK))              ::average_
-
-
-                  average_%weight&
-                 =average1%weight
-
-                  average_%value &
-                 =average1%value /real2
-
-
-        end function average_real_average_division_by_K!average1,real2
-
-
-            function average_average_real_division_by_K(average1,average2) result(real_)
-
-
-                  implicit none
-
-
-                  type(average(KK)),intent(in   )::average1
-                  type(average(KK)),intent(in   )::average2
-                  real(        KK )              ::   real_
-
-
-                 real_=average1%value&
-                      /average2%value
-
-
-        end function average_average_real_division_by_K!average1,average2
+        end subroutine write_average_K!unit,this
 
 
   end module average_type

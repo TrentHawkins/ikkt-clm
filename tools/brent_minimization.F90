@@ -1,7 +1,7 @@
 #     ifndef TOOLS_BRENT_MINIMIZATION_F90
 #     define TOOLS_BRENT_MINIMIZATION_F90
 
-#     include "precision.F90"
+#     include "main/precision.F90"
 
 
 !     BRENT MINIMIZATION

@@ -1,8 +1,7 @@
 #     ifndef IKKT_OBSERVABLES_F90
 #     define IKKT_OBSERVABLES_F90
 
-#     include "precision.F90"
-#     include "interface.F90"
+#     include "main/precision.F90"
 
 #     include "tensor/tensor.F90"
 
@@ -14,8 +13,6 @@
 
       module observables
 
-
-            use::interface
 
             use::tensor_type
 
@@ -30,6 +27,8 @@
 
             character(*),private,parameter::           format_observables_K=COMPLEXGK
             character(*),private,parameter::text_field_format_observables_K=COMPLEXAK
+
+            character(:),allocatable,public::meas_file_name
 
             public::print_observables
 
@@ -50,8 +49,9 @@
                   class(time(KK)),intent(in   )::measurement_time
 
 
-                  write(unit,                   *) measurement_time
-                  write(unit,format_observables_K) boson_action(),fermion_action()
+                  call write(unit,    measurement_time             )
+                       write(unit,format_observables_K,advance="no")   boson_action()
+                       write(unit,format_observables_K             ) fermion_action()
 
 
         end subroutine print_observables
@@ -70,19 +70,19 @@
 
                   boson_action=+.00000e+0
 
-                  do mu=1,inner_degrees_of_freedom,+1
+                  do mu=0,inner_degrees_of_freedom-1,+1
 
-                     do nu=1,inner_degrees_of_freedom,+1
+                     do nu=0,inner_degrees_of_freedom-1,+1
 
                         boson_action&
                        =boson_action+norm(a(:,:,mu).commutation.a(:,:,nu))
 
-              end    do!nu=1,inner_degrees_of_freedom,+1
+              end    do!nu=0,inner_degrees_of_freedom-1,+1
 
-              end do!mu=1,inner_degrees_of_freedom,+1
+              end do!mu=0,inner_degrees_of_freedom-1,+1
 
                   boson_action&
-                 =boson_action*inner_degrees_of_freedom*00.25
+                 =boson_action*inner_degrees_of_freedom*.25000e+0
 
 
         end function boson_action
@@ -98,7 +98,7 @@
 
 
                   fermion_action&
-                 =fermion_action+determinant_degree(boson_degrees_of_freedom)*sum(log(m_eigenvalues))
+                 =fermion_action+determinant_degree(boson_degrees_of_freedom)*sum(log(m_eigenvalues0/m_eigenvalues1))
 
 
         end function fermion_action

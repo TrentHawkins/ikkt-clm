@@ -1,7 +1,7 @@
 #     ifndef MONTE_CARLO_RANDOM_NUMBER_GENERATOR_F90
 #     define MONTE_CARLO_RANDOM_NUMBER_GENERATOR_F90
 
-#     include "precision.F90"
+#     include "main/precision.F90"
 
 
       module random_number_generator
@@ -13,8 +13,10 @@
             character(*),private,parameter::           format_integer=INTEGERG2
             character(*),private,parameter::text_field_format_integer=INTEGERA2
 
-            integer            ,private::       size_seed
-            integer,allocatable,private::seed( :         )
+            character(:),allocatable,public::seed_file_name
+
+            integer,                                     private::size_seed
+            integer,allocatable,dimension( :           ),private::     seed
 
             private::prepare_seed
 
@@ -44,7 +46,7 @@
 
                   else
 
-                     allocate(seed(1:size_seed))
+                     allocate(seed(0:size_seed))
 
               end if!allocated(seed)
 
@@ -64,13 +66,11 @@
         end subroutine make_seed
 
 
-            subroutine load_seed(seed_file_name)
+            subroutine load_seed()
 
 
                   implicit none
 
-
-                  character(*),intent(in   )::seed_file_name
 
                   integer::unit
 
@@ -86,16 +86,14 @@
                   deallocate(seed)
 
 
-        end subroutine load_seed!seed_file_name
+        end subroutine load_seed
 
 
-            subroutine save_seed(seed_file_name)
+            subroutine save_seed()
 
 
                   implicit none
 
-
-                  character(*),intent(in   )::seed_file_name
 
                   integer::unit
 
@@ -111,7 +109,7 @@
                   deallocate(seed)
 
 
-        end subroutine save_seed!unit,seed_file_name
+        end subroutine save_seed
 
 
   end module random_number_generator

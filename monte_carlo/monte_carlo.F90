@@ -17,6 +17,10 @@
             implicit none
 
 
+            real(KK),public::time_setting=+.00000e+0
+            real(KK),public::average_step=+.10000e-4
+            real(KK),public::ac_time_skip=+.10000e-4
+
             class(time(KK)),allocatable,public::s
             class(time(KK)),allocatable,public::t
 
@@ -55,13 +59,58 @@
       contains
 
 
-            subroutine prepare_time_K(is_dynamic)
+            subroutine make_monte_carlo_K()
 
 
                   implicit none
 
 
-                  logical,intent(in   )::is_dynamic
+                  call prepare_time()
+                  call read_time_parameters()
+
+                  call   make_seed(                         )
+                  call s%make_time(time_setting,ac_time_skip)
+                  call t%make_time(ac_time_skip,average_step)
+
+
+        end subroutine make_monte_carlo_K
+
+
+            subroutine load_monte_carlo_K()
+
+
+                  implicit none
+
+
+                  call prepare_time()
+                  call read_time_parameters()
+
+                  call   load_seed(                         )
+                  call s%load_time(time_setting,ac_time_skip)
+                  call t%load_time(ac_time_skip,average_step)
+
+
+        end subroutine load_monte_carlo_K
+
+
+            subroutine save_monte_carlo_K()
+
+
+                  implicit none
+
+
+                  call   save_seed()
+                  call s%save_time()
+                  call t%save_time()
+
+
+        end subroutine save_monte_carlo_K
+
+
+            subroutine prepare_time_K()
+
+
+                  implicit none
 
 
                   if(allocated(s)) then
@@ -72,15 +121,13 @@
 
                   allocate(time(KK)::s)
 
-                  write(*,*) s!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
                   if(allocated(t)) then
 
                      deallocate(t)
 
               end if!allocated(t)
 
-                  if(is_dynamic==.true.) then
+                  if(timestep_is_variable) then
 
                      allocate(dynamic_time(KK)::t)
 
@@ -88,77 +135,30 @@
 
                      allocate(        time(KK)::t)
 
-              end if!is_dynamic==.true.
+              end if!timestep_is_variable
 
 
-        end subroutine prepare_time_K!is_dynamic
+        end subroutine prepare_time_K
 
 
-            subroutine make_monte_carlo_K(time_setting,average_step,ac_time_skip,is_dynamic)
-
-
-                  implicit none
-
-
-                  real(KK),intent(in   )::time_setting
-                  real(KK),intent(in   )::average_step
-                  real(KK),intent(in   )::ac_time_skip
-
-                  logical,intent(in   )::is_dynamic
-
-
-                  call prepare_time(is_dynamic)
-
-                  call   make_seed(                         )
-                  call s%make_time(time_setting,ac_time_skip)
-                  call t%make_time(ac_time_skip,average_step)
-
-
-        end subroutine make_monte_carlo_K!time_setting,average_step,ac_time_skip,is_dynamic
-
-
-            subroutine load_monte_carlo_K(time_setting,average_step,ac_time_skip,is_dynamic,seed_file_name,time_file_name)
+            subroutine read_time_parameters()
 
 
                   implicit none
 
 
-                  real(KK),intent(in   )::time_setting
-                  real(KK),intent(in   )::average_step
-                  real(KK),intent(in   )::ac_time_skip
-
-                  logical,intent(in   )::is_dynamic
-
-                  character(*),intent(in   )::seed_file_name
-                  character(*),intent(in   )::time_file_name
-
-
-                  call prepare_time(is_dynamic)
-
-                  call   load_seed(                          trim(adjustl(seed_file_name)))
-                  call s%load_time(time_setting,ac_time_skip,trim(adjustl(time_file_name)))
-                  call t%load_time(ac_time_skip,average_step,trim(adjustl(time_file_name)))
+                  write(*,"(a)",advance="no") "time_setting: "
+                   read(*,  *               )  time_setting
+                  write(*,  *               )
+                  write(*,"(a)",advance="no") "average_step: "
+                   read(*,  *               )  average_step
+                  write(*,  *               )
+                  write(*,"(a)",advance="no") "ac_time_skip: "
+                   read(*,  *               )  ac_time_skip
+                  write(*,  *               )
 
 
-        end subroutine load_monte_carlo_K!time_setting,average_step,ac_time_skip,is_dynamic,seed_file_name,time_file_name
-
-
-            subroutine save_monte_carlo_K(seed_file_name,time_file_name)
-
-
-                  implicit none
-
-
-                  character(*),intent(in   )::seed_file_name
-                  character(*),intent(in   )::time_file_name
-
-
-                  call   save_seed(trim(adjustl(seed_file_name)))
-                  call s%save_time(trim(adjustl(time_file_name)))
-                  call t%save_time(trim(adjustl(time_file_name)))
-
-
-        end subroutine save_monte_carlo_K!seed_file_name,time_file_name
+        end subroutine read_time_parameters
 
 
   end module monte_carlo
