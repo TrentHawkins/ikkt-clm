@@ -24,6 +24,8 @@
             implicit none
 
 
+            logical,public::fermions_included=.false.
+
             complex(KK),dimension(0:inner_degrees_of_freedom-1,&
                                   0:inner_degrees_of_freedom-1,&
                                   0:boson_degrees_of_freedom-1),public::drift
@@ -31,12 +33,14 @@
                                   0:inner_degrees_of_freedom-1,&
                                   0:boson_degrees_of_freedom-1),public::noise
 
+            real(KK),public::drift_norm
+
             public::langevin_step
 
             public::make_drift
             public::make_noise
 
-            public::drift_norm
+            public::make_drift_norm
 
       contains
 
@@ -47,19 +51,25 @@
                   implicit none
 
 
+                  call make_constants(inner_degrees_of_freedom,&
+                                      boson_degrees_of_freedom)
+
+                  call make_m_kernel()
+
                   if(configuration_loaded) then
 
                      call load_monte_carlo()
+                     call load_fields()
 
                   else
 
                      call make_monte_carlo()
+                     call make_fields(start_field_is_hot)
 
               end if!configuration_loaded
 
 
         end subroutine boot_langevin!
-
 
 
             subroutine langevin_step()
@@ -71,7 +81,7 @@
                   call make_drift()
                   call make_noise()
 
-                  a=a+drift*t%time_step()+noise*sqrt(t%time_step())
+                  a=noise*sqrt(t%time_step())
 
 
         end subroutine langevin_step
@@ -86,35 +96,42 @@
                   integer::mu,nu,i,j
 
 
-                  drift=+.00000e+0
+                  drift=zero
 
                   do mu=0,boson_degrees_of_freedom-1,+1
 
                      do nu=0,boson_degrees_of_freedom-1,+1
 
                         drift(:,:,mu)&
-                       =drift(:,:,mu)+inner_degrees_of_freedom*((a(:,:,mu) &
-                                                    .commutation.a(:,:,nu))&
-                                                    .commutation.a(:,:,nu))
+                       =drift(:,:,mu)-((a(:,:,mu) &
+                           .commutation.a(:,:,nu))&
+                           .commutation.a(:,:,nu))*inner_degrees_of_freedom
 
               end    do!nu=0,boson_degrees_of_freedom-1,+1
 
-                     call update_fermion_matrix()
+                     if(fermions_included) then
 
-                     do j=0,inner_degrees_of_freedom-1,+1
+                        call update_fermion_matrix()
 
-                        do i=0,inner_degrees_of_freedom-1,+1
+                        do j=0,inner_degrees_of_freedom-1,+1
 
-                           call make_fermion_noise()
+                           do i=0,inner_degrees_of_freedom-1,+1
 
-                           drift(i,j,mu)&
-                          =drift(i,j,mu)-determinant_degree(boson_degrees_of_freedom)*(fermion_noise(:) &
-                           .o.ma(:,:,i,j,mu).o.conjugate_gradient_K(cmm(:,:),cm(:,:).o.fermion_noise(:),&
-                                                                                       fermion_noise(:)))
+                              call make_fermi_noise(stddev)
 
-              end       do!i=0,inner_degrees_of_freedom-1,+1
+                              drift(i,j,mu)&
+                             =drift(i,j,mu)-determinant_degree(boson_degrees_of_freedom)*(fermi_noise(:) &
+                          .o.ma(:,:,i,j,mu)            .o.conjugate_gradient_K(cmm(:,:),&
+                                                                                cm(:,:).o.fermi_noise(:),&
+                                                                                          fermi_noise(:)))
 
-              end    do!j=0,inner_degrees_of_freedom-1,+1
+              end          do!i=0,inner_degrees_of_freedom-1,+1
+
+              end       do!j=0,inner_degrees_of_freedom-1,+1
+
+              end    if!fermions_included
+
+                     call make_traceless(drift(:,:,mu))
 
               end do!mu=0,boson_degrees_of_freedom-1,+1
 
@@ -128,7 +145,7 @@
                   implicit none
 
 
-                  call make_boson_noise()
+                  call make_boson_noise(stddev)
 
                   noise=boson_noise
 
@@ -136,18 +153,16 @@
         end subroutine make_noise
 
 
-            function drift_norm()
+            subroutine make_drift_norm()
 
 
                   implicit none
 
 
-                  real(KK)::drift_norm
-
                   integer::mu
 
 
-                  drift_norm=+.00000e+0
+                  drift_norm=+.00000e+0_KK
 
                   do mu=1,inner_degrees_of_freedom,+1
 
@@ -160,7 +175,7 @@
                  =drift_norm/a_size
 
 
-        end function drift_norm
+        end subroutine make_drift_norm
 
 
   end module complex_langevin

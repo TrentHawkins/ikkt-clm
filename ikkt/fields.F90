@@ -26,17 +26,17 @@
 
             character(:),allocatable,public::conf_file_name
 
-            integer,public,parameter::inner_degrees_of_freedom=4,&
+            integer,parameter,public::inner_degrees_of_freedom=4,&
                                       boson_degrees_of_freedom=6,&
                                       fermi_degrees_of_freedom=2 &
                                    **(boson_degrees_of_freedom/2 &
                                                               -1)
 
-            integer,public,parameter::n=inner_degrees_of_freedom,&
+            integer,parameter,public::n=inner_degrees_of_freedom,&
                                       d=boson_degrees_of_freedom,&
                                       p=fermi_degrees_of_freedom
 
-            integer,public,parameter::n_size=inner_degrees_of_freedom &
+            integer,parameter,public::n_size=inner_degrees_of_freedom &
                                             *inner_degrees_of_freedom,&
                                       a_size=boson_degrees_of_freedom &
                                             *inner_degrees_of_freedom &
@@ -45,12 +45,14 @@
                                             *inner_degrees_of_freedom &
                                             *inner_degrees_of_freedom
 
+            real(KK),parameter,public::stddev=sqrt(.20000e+1_KK)
+
             complex(KK),dimension(0:inner_degrees_of_freedom-1,&
                                   0:inner_degrees_of_freedom-1,&
                                   0:boson_degrees_of_freedom-1),public::a,boson_noise
 
             complex(KK),dimension(0:f_size-1),public::m_eigenvalues0,&
-                                                      m_eigenvalues1,fermion_noise
+                                                      m_eigenvalues1,fermi_noise
             complex(KK),dimension(0:f_size-1,&
                                   0:f_size-1),public::m,&
                                                      cm,&
@@ -81,7 +83,7 @@
       contains
 
 
-            subroutine make_boson_noise()
+            subroutine tracelessify()
 
 
                   implicit none
@@ -90,26 +92,60 @@
                   integer::mu
 
 
-                  do mu=0,boson_degrees_of_freedom-1,+1
+                  do mu=1,inner_degrees_of_freedom,+1
 
-                     call random_number(boson_noise(:,:,mu))
+                     call make_traceless(a(:,:,mu))
 
-              end do!mu=0,boson_degrees_of_freedom-1,+1
-
-
-        end subroutine make_boson_noise
+              end do!mu= ,inner_degrees_of_freedom,+1
 
 
-            subroutine make_fermion_noise()
+        end subroutine tracelessify!
+
+
+            subroutine make_boson_noise(stddev)
 
 
                   implicit none
 
 
-                  call random_number(fermion_noise(:))
+                  real(KK)::stddev
+
+                  integer::mu
 
 
-        end subroutine make_fermion_noise
+                  do mu=0,boson_degrees_of_freedom-1,+1
+
+                     call                 random_number(boson_noise(:,:,mu))
+                                                        boson_noise(:,:,mu)   &
+                    =stddev*sqrt(-2*           log(real(boson_noise(:,:,mu))))&
+                           * exp( 2*pi*im_unit*   aimag(boson_noise(:,:,mu)))
+                     call                make_traceless(boson_noise(:,:,mu))
+
+              end do!mu=0,boson_degrees_of_freedom-1,+1
+
+
+        end subroutine make_boson_noise!stddev
+
+
+            subroutine make_fermi_noise(stddev)
+
+
+                  implicit none
+
+
+                  real(KK)::stddev
+
+
+                  call                 random_number(fermi_noise)
+                                                     fermi_noise   &
+                 =stddev*sqrt(-2*           log(real(fermi_noise)))&
+                        * exp( 2*pi*im_unit*   aimag(fermi_noise))
+                                                     fermi_noise&
+                                        =m_kernel.o.fermi_noise
+
+
+
+        end subroutine make_fermi_noise!stddev
 
 
             subroutine make_fields(start_field_is_hot)
@@ -123,13 +159,13 @@
 
                   if(start_field_is_hot) then
 
-                     call make_boson_noise()
+                     call make_boson_noise(stddev)
 
                      a=boson_noise
 
                   else
 
-                     a=+.00000e+0
+                     a=zero
 
               end if!start_field_is_hot
 
@@ -200,7 +236,7 @@
                   complex(KK),dimension(0:n_size-1,&
                                         0:n_size-1)::a_delta
 
-                  m=+.00000e+0
+                  m=zero
 
                   do mu=0,boson_degrees_of_freedom-1,+1
 

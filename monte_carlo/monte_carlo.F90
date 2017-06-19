@@ -17,7 +17,7 @@
             implicit none
 
 
-            real(KK),public::time_setting=+.00000e+0
+            real(KK),public::time_setting=+.00000e+0_KK
             real(KK),public::average_step=+.10000e-4
             real(KK),public::ac_time_skip=+.10000e-4
 

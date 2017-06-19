@@ -2,6 +2,7 @@
 #     define IKKT_CONSTANTS_F90
 
 #     include "main/precision.F90"
+#     include "main/mathematical_constants.F90"
 
 #     include "tensor/tensor.F90"
 
@@ -9,19 +10,17 @@
       module constants
 
 
+            use::mathematical_constants
+
             use::tensor_type
 
 
             implicit none
 
 
-            complex(KK),public,parameter::   zero=( .00000e+0, .00000e+0)
-            complex(KK),public,parameter::re_unit=(+.10000e+1, .00000e+0)
-            complex(KK),public,parameter::im_unit=( .00000e+0,+.10000e+1)
-
             complex(KK),dimension(0:1,&
                                   0:1,&
-                                  0:3),public,parameter::sigma=[[[+re_unit,    zero],[    zero,+re_unit]],&
+                                  0:3),parameter,public::sigma=[[[+re_unit,    zero],[    zero,+re_unit]],&
                                                                 [[    zero,+re_unit],[+re_unit,    zero]],&
                                                                 [[    zero,+im_unit],[-im_unit,    zero]],&
                                                                 [[+re_unit,    zero],[    zero,-re_unit]]]
@@ -37,6 +36,8 @@
             public::make_delta
             public::make_delta_super_traceless
             public::make_gamma
+
+            public::make_constants
 
 
             contains
@@ -77,31 +78,37 @@
                   integer::i1,j1
 
 
+                  if(allocated(delta_super_traceless)) then
+
+                     return
+
+              end if!allocated(delta_super_traceless)
+
                   call make_delta(size)
 
                   allocate(delta_super_traceless(0:size*size-1,&
                                                  0:size*size-1))
 
-                  do j0=0,size*size-1,+1
+                  do j0=0,size-1,+1
 
-                     do j1=0,size*size-1,+1
+                     do j1=0,size-1,+1
 
-                        do i0=0,size*size-1,+1
+                        do i0=0,size-1,+1
 
-                           do i1=0,size*size-1,+1
+                           do i1=0,size-1,+1
 
-                              delta_super_traceless(i0*size+i1,&
-                                                    j0*size+j1)=delta(i0,j0)&
-                                                               *delta(i1,j1)-delta(i0,i1)&
-                                                                            *delta(j0,j1)/real(size,kind=KK)
+                                delta_super_traceless(i0*size+i1,&
+                                                      j0*size+j1)=delta(i0,j0)&
+                                                                 *delta(i1,j1)-delta(i0,i1)&
+                                                                              *delta(j0,j1)/real(size,kind=KK)
 
-              end          do!i1=0,size*size-1,+1
+              end          do!i1=0,size-1,+1
 
-              end       do!i0=0,size*size-1,+1
+              end       do!i0=0,size-1,+1
 
-              end    do!j1=0,size*size-1,+1
+              end    do!j1=0,size-1,+1
 
-              end do!j0=0,size*size-1,+1
+              end do!j0=0,size-1,+1
 
 
         end subroutine make_delta_super_traceless!size
@@ -208,7 +215,7 @@
                   implicit none
 
 
-                  integer::size
+                  integer,intent(in   )::size
 
                   real(KK)::determinant_degree
 
@@ -217,16 +224,34 @@
 
                   case(4,6)
 
-                     determinant_degree=+.10000e+1
+                     determinant_degree=+.10000e+1_KK
 
                   case(10)
 
-                     determinant_degree=+.50000e+0
+                     determinant_degree=+.50000e+0_KK
 
               end select!case(size)
 
 
         end function determinant_degree!d
+
+
+            subroutine make_constants(inner_size,boson_size)
+
+
+                  implicit none
+
+
+                  integer,intent(in   )::inner_size
+                  integer,intent(in   )::boson_size
+
+
+                  call make_delta                (inner_size)
+                  call make_delta_super_traceless(inner_size)
+                  call make_gamma                (boson_size)
+
+
+        end subroutine make_constants
 
 
   end module constants

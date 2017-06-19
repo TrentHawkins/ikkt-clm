@@ -17,8 +17,8 @@
 
                integer,kind::precision
 
-               real(precision),private::weight=+.10000e+1
-               real(precision),private::value =+.00000e+0
+               real(precision),private::weight=+.10000e+1_KK
+               real(precision),private::value =+.00000e+0_KK
 
             contains
 
@@ -167,15 +167,15 @@
                   real(        KK ),intent(in   ),optional::value
 
 
+                  if(present(weight)) then
+
+                     this%weight=weight
+
+              end if!present(weight)
+
                   if(present(value)) then
 
                      this%value=value
-
-                     if(present(weight)) then
-
-                        this%weight=weight
-
-              end    if!present(weight)
 
               end if!present(value)
 
@@ -198,17 +198,25 @@
 
                      if(present(weight)) then
 
-                        call that%initialize_average(weight,value)
+                        call that%initialize_average(weight=weight,value=value)
 
                      else
 
-                        call that%initialize_average(weight)
+                        call that%initialize_average(              value=value)
 
               end    if!present(weight)
 
                   else
 
-                     call that%initialize_average()
+                     if(present(weight)) then
+
+                        call that%initialize_average(weight=weight            )
+
+                     else
+
+                        call that%initialize_average(                         )
+
+              end    if!present(weight)
 
               end if!present(value)
 

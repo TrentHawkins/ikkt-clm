@@ -27,7 +27,7 @@
 
                integer,kind::precision
 
-               real(precision),private::current_time=+.00000e+0
+               real(precision),private::current_time=+.00000e+0_KK
                real(precision),private::time_setting
                real(precision),private::closing_time
                real(precision),private::average_step
@@ -102,7 +102,7 @@
                   real(KK),intent(in   )::average_step
 
 
-                  this%current_time=+.00000e+0
+                  this%current_time=+.00000e+0_KK
 
                   this%time_setting=time_setting
                   this%average_step=average_step
@@ -388,7 +388,7 @@
                   type(time(KK)),intent(in   )::this
 
 
-                  call write(unit,                    average(this%current_time))
+                  call write(unit,             average(weight=this%current_time))
                        write(unit,format_time_K,advance="no") this%average_step
 
 

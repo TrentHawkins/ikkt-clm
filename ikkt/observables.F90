@@ -49,12 +49,21 @@
                   class(time(KK)),intent(in   )::measurement_time
 
 
-                  call write(unit,    measurement_time             )
-                       write(unit,format_observables_K,advance="no")   boson_action()
+                  call write(unit,  measurement_time               )
+                       write(unit,format_observables_K,advance="no") a(:,:,0) !boson_action()
+
+                  if(fermions_included) then
+
                        write(unit,format_observables_K             ) fermion_action()
 
+                  else
 
-        end subroutine print_observables
+                       write(unit,                   *             )
+
+              end if!fermions_included
+
+
+        end subroutine print_observables!unit,measurement_time
 
 
             function boson_action()
@@ -68,21 +77,24 @@
                   integer::mu,nu
 
 
-                  boson_action=+.00000e+0
+                  boson_action=+.00000e+0_KK
 
                   do mu=0,inner_degrees_of_freedom-1,+1
 
                      do nu=0,inner_degrees_of_freedom-1,+1
 
                         boson_action&
-                       =boson_action+norm(a(:,:,mu).commutation.a(:,:,nu))
+                       =boson_action+trace((a(:,:,mu).commutation.a(:,:,nu)).o.(a(:,:,mu).commutation.a(:,:,nu)))
+            !           boson_action&
+            !          =boson_action+trace((a(:,:,mu).o.a(:,:,nu).o.a(:,:,mu).o.a(:,:,nu))&
+            !                             -(a(:,:,mu).o.a(:,:,mu).o.a(:,:,nu).o.a(:,:,nu)))
 
               end    do!nu=0,inner_degrees_of_freedom-1,+1
 
               end do!mu=0,inner_degrees_of_freedom-1,+1
 
                   boson_action&
-                 =boson_action*inner_degrees_of_freedom*.25000e+0
+                 =boson_action*inner_degrees_of_freedom*.25000e+0_KK
 
 
         end function boson_action

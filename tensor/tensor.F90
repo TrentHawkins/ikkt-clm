@@ -193,8 +193,8 @@
                   integer::index
 
 
-                  that=(+.00000e+0,&
-                        +.00000e+0)
+                  that=(+.00000e+0_KK,&
+                        +.00000e+0_KK)
 
                   do index=0,size-1,+1
 
@@ -219,8 +219,8 @@
                   integer::index
 
 
-                  that=(+.00000e+0,&
-                        +.00000e+0)
+                  that=(+.00000e+0_KK,&
+                        +.00000e+0_KK)
 
                   do index=0,size(that,dim=1)-1,+1
 
@@ -434,8 +434,8 @@
                   integer::index
 
 
-                  scalar_=(+.00000e+0,&
-                           +.00000e+0)
+                  scalar_=(+.00000e+0_KK,&
+                           +.00000e+0_KK)
 
                   do index=0,size(matrix0,dim=1)-1,+1
 
@@ -494,13 +494,13 @@
 
                   else
 
-                     scalar_=(+.00000e+0,&
-                              +.00000e+0)
+                     scalar_=(+.00000e+0_KK,&
+                              +.00000e+0_KK)
 
                      do k=0,size(matrix0,dim=1)-1,+1
 
                         scalar_&
-                       =scalar_+matrix0(k,0)*matrix_determinant_K(cofactor_K(matrix0,k,0))
+                       =scalar_+matrix0(k,0)*matrix_determinant_K(cofactor(matrix0,k,0))
 
               end    do!k=0,size(matrix0,dim=1)-1,+1
 
@@ -510,7 +510,7 @@
             contains
 
 
-                  function cofactor_K(matrix0,i0,j0) result(matrix_)
+                  function cofactor(matrix0,i0,j0) result(matrix_)
 
 
                         implicit none
@@ -531,14 +531,30 @@
 
                            do i=0,size(matrix_,dim=1)-1,+1
 
-                              matrix_(i,j)=matrix0(mod(i0+1+i,size(matrix0,dim=1)),mod(j0+j+1,size(matrix0,dim=2)))
+                              matrix_(i,j)=matrix0(mod(i0+1+i,size(matrix0,dim=1)),mod(j0+j+1,size(matrix0,dim=2)))*sign(i0+j0)
 
                     end    do!i=0,size(matrix_,dim=1)-1,+1
 
                     end do!j=0,size(matrix_,dim=2)-1,+1
 
 
-              end function cofactor_K!matrix0,i0,j0
+              end function cofactor!matrix0,i0,j0
+
+
+                  function sign(exponent)
+
+
+                        implicit none
+
+
+                        integer,intent(in   )::exponent
+                        integer              ::sign
+
+
+                        sign=(-1)**exponent
+
+
+              end function sign!exponent
 
 
         end           function matrix_determinant_K!matrix0
@@ -591,8 +607,8 @@
 
                      do i=0,j-1,+1
 
-                        matrix_(i,j)=(conjg(matrix0(j,i))+matrix0(i,j))*(+.50000e+0,&
-                                                                         +.00000e+0)
+                        matrix_(i,j)=(conjg(matrix0(j,i))+matrix0(i,j))*(+.50000e+0_KK,&
+                                                                         +.00000e+0_KK)
 
               end    do!i=0,j-1,+1
 
@@ -610,8 +626,8 @@
 
               end do!j=0,size(matrix_,dim=2)-1,+1
 
-            !     matrix_=(conjugate(matrix0)+matrix0)*(+.50000e+0,&
-            !                                           +.00000e+0)
+            !     matrix_=(conjugate(matrix0)+matrix0)*(+.50000e+0_KK,&
+            !                                           +.00000e+0_KK)
 
 
         end function matrix_hermitian_K!matrix0
@@ -634,8 +650,8 @@
 
                      do i=0,j-1,+1
 
-                        matrix_(i,j)=(conjg(matrix0(j,i))-matrix0(i,j))*(+.00000e+0,&
-                                                                         +.50000e+0)
+                        matrix_(i,j)=(conjg(matrix0(j,i))-matrix0(i,j))*(+.00000e+0_KK,&
+                                                                         +.50000e+0_KK)
 
               end    do!i=0,j-1,+1
 
@@ -653,8 +669,8 @@
 
               end do!j=0,size(matrix_,dim=2)-1,+1
 
-            !     matrix_=(conjugate(matrix0)-matrix0)*(+.00000e+0,&
-            !                                           +.50000e+0)
+            !     matrix_=(conjugate(matrix0)-matrix0)*(+.00000e+0_KK,&
+            !                                           +.50000e+0_KK)
 
 
         end function matrix_antihermitian_K!matrix0
@@ -768,8 +784,8 @@
 
                      do i=0,j-1,+1
 
-                        matrix0(i,j)=(conjg(matrix0(j,i))+matrix0(i,j))*(+.50000e+0,&
-                                                                         +.00000e+0)
+                        matrix0(i,j)=(conjg(matrix0(j,i))+matrix0(i,j))*(+.50000e+0_KK,&
+                                                                         +.00000e+0_KK)
 
               end    do!i=0,j-1,+1
 
@@ -806,8 +822,8 @@
 
                      do i=0,j-1,+1
 
-                        matrix0(i,j)=(conjg(matrix0(j,i))-matrix0(i,j))*(+.00000e+0,&
-                                                                         +.50000e+0)
+                        matrix0(i,j)=(conjg(matrix0(j,i))-matrix0(i,j))*(+.00000e+0_KK,&
+                                                                         +.50000e+0_KK)
 
               end    do!i=0,j-1,+1
 
@@ -858,8 +874,8 @@
                   implicit none
 
 
-                  complex(KK),intent(inout)::matrix0(0:                     ,&
-                                                     0:                     )
+                  complex(KK),dimension(0:                     ,&
+                                        0:                     ),intent(inout)::matrix0
 
                   real(KK),dimension(0:size(matrix0,dim=1)-1,&
                                      0:size(matrix0,dim=2)-1):: real_matrix0
