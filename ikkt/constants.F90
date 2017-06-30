@@ -26,21 +26,48 @@
                                                                 [[+re_unit,    zero],[    zero,-re_unit]]]
 
             complex(KK),allocatable,dimension( : ,&
-                                               : ),public,protected::delta
-            complex(KK),allocatable,dimension( : ,&
-                                               : ),public,protected::delta_super_traceless
+                                               : ),public,protected::delta,&
+                                                                     delta_super_traceless
             complex(KK),allocatable,dimension( : ,&
                                                : ,&
-                                               : ),public,protected::gamma
+                                               : ),public,protected::gamma,&
+                                                                     gamma_conjugate
 
-            public::make_delta
-            public::make_delta_super_traceless
-            public::make_gamma
+            complex(KK),allocatable,dimension( : ,&
+                                               : ,&
+                                               : ,&
+                                               : ),public,protected::gamma_core
+
+            private::gamma_size
+
+            private::make_delta
+            private::make_delta_super_traceless
+            private::make_gamma
+            private::make_gamma_core
+
+            public::determinant_degree
 
             public::make_constants
 
 
             contains
+
+
+            function gamma_size(size)
+
+
+                  implicit none
+
+
+                  integer,intent(in   )::size
+
+                  integer::gamma_size
+
+
+                  gamma_size=2**(size/2-1)
+
+
+        end function gamma_size!size
 
 
             subroutine make_delta(size)
@@ -123,13 +150,13 @@
                   integer,intent(in   )::size
 
 
+                  allocate(gamma(0:gamma_size(size)-1,&
+                                 0:gamma_size(size)-1,&
+                                 0:           size -1))
+
                   select case(size)
 
                   case( 4)
-
-                     allocate(gamma(0:1,&
-                                    0:1,&
-                                    0:3))
 
                      gamma(:,:,0)=im_unit*(sigma(:,:,1))
                      gamma(:,:,1)=im_unit*(sigma(:,:,2))
@@ -139,10 +166,6 @@
 
                   case( 6)
 
-                     allocate(gamma(0:3,&
-                                    0:3,&
-                                    0:5))
-
                      gamma(:,:,0)=        (sigma(:,:,1).x.sigma(:,:,2))
                      gamma(:,:,1)=        (sigma(:,:,2).x.sigma(:,:,2))
                      gamma(:,:,2)=        (sigma(:,:,3).x.sigma(:,:,2))
@@ -151,10 +174,6 @@
                      gamma(:,:,5)=im_unit*(sigma(:,:,0).x.sigma(:,:,0))
 
                   case(10)
-
-                     allocate(gamma(0:16,&
-                                    0:16,&
-                                    0: 9))
 
                      gamma(:,:,0)=im_unit*(sigma(:,:,2).x.sigma(:,:,2).x.sigma(:,:,2).x.sigma(:,:,2))
                      gamma(:,:,1)=im_unit*(sigma(:,:,2).x.sigma(:,:,2).x.sigma(:,:,0).x.sigma(:,:,1))
@@ -177,36 +196,40 @@
         end subroutine make_gamma!size
 
 
-            subroutine print_gamma()
+            subroutine make_gamma_core(size)
 
 
                   implicit none
 
 
-                  integer::unit
-                  integer::mu
+                  integer,intent(in   )::size
+
+                  integer::mu,nu
 
 
-                   open(newunit=unit,file="gamma.matrix")
+                  allocate(gamma_conjugate(0:gamma_size(size)-1,&
+                                           0:gamma_size(size)-1,&
+                                           0:           size -1))
 
-                  call write(unit,delta(:,:))
+                  allocate(gamma_core(0:gamma_size(size)-1,&
+                                      0:gamma_size(size)-1,&
+                                      0:           size -1,&
+                                      0:           size -1))
 
-                  do mu=0,size(sigma,dim=3)-1,+1
+                  do mu=0,size-1,+1
 
-                     call write(unit,sigma(:,:,mu))
+                     gamma_conjugate(:,:,mu)=conjugate(gamma(:,:,mu))
 
-              end do!mu=0,size(sigma,dim=3)-1,+1
+                     do nu=0,size-1,+1
 
-                  do mu=0,size(gamma,dim=3)-1,+1
+                        gamma_core(:,:,mu,nu)=gamma_conjugate(:,:,mu).o.gamma(:,:,nu)
 
-                     call write(unit,gamma(:,:,mu))
+              end    do!nu=0,size-1,+1
 
-              end do!mu=0,size(gamma,dim=3)-1,+1
-
-                  close(        unit                    )
+              end do!mu=0,size-1,+1
 
 
-        end subroutine print_gamma!size
+        end subroutine make_gamma_core!size
 
 
             function determinant_degree(size)
@@ -249,9 +272,55 @@
                   call make_delta                (inner_size)
                   call make_delta_super_traceless(inner_size)
                   call make_gamma                (boson_size)
+                  call make_gamma_core           (boson_size)
+
+                  call print_gamma()
 
 
-        end subroutine make_constants
+        end subroutine make_constants!inner_size,boson_size
+
+
+            subroutine print_gamma()
+
+
+                  implicit none
+
+
+                  integer::unit
+                  integer::mu,nu
+
+
+                   open(newunit=unit,file="gamma.matrix")
+
+                  call write(unit,delta(:,:))
+
+                  do mu=0,size(sigma,dim=3)-1,+1
+
+                     call write(unit,sigma(:,:,mu))
+
+              end do!mu=0,size(sigma,dim=3)-1,+1
+
+                  do mu=0,size(gamma,dim=3)-1,+1
+
+                     call write(unit,gamma(:,:,mu))
+
+              end do!mu=0,size(gamma,dim=3)-1,+1
+
+                  do mu=0,size(gamma_core,dim=3)-1,+1
+
+                     do nu=0,size(gamma_core,dim=3)-1,+1
+
+                        write(unit,*) norm(conjugate(gamma_core(:,:,mu,nu))&
+                                                    -gamma_core(:,:,mu,nu))
+
+              end    do!nu=0,size(gamma_core,dim=3)-1,+1
+
+              end do!mu=0,size(gamma_core,dim=3)-1,+1
+
+                  close(        unit                    )
+
+
+        end subroutine print_gamma!
 
 
   end module constants

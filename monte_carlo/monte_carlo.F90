@@ -73,7 +73,7 @@
                   call t%make_time(ac_time_skip,average_step)
 
 
-        end subroutine make_monte_carlo_K
+        end subroutine make_monte_carlo_K!
 
 
             subroutine load_monte_carlo_K()
@@ -90,7 +90,7 @@
                   call t%load_time(ac_time_skip,average_step)
 
 
-        end subroutine load_monte_carlo_K
+        end subroutine load_monte_carlo_K!
 
 
             subroutine save_monte_carlo_K()
@@ -104,7 +104,7 @@
                   call t%save_time()
 
 
-        end subroutine save_monte_carlo_K
+        end subroutine save_monte_carlo_K!
 
 
             subroutine prepare_time_K()
@@ -138,7 +138,7 @@
               end if!timestep_is_variable
 
 
-        end subroutine prepare_time_K
+        end subroutine prepare_time_K!
 
 
             subroutine read_time_parameters()
@@ -158,7 +158,7 @@
                   write(*,  *               )
 
 
-        end subroutine read_time_parameters
+        end subroutine read_time_parameters!
 
 
   end module monte_carlo

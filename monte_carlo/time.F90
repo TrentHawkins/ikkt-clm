@@ -286,7 +286,7 @@
 
                   class(time(KK)),intent(inout)::this
 
-                  real(KK),intent(in   )::current_control
+                  real(KK),intent(in   ),optional::current_control
 
 
                   this%current_time&
@@ -304,24 +304,28 @@
 
                   class(dynamic_time(KK)),intent(inout)::this
 
-                  real(KK),intent(in   )::current_control
+                  real(KK),intent(in   ),optional::current_control
 
 
-                  this%current_step&
-                 =this%average_step*(exp(value(this%log_average_control))&
-                                                       /current_control)
+                  if(present(current_control)) then
 
-                  this%log_current_control=average(this%current_step,&
-                       log(current_control))
+                     this%current_step&
+                    =this%average_step*(exp(this%log_average_control%value)&
+                                      /              current_control      )
 
-                  this%log_average_control&
-                 =this%log_average_control&
-                 +this%log_current_control
+                     this%log_current_control=average(this%current_step,&
+                          log(current_control))
 
-                  this%current_time=weight(this%log_average_control)
+                     this%log_average_control&
+                    =this%log_average_control&
+                    +this%log_current_control
+
+                     this%current_time=this%log_average_control%weight
+
+              end if!.not.present(current_control)
 
 
-        end subroutine dynamic_push_time_K!this,current_drift
+        end subroutine dynamic_push_time_K!this,current_control
 
 
             function time_step_K(this) result(this_average_step)

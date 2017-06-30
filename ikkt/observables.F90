@@ -8,6 +8,13 @@
 #     include "monte_carlo/time.F90"
 
 #     include "ikkt/fields.F90"
+
+#     ifdef OPTIMAL
+
+#     include "ikkt/optimal_toolset.F90"
+
+#  endif
+
 #     include "ikkt/complex_langevin.F90"
 
 
@@ -19,6 +26,13 @@
             use::time_type
 
             use::fields
+
+#           ifdef OPTIMAL
+
+            use::optimal_toolset
+
+#        endif
+
             use::complex_langevin
 
 
@@ -32,8 +46,11 @@
 
             public::print_observables
 
-            private::  boson_action
-            private::fermion_action
+            private::faraday_squared
+            private::lambda
+
+            public::boson_action
+            public::fermi_action
 
 
       contains
@@ -48,22 +65,81 @@
                   integer        ,intent(in   )::unit
                   class(time(KK)),intent(in   )::measurement_time
 
+                  integer::mu
+
+
+            !     call make_drift_norm()
 
                   call write(unit,  measurement_time               )
-                       write(unit,format_observables_K,advance="no") a(:,:,0) !boson_action()
+                       write(unit,format_observables_K,advance="no") faraday_squared()
 
-                  if(fermions_included) then
+                  if(massive_deformations) then
 
-                       write(unit,format_observables_K             ) fermion_action()
+                       write(unit,format_observables_K,advance="no") epsilon,fermi_mass
 
-                  else
+                     do mu=0,boson_degrees_of_freedom-1,+1
 
-                       write(unit,                   *             )
+                       write(unit,format_observables_K,advance="no") lambda(mu)
 
-              end if!fermions_included
+              end    do!mu=0,boson_degrees_of_freedom-1,+1
+
+              end if!massive_deformations
+
+                  write(unit,*)
+
+                  call s%push_time()
 
 
         end subroutine print_observables!unit,measurement_time
+
+
+            function faraday_squared()
+
+
+                  implicit none
+
+
+                  real(KK)::faraday_squared
+
+                  integer::mu,nu
+
+
+                  faraday_squared=+.00000e+0_KK
+
+                  do mu=0,boson_degrees_of_freedom-1,+1
+
+                     do nu=0,boson_degrees_of_freedom-1,+1
+
+            !           faraday_squared&
+            !          =faraday_squared+norm(a(:,:,mu).commutation.a(:,:,nu))
+
+                        faraday_squared&
+                       =faraday_squared-trace((a(:,:,mu).commutation.a(:,:,nu)) &
+                                           .o.(a(:,:,mu).commutation.a(:,:,nu)))/inner_degrees_of_freedom
+
+              end    do!nu=0,boson_degrees_of_freedom-1,+1
+
+              end do!mu=0,boson_degrees_of_freedom-1,+1
+
+
+        end function faraday_squared
+
+
+            function lambda(k)
+
+
+                  implicit none
+
+
+                  integer,intent(in   )::k
+
+                  real(KK)::lambda
+
+
+                  lambda=trace(a(:,:,k).o.a(:,:,k))
+
+
+        end function lambda!k
 
 
             function boson_action()
@@ -74,46 +150,47 @@
 
                   real(KK)::boson_action
 
-                  integer::mu,nu
+#                 ifdef SYMMETRY_BREAKING
+
+                  integer::mu
+
+#              endif
 
 
-                  boson_action=+.00000e+0_KK
+                  boson_action=faraday_squared()*inner_degrees_of_freedom&
+                                                *inner_degrees_of_freedom/4
 
-                  do mu=0,inner_degrees_of_freedom-1,+1
+#                 ifdef SYMMETRY_BREAKING
 
-                     do nu=0,inner_degrees_of_freedom-1,+1
+                  do mu=0,boson_degrees_of_freedom-1,+1
 
-                        boson_action&
-                       =boson_action+trace((a(:,:,mu).commutation.a(:,:,nu)).o.(a(:,:,mu).commutation.a(:,:,nu)))
-            !           boson_action&
-            !          =boson_action+trace((a(:,:,mu).o.a(:,:,nu).o.a(:,:,mu).o.a(:,:,nu))&
-            !                             -(a(:,:,mu).o.a(:,:,mu).o.a(:,:,nu).o.a(:,:,nu)))
+                     boson_action&
+                    =boson_action+boson_mass(mu)*lambda(mu)*epsilon*inner_degrees_of_freedom&
+                                                                   *inner_degrees_of_freedom/2
 
-              end    do!nu=0,inner_degrees_of_freedom-1,+1
+              end do!mu=0,boson_degrees_of_freedom-1,+1
 
-              end do!mu=0,inner_degrees_of_freedom-1,+1
-
-                  boson_action&
-                 =boson_action*inner_degrees_of_freedom*.25000e+0_KK
+#              endif
 
 
         end function boson_action
 
 
-            function fermion_action()
+            function fermi_action()
 
 
                   implicit none
 
 
-                  complex(KK)::fermion_action
+                  complex(KK)::fermi_action
 
 
-                  fermion_action&
-                 =fermion_action+determinant_degree(boson_degrees_of_freedom)*sum(log(m_eigenvalues0/m_eigenvalues1))
+                  fermi_action&
+                 =fermi_action+determinant_degree(boson_degrees_of_freedom)*sum(log(m_eigenvalues0&
+                                                                                   /m_eigenvalues1))
 
 
-        end function fermion_action
+        end function fermi_action
 
 
   end module observables

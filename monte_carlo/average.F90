@@ -17,15 +17,15 @@
 
                integer,kind::precision
 
-               real(precision),private::weight=+.10000e+1_KK
-               real(precision),private::value =+.00000e+0_KK
+               real(precision),public::weight=+.00000e+0_KK
+               real(precision),public::value =+.00000e+0_KK
 
             contains
 
                procedure,private::initialize_average_K;generic::initialize_average=>initialize_average_K
 
-               procedure,public::weight_K
-               procedure,public::value__K
+      !        procedure,public::weight_K
+      !        procedure,public::value__K
 
                procedure,private::                is_equal_to_K;generic::                is_equal_to=>                is_equal_to_K
                procedure,private::   is_less_than_or_equal_to_K;generic::   is_less_than_or_equal_to=>   is_less_than_or_equal_to_K
@@ -43,17 +43,17 @@
 
         end interface average
 
-            interface weight
+      !     interface weight
 
-               module procedure weight_K
+      !        module procedure weight_K
 
-        end interface weight
+      ! end interface weight
 
-            interface value
+      !     interface value
 
-               module procedure value__K
+      !        module procedure value__K
 
-        end interface value
+      ! end interface value
 
             interface operator(+)
 
@@ -61,6 +61,12 @@
                module procedure average_average_average__plus_K
 
         end interface operator(+)
+
+            interface sum
+
+               module procedure average_sum_K
+
+        end interface sum
 
             interface operator(-)
 
@@ -77,6 +83,12 @@
                module procedure average_average_real_times_value_K
 
         end interface operator(*)
+
+            interface product
+
+               module procedure average_product_K
+
+        end interface product
 
             interface operator(/)
 
@@ -224,36 +236,36 @@
         end function average_constructor_K!weight,value
 
 
-            function weight_K(this) result(weight)
+      !     function weight_K(this) result(weight)
 
 
-                  implicit none
+      !           implicit none
 
 
-                  type(average(KK)),intent(inout)::this
-                  real(        KK )              ::weight
+      !           type(average(KK)),intent(inout)::this
+      !           real(        KK )              ::weight
 
 
-                  weight=this%weight
+      !           weight=this%weight
 
 
-        end function weight_K!this
+      ! end function weight_K!this
 
 
-            function value__K(this) result(value )
+      !     function value__K(this) result(value )
 
 
-                  implicit none
+      !           implicit none
 
 
-                  type(average(KK)),intent(inout)::this
-                  real(        KK )              ::value
+      !           type(average(KK)),intent(inout)::this
+      !           real(        KK )              ::value
 
 
-                  value =this%value
+      !           value =this%value
 
 
-        end function value__K!this
+      ! end function value__K!this
 
 
             function average_average__plus_K(average0) result(average_)
@@ -304,6 +316,29 @@
         end function average_average_average__plus_K!average1,average2
 
 
+            function average_sum_K(average0) result(average_)
+
+
+                  implicit none
+
+
+                  type(average(KK)),dimension(:),intent(in   )::average0
+                  type(average(KK))                           ::average_
+
+                      average_%weight&
+                 =sum(average0%weight)
+                      average_%value &
+                 =sum(average0%weight&
+                 *    average0%value)
+
+                      average_%value &
+                 =    average_%value &
+                 /    average_%weight
+
+
+        end function average_sum_K!average0
+
+
             function average_average_minus_K(average0) result(average_)
 
 
@@ -337,7 +372,7 @@
 
                   average_%weight&
                  =average1%weight&
-                 +average2%weight
+                 -average2%weight
 
                   average_%value &
                  =average1%weight&
@@ -411,6 +446,22 @@
 
 
         end function average_average_real_times_value_K!average1,average2
+
+
+            function average_product_K(average0) result(real_)
+
+
+                  implicit none
+
+
+                  type(average(KK)),dimension(:),intent(in   )::average0
+                  real(        KK )                           ::   real_
+
+
+                  real_=product(average0%value)
+
+
+        end function average_product_K!average0
 
 
             function average_real_average_division_by_K(average1,real2) result(average_)

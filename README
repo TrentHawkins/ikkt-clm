@@ -1,16 +1,44 @@
 IKKT Matrix model: Complex Langevin method (object-oriented-implementation)
 
-compile with:
-ifort -module "ifort/modules" -w main.F90 -mkl=sequential -lmkl_lapack95_lp64
+compile in ./ without BLAS:
 
-pending simulation work:
-- add simulation command body (simulation core is complete, referring to main)
-- add simulation end (wrapper)
-- add more observables
-- add gauge-cooling
-- add several method alterations to facilitate IKKT CLM study
+   ifort -module "ifort/modules" -fast -w main/main.F90
+   -mkl=sequential -lmkl_lapack95_lp64 -lmkl_core -lpthread -lm -ldl
 
-pending technical work:
-- add LAPACK support for multiplication
-- implement machine parallel support (openMP)
-- implement cluster parallel support (MPI)
+or with BLAS:
+
+   ifort -module "ifort/modules" -fast -w -DBLAS main/main.F90
+   -mkl=sequential -lmkl_blas95_lp64 -lmkl_lapack95_lp64 -lmkl_core -lpthread -lm -ldl
+
+You may need the option "-mcmodel=medium" if the stored arrays are too large, which conflicts with the "-fast" option.
+Later when the optimized version using commutators is fixed, it will not be necessary, as the fermion matrix is bypassed.
+
+The compiled program takes 1 argument has 6 options:
+
+-c: use old configuration, filename is internal for now, so no argument (TODO)
+-a: use cold (0) or hot (1) initial field configuration. using this option is mandatory
+-t: use dynamic time-step based on drift norm behaviour
+-f: use fermions in the simulation (not using is jsut a normalization test case for the simulation's noise)
+-g: apply gauge cooling in each step. In the end we want to use this
+-m: include mass deformations of the system that allow simulating it away from singular drifts
+
+The argument is a file base name for use in the various output files.
+
+The program for now queries the total time, average time-step, and average skip-time for measurements. The rest of the constant
+parameters can be found in "./ikkt/fields.F90". They will be moved from there later, compile time constants will go to a new file,
+and the more customizable parameters will also be querried run-time instead too. (TODO)
+
+Jack-knife is a separate program under "./jack_knife/". You compile seperately with:
+
+   ifort -module "ifort/modules" -fast -w jack_knife/main.F90
+
+Jack-knife has four versions, accounting on whether you wish to measure susceptibility as well, and whether the data are timed with
+a dynamic time-step instead of a static one.
+
+The compiled program takes 1 argument has 6 options:
+
+-j: how many jack-knife bins to take; it defines the jack-knife bin width later on
+-w: use weighted averages because you know the data are timed with a dynamic time-step
+-x: measure susceptibility along with plain observable
+
+The argument is the time history file name to process.

@@ -34,17 +34,17 @@
                   implicit none
 
 
-                  complex(KK),intent(in   ):: b( :               )
-                  complex(KK),intent(in   ):: a(0:size(b,dim=1)-1,&
-                                                0:size(b,dim=1)-1)
-                  complex(KK),intent(inout)::x0(0:size(b,dim=1)-1)
-                  complex(KK)              ::r0(0:size(b,dim=1)-1)
-                  complex(KK)              ::p0(0:size(b,dim=1)-1)
-                  real(   KK)              ::cb(0:size(b,dim=1)-1)
-                  complex(KK)              ::x1(0:size(b,dim=1)-1)
-                  complex(KK)              ::r1(0:size(b,dim=1)-1)
-                  real(   KK)              ::ca(0:size(b,dim=1)-1)
-                  complex(KK)              ::p1(0:size(b,dim=1)-1)
+                  complex(KK),dimension( :               ),intent(in   ):: b
+                  complex(KK),dimension(0:size(b,dim=1)-1,&
+                                        0:size(b,dim=1)-1),intent(in   ):: a
+                  complex(KK),dimension(0:size(b,dim=1)-1),intent(inout)::x0
+                  complex(KK),dimension(0:size(b,dim=1)-1)              ::r0
+                  complex(KK),dimension(0:size(b,dim=1)-1)              ::p0
+                  real(   KK)                                           ::cb
+                  complex(KK),dimension(0:size(b,dim=1)-1)              ::x1
+                  complex(KK),dimension(0:size(b,dim=1)-1)              ::r1
+                  real(   KK)                                           ::ca
+                  complex(KK),dimension(0:size(b,dim=1)-1)              ::p1
 
 
                   r0=b-(a.o.x0)
@@ -56,8 +56,6 @@
                         /norm(r0,a)
 
                      x1=x0-cb*     p0
-
-                     print *,norm(x1-x0)
 
                      if(norm(x1-x0)<=tolerance) then
 
@@ -79,7 +77,7 @@
               end do
 
 
-        end function conjugate_gradient_K!a,b,x0,count
+        end function conjugate_gradient_K!a,b,x0
 
 
   end module conjugate_gradient_method

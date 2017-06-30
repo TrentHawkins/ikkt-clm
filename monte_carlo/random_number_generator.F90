@@ -51,7 +51,7 @@
               end if!allocated(seed)
 
 
-        end subroutine prepare_seed
+        end subroutine prepare_seed!
 
 
             subroutine make_seed()
@@ -63,7 +63,7 @@
                   call random_seed()
 
 
-        end subroutine make_seed
+        end subroutine make_seed!
 
 
             subroutine load_seed()
@@ -86,7 +86,7 @@
                   deallocate(seed)
 
 
-        end subroutine load_seed
+        end subroutine load_seed!
 
 
             subroutine save_seed()
@@ -109,7 +109,7 @@
                   deallocate(seed)
 
 
-        end subroutine save_seed
+        end subroutine save_seed!
 
 
   end module random_number_generator
