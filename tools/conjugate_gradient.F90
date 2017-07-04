@@ -57,11 +57,11 @@
 
                      x1=x0-cb*     p0
 
-                     if(norm(x1-x0)<=tolerance) then
+                     if(norm(x1-x0)<tolerance) then
 
                         exit
 
-              end    if!norm(x1-x0)<=tolerance
+              end    if!norm(x1-x0)<tolerance)
 
                      r1=r0+cb*(a.o.p0)
 

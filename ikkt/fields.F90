@@ -56,12 +56,12 @@
             real(KK),                                        parameter,public::epsilon   = +.10000e+1_KK
             real(KK),dimension(0:boson_degrees_of_freedom-1),parameter,public::boson_mass=[+.50000e+0_KK,&
                                                                                            +.50000e+0_KK,&
-                                                                                           +.50000e+0_KK,&
                                                                                            +.10000e+1_KK,&
-                                                                                           +.10000e+1_KK,&
-                                                                                           +.10000e+1_KK]
+                                                                                           +.20000e+1_KK,&
+                                                                                           +.40000e+1_KK,&
+                                                                                           +.80000e+1_KK]
 
-            real(KK),                                        parameter,public::fermi_mass= +.15000e+1_KK
+            real(KK),                                        parameter,public::fermi_mass= +.12500e+1_KK
 
             complex(KK),dimension(0:inner_degrees_of_freedom-1,&
                                   0:inner_degrees_of_freedom-1,&
@@ -316,7 +316,8 @@
 
               end    do!i2=0,inner_degrees_of_freedom-1,+1
 
-                     m(:,:)=m(:,:)+(gamma(:,:,mu).x.a_delta(:,:))
+                     m(:,:)&
+                    =m(:,:)+(gamma(:,:,mu).x.a_delta(:,:))
 
               end do!mu=0,boson_degrees_of_freedom-1,+1
 

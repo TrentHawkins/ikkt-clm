@@ -155,7 +155,7 @@
 
                   if(fermions_included) then
 
-                     call make_fermi_noise(standard_deviation/2);f=zero!fermi_noise
+                     call make_fermi_noise(standard_deviation/2);f=fermi_noise
 
 #                 ifndef OPTIMAL
 
@@ -186,16 +186,16 @@
 
 #              endif
 
-                     do mu=0,boson_degrees_of_freedom-1,+1
+                     if(massive_deformations) then
 
-                        if(massive_deformations) then
+                       do mu=0,boson_degrees_of_freedom-1,+1
 
                            drift(:,:,mu)&
                           =drift(:,:,mu)-boson_mass(mu)*a(:,:,mu)*epsilon*inner_degrees_of_freedom
 
-              end       if!massive_deformations
+              end       do!mu=0,boson_degrees_of_freedom-1,+1
 
-              end    do!mu=0,boson_degrees_of_freedom-1,+1
+              end    if!massive_deformations
 
               end if!fermions_included
 

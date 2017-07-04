@@ -19,23 +19,15 @@
 
             real(KK),public::time_setting=+.00000e+0_KK
             real(KK),public::average_step=+.10000e-4
-            real(KK),public::ac_time_skip=+.10000e-4
 
-            class(time(KK)),allocatable,public::s
-            class(time(KK)),allocatable,public::t
+            type(time(KK)),public::t
 
-            private::prepare_time_K
+            private::read_time_parameters
 
             public::make_monte_carlo_K
             public::load_monte_carlo_K
             public::save_monte_carlo_K
 
-
-            interface prepare_time
-
-               module procedure prepare_time_K
-
-        end interface prepare_time
 
             interface make_monte_carlo
 
@@ -65,12 +57,10 @@
                   implicit none
 
 
-                  call prepare_time()
                   call read_time_parameters()
 
                   call   make_seed(                         )
-                  call s%make_time(time_setting,ac_time_skip)
-                  call t%make_time(ac_time_skip,average_step)
+                  call t%make_time(time_setting,average_step)
 
 
         end subroutine make_monte_carlo_K!
@@ -82,12 +72,10 @@
                   implicit none
 
 
-                  call prepare_time()
                   call read_time_parameters()
 
                   call   load_seed(                         )
-                  call s%load_time(time_setting,ac_time_skip)
-                  call t%load_time(ac_time_skip,average_step)
+                  call t%load_time(time_setting,average_step)
 
 
         end subroutine load_monte_carlo_K!
@@ -99,46 +87,11 @@
                   implicit none
 
 
-                  call   save_seed()
-                  call s%save_time()
-                  call t%save_time()
+                  call   save_seed(                         )
+                  call t%save_time(                         )
 
 
         end subroutine save_monte_carlo_K!
-
-
-            subroutine prepare_time_K()
-
-
-                  implicit none
-
-
-                  if(allocated(s)) then
-
-                     deallocate(s)
-
-              end if!allocated(s)
-
-                  allocate(time(KK)::s)
-
-                  if(allocated(t)) then
-
-                     deallocate(t)
-
-              end if!allocated(t)
-
-                  if(timestep_is_variable) then
-
-                     allocate(dynamic_time(KK)::t)
-
-                  else
-
-                     allocate(        time(KK)::t)
-
-              end if!timestep_is_variable
-
-
-        end subroutine prepare_time_K!
 
 
             subroutine read_time_parameters()
@@ -152,9 +105,6 @@
                   write(*,  *               )
                   write(*,"(a)",advance="no") "average_step: "
                    read(*,  *               )  average_step
-                  write(*,  *               )
-                  write(*,"(a)",advance="no") "ac_time_skip: "
-                   read(*,  *               )  ac_time_skip
                   write(*,  *               )
 
 

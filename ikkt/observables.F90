@@ -56,21 +56,20 @@
       contains
 
 
-            subroutine print_observables(unit,measurement_time)
+            subroutine print_observables(unit)
 
 
                   implicit none
 
 
                   integer        ,intent(in   )::unit
-                  class(time(KK)),intent(in   )::measurement_time
 
                   integer::mu
 
 
             !     call make_drift_norm()
 
-                  call write(unit,  measurement_time               )
+                  call write(unit,                   t             )
                        write(unit,format_observables_K,advance="no") faraday_squared()
 
                   if(massive_deformations) then
@@ -86,8 +85,6 @@
               end if!massive_deformations
 
                   write(unit,*)
-
-                  call s%push_time()
 
 
         end subroutine print_observables!unit,measurement_time
@@ -133,7 +130,7 @@
 
                   integer,intent(in   )::k
 
-                  real(KK)::lambda
+                  complex(KK)::lambda
 
 
                   lambda=trace(a(:,:,k).o.a(:,:,k))
