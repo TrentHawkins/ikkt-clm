@@ -31,7 +31,7 @@
 
             character(:),allocatable,public::conf_file_name
 
-            integer,parameter,public::inner_degrees_of_freedom=4,&
+            integer,parameter,public::inner_degrees_of_freedom=8,&
                                       boson_degrees_of_freedom=6,&
                                       fermi_degrees_of_freedom=2 &
                                    **(boson_degrees_of_freedom/2 &
