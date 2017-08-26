@@ -41,14 +41,14 @@
                                       d=boson_degrees_of_freedom,&
                                       p=fermi_degrees_of_freedom
 
-            integer,parameter,public::n_size=inner_degrees_of_freedom &
-                                            *inner_degrees_of_freedom,&
-                                      a_size=boson_degrees_of_freedom &
-                                            *inner_degrees_of_freedom &
-                                            *inner_degrees_of_freedom,&
-                                      f_size=fermi_degrees_of_freedom &
-                                            *inner_degrees_of_freedom &
-                                            *inner_degrees_of_freedom
+            integer,parameter,public::n_size= inner_degrees_of_freedom    &
+                                            * inner_degrees_of_freedom   ,&
+                                      a_size= boson_degrees_of_freedom    &
+                                            *(inner_degrees_of_freedom+1) &
+                                            *(inner_degrees_of_freedom+1),&
+                                      f_size= fermi_degrees_of_freedom    &
+                                            * inner_degrees_of_freedom    &
+                                            * inner_degrees_of_freedom
 
             real(KK),parameter,public::standard_deviation=sqrt(+.20000e+1_KK)
       !     real(KK),parameter,public::standard_deviation=     +.10000e+1_KK
@@ -63,43 +63,39 @@
 
             real(KK),                                        parameter,public::fermi_mass= +.12500e+1_KK
 
-            complex(KK),dimension(0:inner_degrees_of_freedom-1,&
-                                  0:inner_degrees_of_freedom-1,&
+            complex(KK),dimension(0:inner_degrees_of_freedom  ,&
+                                  0:inner_degrees_of_freedom  ,&
                                   0:boson_degrees_of_freedom-1),public::a,boson_noise
 
 #           ifndef OPTIMAL
 
-            complex(KK),dimension(0:f_size-1),public::f,fermi_noise,m_eigenvalues_,&
-                                                                    m_eigenvalues0,&
-                                                                    m_eigenvalues1
+            complex(KK),dimension(0:f_size-1),public::f,fermi_noise,m_eigenvalues_
             complex(KK),dimension(0:f_size-1,&
-                                  0:f_size-1),public::m,cm,cmm,m_kernel
+                                  0:f_size-1),public::m,cm,cmm
             complex(KK),dimension(0:f_size-1,&
-                                  0:f_size-1,0:inner_degrees_of_freedom-1,&
-                                             0:inner_degrees_of_freedom-1,&
+                                  0:f_size-1,0:inner_degrees_of_freedom  ,&
+                                             0:inner_degrees_of_freedom  ,&
                                              0:boson_degrees_of_freedom-1),public::ma
 
 #           else
 
-            complex(KK),dimension(0:inner_degrees_of_freedom-1,&
-                                  0:inner_degrees_of_freedom-1,&
-                                  0:fermi_degrees_of_freedom-1),public::f,fermi_noise!m_eigenvalues_,&
-      !                                                                               m_eigenvalues0,&
-      !                                                                               m_eigenvalues1
-      !     complex(KK),dimension(0:inner_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
+            complex(KK),dimension(0:inner_degrees_of_freedom  ,&
+                                  0:inner_degrees_of_freedom  ,&
+                                  0:fermi_degrees_of_freedom-1),public::f,fermi_noise!m_eigenvalues_
+      !     complex(KK),dimension(0:inner_degrees_of_freedom  ,&
+      !                           0:inner_degrees_of_freedom  ,&
       !                           0:fermi_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
+      !                           0:inner_degrees_of_freedom  ,&
+      !                           0:inner_degrees_of_freedom  ,&
       !                           0:fermi_degrees_of_freedom-1),public::m,cm,cmm,m_kernel
-      !     complex(KK),dimension(0:inner_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
+      !     complex(KK),dimension(0:inner_degrees_of_freedom  ,&
+      !                           0:inner_degrees_of_freedom  ,&
       !                           0:fermi_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
+      !                           0:inner_degrees_of_freedom  ,&
+      !                           0:inner_degrees_of_freedom  ,&
       !                           0:fermi_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
+      !                           0:inner_degrees_of_freedom  ,&
+      !                           0:inner_degrees_of_freedom  ,&
       !                           0:boson_degrees_of_freedom-1),public::ma
 
 #        endif
@@ -121,7 +117,6 @@
 
             private::make_m_eigenvalues
 
-            public::make_m_kernel
             public::update_fermion_matrix
 
 #        endif
@@ -175,9 +170,6 @@
                  =standard_deviation*sqrt(-2        *log(real(fermi_noise)))&
                                     * exp( 2*pi*im_unit*aimag(fermi_noise))
 
-                             fermi_noise&
-                 =m_kernel.o.fermi_noise
-
 #                 else
 
                   integer::a_
@@ -211,7 +203,7 @@
 
                      call make_boson_noise(standard_deviation)
 
-                     a=boson_noise
+                     a=real(boson_noise)
 
                   else
 
@@ -286,8 +278,8 @@
 
                   integer::mu,j2,i2,j1,i1
 
-                  complex(KK),dimension(0:n_size-1,&
-                                        0:n_size-1)::a_delta
+                  complex(KK),dimension(0:n_size-2,&
+                                        0:n_size-2)::a_delta
 
                   m=zero
 
@@ -295,7 +287,7 @@
 
                   do mu=0,boson_degrees_of_freedom-1,+1
 
-                     a_delta(:,:)=a(:,:,mu).x.delta(:,:)
+                     a_delta(:,:)=zero
 
                      do i2=0,inner_degrees_of_freedom-1,+1
 
@@ -305,8 +297,12 @@
 
                               do j1=0,inner_degrees_of_freedom-1,+1
 
-                                 a_delta(n*i1+j1,n*i2+j2)=a(j1,i2,mu)*delta(j2,i1)&
-                                                         -a(j2,i1,mu)*delta(j1,i2)
+                                 a_delta(n*i1+j1,n*i2+j2)= a(j1,i2,mu)*delta(j2,i1)              &
+                                                         - a(j2,i1,mu)*delta(j1,i2)              &
+                                                         -(a(n ,i2,mu)*delta(j2,n )              &
+                                                         - a(j2,n ,mu)*delta(n ,i2))*delta(i1,j1)&
+                                                         -(a(j1,n ,mu)*delta(n ,i1)              &
+                                                         - a(n ,i1,mu)*delta(j1,n ))*delta(i2,j2)
 
               end             do!j1=0,inner_degrees_of_freedom-1,+1
 
@@ -323,98 +319,38 @@
 
                   if(massive_deformations) then
 
-                     a_delta=zero
+                     select case(boson_degrees_of_freedom)
 
-                     do i2=0,inner_degrees_of_freedom-1,+1
+                     case(6)
 
-                        do j2=0,inner_degrees_of_freedom-1,+1
+                        do i2=0,inner_degrees_of_freedom-1,+1
 
-                           do i1=0,inner_degrees_of_freedom-1,+1
+                           do j2=0,inner_degrees_of_freedom-1,+1
 
-                              do j1=0,inner_degrees_of_freedom-1,+1
+                              do i1=0,inner_degrees_of_freedom-1,+1
 
-                                 a_delta(n*i1+j1,n*i2+j2)=delta(i1,i2)&
-                                                         *delta(j1,j2)
+                                 do j1=0,inner_degrees_of_freedom-1,+1
 
-              end             do!j1=0,inner_degrees_of_freedom-1,+1
+                                    a_delta(n*i1+j1,n*i2+j2)=delta(j1,i2)&
+                                                            *delta(j2,i1)
 
-              end          do!i1=0,inner_degrees_of_freedom-1,+1
+              end                do!j1=0,inner_degrees_of_freedom-1,+1
 
-              end       do!j2=0,inner_degrees_of_freedom-1,+1
+              end             do!i1=0,inner_degrees_of_freedom-1,+1
 
-              end    do!i2=0,inner_degrees_of_freedom-1,+1
+              end          do!j2=0,inner_degrees_of_freedom-1,+1
 
+              end       do!i2=0,inner_degrees_of_freedom-1,+1
 
                      m(:,:)&
                     =m(:,:)+(gamma(:,:,boson_degrees_of_freedom).x.a_delta(:,:))*fermi_mass
+
+              end    select!case(boson_degrees_of_freedom)
 
               end if!massive_deformations
 
 
         end subroutine make_m!
-
-
-      !     subroutine make_m()
-
-
-      !           implicit none
-
-
-      !           integer::mu,k,k1,k2
-
-      !           complex(KK),dimension(0:n_size-1,&
-      !                                 0:n_size-1)::a_delta
-
-
-      !           m=zero
-
-      !           do mu=0,boson_degrees_of_freedom-1,+1
-
-      !              a_delta=zero
-
-      !              do k2=0,inner_degrees_of_freedom-1,+1
-
-      !                 do k1=0,inner_degrees_of_freedom-1,+1
-
-      !                    do k=0,inner_degrees_of_freedom-1,+1
-
-      !                       a_delta(n*k+k1,n*k2+k)&
-      !                      =a_delta(n*k+k1,n*k2+k)+a(k1,k2,mu)
-      !                       a_delta(n*k1+k,n*k+k2)&
-      !                      =a_delta(n*k1+k,n*k+k2)-a(k2,k1,mu)
-
-      !       end          do!k=0,inner_degrees_of_freedom-1,+1
-
-      !       end       do!k1=0,inner_degrees_of_freedom-1,+1
-
-      !       end    do!k2=0,inner_degrees_of_freedom-1,+1
-
-      !              m(:,:)&
-      !             =m(:,:)+(gamma(:,:,mu).x.a_delta(:,:))
-
-      !       end do!mu=0,boson_degrees_of_freedom-1,+1
-
-      !           if(massive_deformations) then
-
-      !              a_delta=zero
-
-      !              do k2=0,inner_degrees_of_freedom-1,+1
-
-      !                 do k1=0,inner_degrees_of_freedom-1,+1
-
-      !                    a_delta(n*k1+k2,n*k1+k2)=re_unit
-
-      !       end       do!k1=0,inner_degrees_of_freedom-1,+1
-
-      !       end    do!k2=0,inner_degrees_of_freedom-1,+1
-
-      !              m(:,:)&
-      !             =m(:,:)+(gamma(:,:,boson_degrees_of_freedom).x.a_delta(:,:))*fermi_mass
-
-      !       end if!massive_deformations
-
-
-      ! end subroutine make_m!
 
 
             subroutine make_cm()
@@ -435,7 +371,7 @@
                   implicit none
 
 
-                  cmm=real(cm.o.m)
+                  cmm=hermitian(cm.o.m)
 
 
         end subroutine make_cmm!
@@ -453,9 +389,9 @@
                                         0:n_size-1)::delta_3
 
 
-                  do j=0,inner_degrees_of_freedom-1,+1
+                  do j=0,inner_degrees_of_freedom  ,+1
 
-                     do i=0,inner_degrees_of_freedom-1,+1
+                     do i=0,inner_degrees_of_freedom  ,+1
 
                            do i2=0,inner_degrees_of_freedom-1,+1
 
@@ -465,8 +401,12 @@
 
                                     do j1=0,inner_degrees_of_freedom-1,+1
 
-                                       delta_3(n*i1+j1,n*i2+j2)=delta(j1,j)*delta(i,i2)*delta(j2,i1)&
-                                                               -delta(j2,j)*delta(i,i1)*delta(j1,i2)
+                                       delta_3(n*i1+j1,n*i2+j2)= delta(j1,j)*delta(i,i2)*delta(j2,i1)              &
+                                                               - delta(j2,j)*delta(i,i1)*delta(j1,i2)              &
+                                                               -(delta(n ,j)*delta(i,i2)*delta(j2,n )              &
+                                                               - delta(j2,j)*delta(i,n )*delta(n ,i2))*delta(i1,j1)&
+                                                               -(delta(j1,j)*delta(i,n )*delta(n ,i1)              &
+                                                               - delta(n ,j)*delta(i,i1)*delta(j1,n ))*delta(i2,j2)
 
               end                   do!j1=0,inner_degrees_of_freedom-1,+1
 
@@ -482,60 +422,12 @@
 
               end       do!mu=0,boson_degrees_of_freedom-1,+1
 
-              end    do!i=0,inner_degrees_of_freedom-1,+1
+              end    do!i=0,inner_degrees_of_freedom  ,+1
 
-              end do!j=0,inner_degrees_of_freedom-1,+1
+              end do!j=0,inner_degrees_of_freedom  ,+1
 
 
         end subroutine make_ma!
-
-
-      !     subroutine make_ma()
-
-
-      !           implicit none
-
-
-      !           integer::mu,k,k1,k2
-
-      !           complex(KK),dimension(0:n_size-1,&
-      !                                 0:n_size-1,&
-      !                                 0:n_size-1)::delta_3
-
-
-      !           do k=0,inner_degrees_of_freedom-1,+1
-
-      !              do k2=0,inner_degrees_of_freedom-1,+1
-
-      !                 do k1=0,inner_degrees_of_freedom-1,+1
-
-      !                    delta_3(n*k1+k2,n*k+k2,n*k1+k)&
-      !                   =delta_3(n*k1+k2,n*k+k2,n*k1+k)+re_unit
-      !                    delta_3(n*k2+k1,n*k1+k,n*k+k1)&
-      !                   =delta_3(n*k2+k1,n*k1+k,n*k+k1)-re_unit
-
-      !       end       do!k1=0,inner_degrees_of_freedom-1,+1
-
-      !       end    do!k2=0,inner_degrees_of_freedom-1,+1
-
-      !       end do!k=0,inner_degrees_of_freedom-1,+1
-
-      !           do mu=0,boson_degrees_of_freedom-1,+1
-
-      !              do k2=0,inner_degrees_of_freedom-1,+1
-
-      !                 do k1=0,inner_degrees_of_freedom-1,+1
-
-      !                    ma(:,:,k1,k2,mu)=gamma(:,:,mu).x.delta_3(n*k1+k2,:,:)
-
-      !       end       do!k1=0,inner_degrees_of_freedom-1,+1
-
-      !       end    do!k2=0,inner_degrees_of_freedom-1,+1
-
-      !       end do!mu=0,boson_degrees_of_freedom-1,+1
-
-
-      ! end subroutine make_ma!
 
 
             subroutine make_m_eigenvalues
@@ -544,35 +436,10 @@
                   implicit none
 
 
-                  if(massive_deformations) then
-
-                     call geev(m,m_eigenvalues_)
-
-                  else
-
-                     call ggev(m,m_kernel,m_eigenvalues0,m_eigenvalues1)
-
-                                m_eigenvalues0&
-                    =m_kernel.o.m_eigenvalues0
-                                m_eigenvalues1&
-                    =m_kernel.o.m_eigenvalues1
-
-              end if!massive_deformations
+                  call geev(m,m_eigenvalues_)
 
 
         end subroutine make_m_eigenvalues!
-
-
-            subroutine make_m_kernel()
-
-
-                  implicit none
-
-
-                  m_kernel=matrix(fermi_degrees_of_freedom,re_unit).x.delta_super_traceless
-
-
-        end subroutine make_m_kernel!
 
 
             subroutine update_fermion_matrix()
@@ -610,19 +477,7 @@
             !     call write(   unit,cm)
             !     call write(   unit,cmm)
 
-                  if(massive_deformations) then
-
-                     call write(unit,m_eigenvalues_)
-
-                  else
-
-                     call write(unit,m_eigenvalues0)
-                     call write(unit,m_eigenvalues1)
-
-            !        call write(unit,m_eigenvalues0&
-            !                       /m_eigenvalues1)
-
-              end if!massive_deformations
+                  call write(unit,m_eigenvalues_)
 
                   close(        unit                      )
 

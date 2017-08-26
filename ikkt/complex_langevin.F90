@@ -50,8 +50,8 @@
 
             logical,public::fermions_included=.false.
 
-            complex(KK),dimension(0:inner_degrees_of_freedom-1,&
-                                  0:inner_degrees_of_freedom-1,&
+            complex(KK),dimension(0:inner_degrees_of_freedom  ,&
+                                  0:inner_degrees_of_freedom  ,&
                                   0:boson_degrees_of_freedom-1),public::drift,&
                                                                         noise
 
@@ -72,8 +72,8 @@
                   implicit none
 
 
-                  call make_constants(inner_degrees_of_freedom,&
-                                      boson_degrees_of_freedom)
+                  call make_constants(inner_degrees_of_freedom+1,&
+                                      boson_degrees_of_freedom  )
 
 #                 ifndef OPTIMAL
 
@@ -107,8 +107,8 @@
                   call make_noise()
 
                   a&
-                 =a+drift*     t%time_step()&
-                   +noise*sqrt(t%time_step())
+                 =a+     drift *     t%time_step()&
+                   +real(noise)*sqrt(t%time_step())
 
                   if(gauge_cooling_active) then
 

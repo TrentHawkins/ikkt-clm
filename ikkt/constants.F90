@@ -31,7 +31,7 @@
             complex(KK),allocatable,dimension( : ,&
                                                : ,&
                                                : ),public,protected::gamma,&
-                                                                     gamma_conjugate
+                                                           conjugate_gamma
 
             complex(KK),allocatable,dimension( : ,&
                                                : ,&
@@ -41,7 +41,6 @@
             private::gamma_size
 
             private::make_delta
-            private::make_delta_super_traceless
             private::make_gamma
             private::make_gamma_core
 
@@ -92,53 +91,6 @@
 
 
         end subroutine make_delta!size
-
-
-            subroutine make_delta_super_traceless(size)
-
-
-                  implicit none
-
-                  integer,intent(in   )::size
-
-                  integer::i0,j0
-                  integer::i1,j1
-
-
-                  if(allocated(delta_super_traceless)) then
-
-                     return
-
-              end if!allocated(delta_super_traceless)
-
-                  call make_delta(size)
-
-                  allocate(delta_super_traceless(0:size*size-1,&
-                                                 0:size*size-1))
-
-                  do j0=0,size-1,+1
-
-                     do j1=0,size-1,+1
-
-                        do i0=0,size-1,+1
-
-                           do i1=0,size-1,+1
-
-                                delta_super_traceless(i0*size+i1,&
-                                                      j0*size+j1)=delta(i0,j0)&
-                                                                 *delta(i1,j1)-delta(i0,i1)&
-                                                                              *delta(j0,j1)/real(size,kind=KK)
-
-              end          do!i1=0,size-1,+1
-
-              end       do!i0=0,size-1,+1
-
-              end    do!j1=0,size-1,+1
-
-              end do!j0=0,size-1,+1
-
-
-        end subroutine make_delta_super_traceless!size
 
 
             subroutine make_gamma(size)
@@ -207,7 +159,7 @@
                   integer::mu,nu
 
 
-                  allocate(gamma_conjugate(0:gamma_size(size)-1,&
+                  allocate(conjugate_gamma(0:gamma_size(size)-1,&
                                            0:gamma_size(size)-1,&
                                            0:           size -1))
 
@@ -218,11 +170,12 @@
 
                   do mu=0,size-1,+1
 
-                     gamma_conjugate(:,:,mu)=conjugate(gamma(:,:,mu))
+                     conjugate_gamma(:,:,mu)&
+                    =conjugate(gamma(:,:,mu))
 
                      do nu=0,size-1,+1
 
-                        gamma_core(:,:,mu,nu)=gamma_conjugate(:,:,mu).o.gamma(:,:,nu)
+                        gamma_core(:,:,mu,nu)=conjugate_gamma(:,:,mu).o.gamma(:,:,nu)
 
               end    do!nu=0,size-1,+1
 
@@ -259,7 +212,8 @@
         end function determinant_degree!d
 
 
-            subroutine make_constants(inner_size,boson_size)
+            subroutine make_constants(inner_size,&
+                                      boson_size)
 
 
                   implicit none
@@ -269,15 +223,15 @@
                   integer,intent(in   )::boson_size
 
 
-                  call make_delta                (inner_size)
-                  call make_delta_super_traceless(inner_size)
-                  call make_gamma                (boson_size)
-                  call make_gamma_core           (boson_size)
+                  call make_delta     (inner_size)
+                  call make_gamma     (boson_size)
+                  call make_gamma_core(boson_size)
 
                   call print_gamma()
 
 
-        end subroutine make_constants!inner_size,boson_size
+        end subroutine make_constants!inner_size,
+      !                               boson_size
 
 
             subroutine print_gamma()

@@ -123,6 +123,7 @@
 
             interface norm
 
+               module procedure scalar_norm_squared_K
                module procedure vector_norm_squared_K
                module procedure matrix_norm_squared_K
 
@@ -908,6 +909,22 @@
         end function matrix_antihermitian_K!matrix0
 
 
+            function scalar_norm_squared_K(scalar0) result(scalar_)
+
+
+                  implicit none
+
+
+                  complex(KK)                                   ,intent(in   )::scalar0
+                  real(   KK)                                                 ::scalar_
+
+
+                  scalar_=           conjg(scalar0)* scalar0
+
+
+        end function scalar_norm_squared_K!scalar0
+
+
             function vector_norm_squared_K(vector0) result(scalar_)
 
 
@@ -994,8 +1011,12 @@
                   complex(KK),dimension(0:                     ,&
                                         0:                     ),intent(inout)::matrix0
 
-                  call make_eigenmatrix(matrix0,trace_piece(matrix0))
-            !     call make_eigenmatrix(matrix0,trace(      matrix0)/real(size(matrix0,dim=1)))
+            !     call make_eigenmatrix(matrix0,trace_piece(matrix0))
+
+            !     call make_eigenmatrix(matrix0,trace(matrix0)/real(size(matrix0,dim=1)))
+
+                  matrix0(size(matrix0,dim=1)-1,size(matrix0,dim=2)-1)&
+                 =matrix0(size(matrix0,dim=1)-1,size(matrix0,dim=2)-1)-trace(matrix0)
 
 
         end subroutine make_matrix_traceless_K!matrix0
