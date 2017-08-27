@@ -50,8 +50,8 @@
 
             logical,public::fermions_included=.false.
 
-            complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                  0:inner_degrees_of_freedom  ,&
+            complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                  0:inner_degrees_of_freedom-1,&
                                   0:boson_degrees_of_freedom-1),public::drift,&
                                                                         noise
 
@@ -74,12 +74,6 @@
 
                   call make_constants(inner_degrees_of_freedom+1,&
                                       boson_degrees_of_freedom  )
-
-#                 ifndef OPTIMAL
-
-                  call make_m_kernel()
-
-#              endif
 
                   if(configuration_loaded) then
 

@@ -61,17 +61,17 @@
 
                   do
 
-                     cb=-vv(r0)/vcmmv(a,r0);x1=x0-cb*p0
+                     cb=-ucv(r0,r0)/ucmmv(r0,a,r0);x1=x0-cb*p0
 
-                     print *,vv(x1-x0)
+                     print *,ucv(x1-x0,x1-x0)
 
-                     if(sqrt(vv(x1-x0))<tolerance) then
+                     if(sqrt(ucv(x1-x0,x1-x0))<tolerance) then
 
                         exit
 
-              end    if!sqrt(vv(x1-x0))<tolerance
+              end    if!sqrt(ucv(x1-x0,x1-x0))<tolerance
 
-                     r1=r0+cb*cmmv(a,p0);ca=vv(r1)/vv(r0);p1=r1+ca*p0
+                     r1=r0+cb*cmmv(a,p0);ca=ucv(r1,r1)/ucv(r0,r0);p1=r1+ca*p0
 
                      x0=x1
                      r0=r1

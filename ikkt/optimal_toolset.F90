@@ -19,67 +19,110 @@
             implicit none
 
 
-            complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                  0:inner_degrees_of_freedom  ,&
+            complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                  0:inner_degrees_of_freedom-1,&
                                   0:fermi_degrees_of_freedom-1,&
                                   0:boson_degrees_of_freedom-1,0:1,&
                                                                0:1)::av_va
-            public::vv,mv,cmv,um,ucm,vcmmv,cmmv,ucmm,umav
+            public::ucv,mv,cmv,um,ucm,cmmv,ucmm,ucmmv,umav
 
 
-            interface operator( .m.)
+      !     interface operator( .o. )
 
-               module procedure  mv
-               module procedure um
-               module procedure umv
+      !        module procedure uov
 
-        end interface operator( .m.)
+      ! end interface operator( .o. )
 
-            interface operator( .cm.)
+      !     interface operator( .c. )
 
-               module procedure  cmv
-               module procedure ucm
-               module procedure ucmv
+      !        module procedure ucv
 
-        end interface operator( .cm.)
+      ! end interface operator( .c. )
 
-            interface operator( .cmm.)
+      !     interface operator( .m. )
 
-               module procedure  cmmv
-               module procedure ucmm
-               module procedure ucmmv
+      !        module procedure  mv
+      !        module procedure um
 
-        end interface operator( .cmm.)
+      ! end interface operator( .m. )
+
+      !     interface operator( .cm. )
+
+      !        module procedure  cmv
+      !        module procedure ucm
+
+      ! end interface operator( .cm. )
+
+      !     interface operator( .cmm. )
+
+      !        module procedure  cmmv
+      !        module procedure ucmm
+      !        module procedure ucmmv
+
+      ! end interface operator( .cmm. )
+
+      !     interface operator( .ma. )
+
+      !        module procedure umav
+
+      ! end interface operator( .ma. )
 
 
       contains
 
 
-            function vv(v)
+            function uov(u,v)
 
 
                   implicit none
 
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
-                                        0:fermi_degrees_of_freedom-1),intent(in   )::v
-                  real(KK)::vv
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
+                                        0:fermi_degrees_of_freedom-1),intent(in   )::u,v
+                  complex(KK)::uov
 
                   integer::a_
 
 
-                  vv=+.00000e+0_KK
+                  uov=+.00000e+0_KK
 
                   do a_=0,fermi_degrees_of_freedom-1,+1
 
-                     vv&
-                    =vv+norm(v(:,:,a_))
+                     uov&
+                    =uov+trace(u(:,:,a_).o.v(:,:,a_))
 
               end do!a_=0,fermi_degrees_of_freedom-1,+1
 
 
-        end function vv!v
+        end function uov!u,v
+
+
+            function ucv(u,v)
+
+
+                  implicit none
+
+
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
+                                        0:fermi_degrees_of_freedom-1),intent(in   )::u,v
+                  real(KK)::ucv
+
+                  integer::a_
+
+
+                  ucv=+.00000e+0_KK
+
+                  do a_=0,fermi_degrees_of_freedom-1,+1
+
+                     ucv&
+                    =ucv+trace(u(:,:,a_).c.v(:,:,a_))
+
+              end do!a_=0,fermi_degrees_of_freedom-1,+1
+
+
+        end function ucv!u,v
 
 
             function mv(a,v)
@@ -88,18 +131,18 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:boson_degrees_of_freedom-1),intent(in   )::a
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:fermi_degrees_of_freedom-1),intent(in   )::v
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:fermi_degrees_of_freedom-1)::mv
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  )::av_va
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1)::av_va
 
                   integer::a1,a2,m_
 
@@ -110,19 +153,41 @@
 
                      do a2=0,fermi_degrees_of_freedom-1,+1
 
-                        av_va(:,:)=transpose(      a(:,:,m_) .commutation.      v(:,:,a2) )
+                        av_va(:,:)=transpose(a(:,:,m_).commutation.v(:,:,a2))
 
                         do a1=0,fermi_degrees_of_freedom-1,+1
 
                            mv(:,:,a1)&
-                          =mv(:,:,a1)+           gamma(a1,a2,m_)*(av_va(:,:)&
-                                                                - av_va(n,n)*delta(:,:))
+                          =mv(:,:,a1)+gamma(a1,a2,m_)*(av_va(:,:)&
+                                                     - av_va(n,n)*delta(:,:))
 
               end       do!a1=0,fermi_degrees_of_freedom-1,+1
 
               end    do!a2=0,fermi_degrees_of_freedom-1,+1
 
               end do!m_=0,boson_degrees_of_freedom-1,+1
+
+                  if(massive_deformations) then
+
+                     select case(boson_degrees_of_freedom)
+
+                     case(6)
+
+                        do a2=0,fermi_degrees_of_freedom-1,+1
+
+                           do a1=0,fermi_degrees_of_freedom-1,+1
+
+                              mv(:,:,a1)&
+                             =mv(:,:,a1)+gamma(a1,a2,d)*transpose(v(:,:,a2)&
+                                                                - v(n,n,a2)*delta(:,:))
+
+              end          do!a1=0,fermi_degrees_of_freedom-1,+1
+
+              end       do!a2=0,fermi_degrees_of_freedom-1,+1
+
+              end    select!case(boson_degrees_of_freedom)
+
+              end if!massive_deformations
 
 
         end function mv!a,v
@@ -134,18 +199,18 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:boson_degrees_of_freedom-1),intent(in   )::a
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:fermi_degrees_of_freedom-1),intent(in   )::v
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:fermi_degrees_of_freedom-1)::cmv
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  )::av_va
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1)::av_va
 
                   integer::a1,a2,m_
 
@@ -156,7 +221,7 @@
 
                      do a2=0,fermi_degrees_of_freedom-1,+1
 
-                        av_va(:,:)=transpose(conjg(a(:,:,m_)).commutation.      v(:,:,a2) )
+                        av_va(:,:)=transpose(conjg(a(:,:,m_)).commutation.v(:,:,a2))
 
                         do a1=0,fermi_degrees_of_freedom-1,+1
 
@@ -170,6 +235,28 @@
 
               end do!m_=0,boson_degrees_of_freedom-1,+1
 
+                  if(massive_deformations) then
+
+                     select case(boson_degrees_of_freedom)
+
+                     case(6)
+
+                        do a2=0,fermi_degrees_of_freedom-1,+1
+
+                           do a1=0,fermi_degrees_of_freedom-1,+1
+
+                              cmv(:,:,a1)&
+                             =cmv(:,:,a1)+conjugate_gamma(a1,a2,d)*transpose(v(:,:,a2)&
+                                                                           - v(n,n,a2)*delta(:,:))
+
+              end          do!a1=0,fermi_degrees_of_freedom-1,+1
+
+              end       do!a2=0,fermi_degrees_of_freedom-1,+1
+
+              end    select!case(boson_degrees_of_freedom)
+
+              end if!massive_deformations
+
 
         end function cmv!a,v
 
@@ -180,18 +267,18 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
-                                        0:boson_degrees_of_freedom-1),intent(in   )::a
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:fermi_degrees_of_freedom-1),intent(in   )::u
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
+                                        0:boson_degrees_of_freedom-1),intent(in   )::a
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:fermi_degrees_of_freedom-1)::um
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  )::au_ua
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1)::ua_au
 
                   integer::a1,a2,m_
 
@@ -202,19 +289,41 @@
 
                      do a1=0,fermi_degrees_of_freedom-1,+1
 
-                        au_ua(:,:)=transpose(      a(:,:,m_) .commutation.conjg(v(:,:,a1)))
+                        ua_au(:,:)=transpose(conjg(u(:,:,a1)).commutation.a(:,:,m_))
 
                         do a2=0,fermi_degrees_of_freedom-1,+1
 
                            um(:,:,a2)&
-                          =um(:,:,a2)-           gamma(a1,a2,m_)*(au_ua(:,:)&
-                                                                - au_ua(n,n)*delta(:,:))
+                          =um(:,:,a2)+gamma(a1,a2,m_)*(ua_au(:,:)&
+                                                     - ua_au(n,n)*delta(:,:))
 
               end       do!a2=0,fermi_degrees_of_freedom-1,+1
 
               end    do!a1=0,fermi_degrees_of_freedom-1,+1
 
               end do!m_=0,boson_degrees_of_freedom-1,+1
+
+                  if(massive_deformations) then
+
+                     select case(boson_degrees_of_freedom)
+
+                     case(6)
+
+                        do a1=0,fermi_degrees_of_freedom-1,+1
+
+                           do a2=0,fermi_degrees_of_freedom-1,+1
+
+                              um(:,:,a2)&
+                             =um(:,:,a2)+gamma(a1,a2,d)*conjugate(u(:,:,a1)&
+                                                                - u(n,n,a1)*delta(:,:))
+
+              end          do!a2=0,fermi_degrees_of_freedom-1,+1
+
+              end       do!a1=0,fermi_degrees_of_freedom-1,+1
+
+              end    select!case(boson_degrees_of_freedom)
+
+              end if!massive_deformations
 
 
         end function um!u,a
@@ -226,18 +335,18 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
-                                        0:boson_degrees_of_freedom-1),intent(in   )::a
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:fermi_degrees_of_freedom-1),intent(in   )::u
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
+                                        0:boson_degrees_of_freedom-1),intent(in   )::a
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:fermi_degrees_of_freedom-1)::ucm
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  )::au_ua
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1)::ua_au
 
                   integer::a1,a2,m_
 
@@ -248,13 +357,13 @@
 
                      do a1=0,fermi_degrees_of_freedom-1,+1
 
-                        au_ua(:,:)=conjugate(      a(:,:,m_) .commutation.      v(:,:,a1) )
+                        ua_au(:,:)=conjugate(u(:,:,a1).commutation.a(:,:,m_))
 
                         do a2=0,fermi_degrees_of_freedom-1,+1
 
                            ucm(:,:,a2)&
-                          =ucm(:,:,a2)+conjugate_gamma(a1,a2,m_)*(au_ua(:,:)&
-                                                                - au_ua(n,n)*delta(:,:))
+                          =ucm(:,:,a2)-conjugate_gamma(a1,a2,m_)*(ua_au(:,:)&
+                                                                - ua_au(n,n)*delta(:,:))
 
               end       do!a2=0,fermi_degrees_of_freedom-1,+1
 
@@ -262,56 +371,30 @@
 
               end do!m_=0,boson_degrees_of_freedom-1,+1
 
+                  if(massive_deformations) then
+
+                     select case(boson_degrees_of_freedom)
+
+                     case(6)
+
+                        do a1=0,fermi_degrees_of_freedom-1,+1
+
+                           do a2=0,fermi_degrees_of_freedom-1,+1
+
+                              ucm(:,:,a1)&
+                             =ucm(:,:,a1)+conjugate_gamma(a1,a2,d)*conjugate(u(:,:,a2)&
+                                                                          - u(n,n,a2)*delta(:,:))
+
+              end          do!a2=0,fermi_degrees_of_freedom-1,+1
+
+              end       do!a1=0,fermi_degrees_of_freedom-1,+1
+
+              end    select!case(boson_degrees_of_freedom)
+
+              end if!massive_deformations
+
 
         end function ucm!u,a
-
-
-            function vcmmv(a,v)
-
-
-                  implicit none
-
-
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
-                                        0:boson_degrees_of_freedom-1),intent(in   )::a
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
-                                        0:fermi_degrees_of_freedom-1),intent(in   )::v
-                  real(KK)::vcmmv
-
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  )::av_va
-
-                  integer::a1,a2,m1,m2
-
-
-                  vcmmv=+.00000e+0_KK
-
-                  do m2=0,boson_degrees_of_freedom-1,+1
-
-                     do a2=0,boson_degrees_of_freedom-1,+1
-
-                        av_va(:,:)=transpose(conjg(a(:,:,m2)).commutation.      v(:,:,a2) )
-
-                        do m1=0,fermi_degrees_of_freedom-1,+1
-
-                           do a1=0,fermi_degrees_of_freedom-1,+1
-
-                              vcmmv&
-                             =vcmmv+gamma_core(a1,a2,m1,m2)*(norm(av_va(:,:))&
-                                                           + norm(av_va(n,n))*(inner_degrees_of_freedom+1))
-
-              end          do!a1=0,fermi_degrees_of_freedom-1,+1
-
-              end       do!m1=0,fermi_degrees_of_freedom-1,+1
-
-              end    do!a2=0,boson_degrees_of_freedom-1,+1
-
-              end do!m2=0,boson_degrees_of_freedom-1,+1
-
-
-        end function vcmmv!a,v
 
 
             function cmmv(a,v)
@@ -320,100 +403,68 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:boson_degrees_of_freedom-1),intent(in   )::a
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:fermi_degrees_of_freedom-1),intent(in   )::v
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:fermi_degrees_of_freedom-1)::cmmv
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  )::av_va,aav_ava_ava_vaa
 
-                  integer::a1,a2,m1,m2
-
-
-                  cmmv=zero
-
-                  do m2=0,boson_degrees_of_freedom-1,+1
-
-                     do a2=0,boson_degrees_of_freedom-1,+1
-
-                        av_va(:,:)=transpose(a(:,:,m2).commutation.v(:,:,a2)))
-
-                        do m1=0,fermi_degrees_of_freedom-1,+1
-
-                           aav_ava_ava_vaa(:,:)=transpose(conjg(a(:,:,m1)).commutation.av_va(:,:))
-
-                           do a1=0,fermi_degrees_of_freedom-1,+1
-
-                              cmmv(:,:,a1)&
-                             =cmmv(:,:,a1)-gamma_core(a1,a2,m1,m2)*aav_ava_ava_vaa(:,:)
-
-              end          do!a1=0,fermi_degrees_of_freedom-1,+1
-
-              end       do!m1=0,fermi_degrees_of_freedom-1,+1
-
-              end    do!a2=0,boson_degrees_of_freedom-1,+1
-
-              end do!m2=0,boson_degrees_of_freedom-1,+1
+                  cmmv=cmv(a,(mv(a,v)))
 
 
         end function cmmv!a,v
 
 
-            function ucmm(a,v)
+            function ucmm(u,a)
 
 
                   implicit none
 
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
+                                        0:fermi_degrees_of_freedom-1),intent(in   )::u
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:boson_degrees_of_freedom-1),intent(in   )::a
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
-                                        0:fermi_degrees_of_freedom-1),intent(in   )::v
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:fermi_degrees_of_freedom-1)::ucmm
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  )::av_va,aav_ava_ava_vaa
 
-                  integer::a1,a2,m1,m2
+                  ucmm=um(ucm(u,a),a)
 
 
-                  ucmm=zero
-
-                  do m1=0,boson_degrees_of_freedom-1,+1
-
-                     do a1=0,boson_degrees_of_freedom-1,+1
-
-                        av_va(:,:)=conjugate(a(:,:,m1).commutation.v(:,:,a1)))
-
-                        do m2=0,fermi_degrees_of_freedom-1,+1
-
-                           aav_ava_ava_vaa(:,:)=transpose(      a(:,:,m2) .commutation.av_va(:,:))
-
-                           do a2=0,fermi_degrees_of_freedom-1,+1
-
-                              ucmm(:,:,a2)&
-                             =ucmm(:,:,a2)+gamma_core(a1,a2,m1,m2)*aav_ava_ava_vaa(:,:)
-
-              end          do!a2=0,fermi_degrees_of_freedom-1,+1
-
-              end       do!m2=0,fermi_degrees_of_freedom-1,+1
-
-              end    do!a1=0,boson_degrees_of_freedom-1,+1
-
-              end do!m1=0,boson_degrees_of_freedom-1,+1
+        end function ucmm!u,a
 
 
-        end function ucmm!a,v
+            function ucmmv(u,a,v)
+
+
+                  implicit none
+
+
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
+                                        0:fermi_degrees_of_freedom-1),intent(in   )::u,v
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
+                                        0:boson_degrees_of_freedom-1),intent(in   )::a
+                  real(KK)::ucmmv
+
+
+            !     ucmmv=ucv(u,cm(a,mv(a,v)))=ucv(u,cmmv(a,v))
+
+                  ucmmv=uov(ucm(u,a),mv(a,v))
+
+            !     ucmmv=uov(um(ucm(u,a),a),v)=uov(ucmm(u,a),v)
+
+        end function ucmmv!u,a,v
 
 
             function umav(u,v)
@@ -422,15 +473,15 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:fermi_degrees_of_freedom-1),intent(in   )::u,v
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  ,&
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
                                         0:boson_degrees_of_freedom-1)::umav
 
-                  complex(KK),dimension(0:inner_degrees_of_freedom  ,&
-                                        0:inner_degrees_of_freedom  )::uv_vu
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1)::uv_vu
 
                   integer::a1,a2,m_
 

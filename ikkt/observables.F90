@@ -50,7 +50,7 @@
             private::lambda
 
             public::boson_action
-            public::fermi_action
+      !     public::fermi_action
 
 
       contains
@@ -147,47 +147,42 @@
 
                   real(KK)::boson_action
 
-#                 ifdef SYMMETRY_BREAKING
-
                   integer::mu
-
-#              endif
 
 
                   boson_action=faraday_squared()*inner_degrees_of_freedom&
                                                 *inner_degrees_of_freedom/4
 
-#                 ifdef SYMMETRY_BREAKING
+                  if(massive_deformations) then
 
-                  do mu=0,boson_degrees_of_freedom-1,+1
+                     do mu=0,boson_degrees_of_freedom-1,+1
 
-                     boson_action&
-                    =boson_action+boson_mass(mu)*lambda(mu)*epsilon*inner_degrees_of_freedom&
-                                                                   *inner_degrees_of_freedom/2
+                        boson_action&
+                       =boson_action+boson_mass(mu)*lambda(mu)*epsilon*inner_degrees_of_freedom&
+                                                                      *inner_degrees_of_freedom/2
 
-              end do!mu=0,boson_degrees_of_freedom-1,+1
+              end    do!mu=0,boson_degrees_of_freedom-1,+1
 
-#              endif
+              end if!massive_deformations
 
 
         end function boson_action
 
 
-            function fermi_action()
+      !     function fermi_action()
 
 
-                  implicit none
+      !           implicit none
 
 
-                  complex(KK)::fermi_action
+      !           complex(KK)::fermi_action
 
 
-                  fermi_action&
-                 =fermi_action+determinant_degree(boson_degrees_of_freedom)*sum(log(m_eigenvalues0&
-                                                                                   /m_eigenvalues1))
+      !           fermi_action&
+      !          =fermi_action+determinant_degree(boson_degrees_of_freedom)*sum(log(m_eigenvalues_))
 
 
-        end function fermi_action
+      ! end function fermi_action
 
 
   end module observables
