@@ -145,11 +145,18 @@
 
               end    do!nu=0,boson_degrees_of_freedom-1,+1
 
+                     if(massive_deformations) then
+
+                        drift(:,:,mu)&
+                       =drift(:,:,mu)-boson_mass(mu)*a(:,:,mu)*epsilon*inner_degrees_of_freedom
+
+              end    if!massive_deformations
+
               end do!mu=0,boson_degrees_of_freedom-1,+1
 
                   if(fermions_included) then
 
-                     call make_fermi_noise(standard_deviation/2);f=fermi_noise
+                     f=fermi_noise(.10000e+1_KK)
 
 #                 ifndef OPTIMAL
 
@@ -162,9 +169,9 @@
                            do i=0,inner_degrees_of_freedom-1,+1
 
                               drift(i,j,mu)&
-                             =drift(i,j,mu)+determinant_degree(boson_degrees_of_freedom)*(fermi_noise(:) &
-                         .c.(ma(:,:,i,j,mu)              .o.conjugate_gradient(cmm(:,:)                 ,&
-                                                                                cm(:,:).o.fermi_noise(:),f(:))))
+                             =drift(i,j,mu)+determinant_degree(boson_degrees_of_freedom)*(fermi_noise(.10000e+1_KK) &
+                         .c.(ma(:,:,i,j,mu)              .o.conjugate_gradient(cmm(:,:)                            ,&
+                                                                                cm(:,:).o.fermi_noise(.10000e+1_KK),f(:))))
 
               end          do!i=0,inner_degrees_of_freedom-1,+1
 
@@ -175,27 +182,16 @@
 #                 else
 
                      drift&
-                    =drift-determinant_degree(boson_degrees_of_freedom)*umav(fermi_noise ,&
-                                                  conjugate_gradient(a,cmv(a,fermi_noise),f))
+                    =drift-determinant_degree(boson_degrees_of_freedom)*umav(fermi_noise(.10000e+1_KK) ,&
+                                                  conjugate_gradient(a,cmv(a,fermi_noise(.10000e+1_KK)),f))
 
 #              endif
-
-                     if(massive_deformations) then
-
-                       do mu=0,boson_degrees_of_freedom-1,+1
-
-                           drift(:,:,mu)&
-                          =drift(:,:,mu)-boson_mass(mu)*a(:,:,mu)*epsilon*inner_degrees_of_freedom
-
-              end       do!mu=0,boson_degrees_of_freedom-1,+1
-
-              end    if!massive_deformations
 
               end if!fermions_included
 
                   do mu=0,boson_degrees_of_freedom-1,+1
 
-            !        call make_hermitian(drift(:,:,mu),+.10000e+1_KK)
+            !        call make_hermitian(drift(:,:,mu))
                      call make_traceless(drift(:,:,mu))
 
               end do!mu=0,boson_degrees_of_freedom-1,+1
@@ -238,14 +234,12 @@
                   integer::mu
 
 
-                  call make_boson_noise(standard_deviation)
-
-                  noise=boson_noise
+                  noise=boson_noise(.20000e+1_KK)
             !     noise=zero
 
                   do mu=0,boson_degrees_of_freedom-1,+1
 
-                     call make_hermitian(noise(:,:,mu),+.10000e+1_KK)
+                     call make_hermitian(noise(:,:,mu))
                      call make_traceless(noise(:,:,mu))
 
               end do!mu=0,boson_degrees_of_freedom-1,+1

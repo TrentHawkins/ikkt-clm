@@ -157,7 +157,7 @@
                   options(2)=option(   "start-field"   ,.true. ,'a',"New field configuration setting."                 ,"hot-cold")
                   options(3)=option("variable-timestep",.false.,'t',"Use variable timestep."                           ,"        ")
                   options(4)=option("fermions-included",.false.,'f',"Include fermions in simulation."                  ,"        ")
-                  options(5)=option("   gauge-cooling ",.false.,'m',"Apply gauge-cooling to configuratio"              ,"        ")
+                  options(5)=option("   gauge-cooling ",.false.,'g',"Apply gauge-cooling to configuratio"              ,"        ")
                   options(6)=option("mass-deformations",.false.,'m',"Include massive deformations in Complex Langevin.","        ")
 
                   do

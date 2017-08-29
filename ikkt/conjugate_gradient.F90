@@ -63,8 +63,6 @@
 
                      cb=-ucv(r0,r0)/ucmmv(r0,a,r0);x1=x0-cb*p0
 
-                     print *,ucv(x1-x0,x1-x0)
-
                      if(sqrt(ucv(x1-x0,x1-x0))<tolerance) then
 
                         exit

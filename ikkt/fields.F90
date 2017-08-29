@@ -46,9 +46,6 @@
                                       a_size= boson_degrees_of_freedom* n_size  ,&
                                       f_size= fermi_degrees_of_freedom*(n_size-1)
 
-            real(KK),parameter,public::standard_deviation=sqrt(+.20000e+1_KK)
-      !     real(KK),parameter,public::standard_deviation=     +.10000e+1_KK
-
             real(KK),                                        parameter,public::epsilon   = +.10000e+1_KK
             real(KK),dimension(0:boson_degrees_of_freedom-1),parameter,public::boson_mass=[+.50000e+0_KK,&
                                                                                            +.50000e+0_KK,&
@@ -61,11 +58,11 @@
 
             complex(KK),dimension(0:inner_degrees_of_freedom-1,&
                                   0:inner_degrees_of_freedom-1,&
-                                  0:boson_degrees_of_freedom-1),public::a,boson_noise
+                                  0:boson_degrees_of_freedom-1),public::a
 
 #           ifndef OPTIMAL
 
-            complex(KK),dimension(0:f_size-1),public::f,fermi_noise,m_eigenvalues_
+            complex(KK),dimension(0:f_size-1),public::f,m_eigenvalues_
             complex(KK),dimension(0:f_size-1,&
                                   0:f_size-1),public::m,cm,cmm
             complex(KK),dimension(0:f_size-1,&
@@ -87,7 +84,7 @@
 
             complex(KK),dimension(0:inner_degrees_of_freedom-1,&
                                   0:inner_degrees_of_freedom-1,&
-                                  0:fermi_degrees_of_freedom-1),public::f,fermi_noise!m_eigenvalues_
+                                  0:fermi_degrees_of_freedom-1),public::f!m_eigenvalues_
       !     complex(KK),dimension(0:inner_degrees_of_freedom-1,&
       !                           0:inner_degrees_of_freedom-1,&
       !                           0:fermi_degrees_of_freedom-1,&
@@ -106,8 +103,8 @@
 
 #        endif
 
-            public::make_boson_noise
-            public::make_fermi_noise
+            public::boson_noise
+            public::fermi_noise
 
             public::make_fields
             public::load_fields
@@ -117,13 +114,17 @@
       contains
 
 
-            subroutine make_boson_noise(standard_deviation)
+            function boson_noise(standard_deviation)
 
 
                   implicit none
 
 
-                  real(KK)::standard_deviation
+                  real(KK),intent(in   )::standard_deviation
+
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
+                                        0:boson_degrees_of_freedom-1)::boson_noise
 
                   integer::mu
 
@@ -132,9 +133,9 @@
 
                      call random_number(boson_noise(:,:,mu))
 
-                                                                 boson_noise(:,:,mu)   &
-                    =standard_deviation*sqrt(-2        *log(real(boson_noise(:,:,mu))))&
-                                       * exp( 2*pi*im_unit*aimag(boson_noise(:,:,mu)))
+                                                                           boson_noise(:,:,mu)   &
+                    =standard_deviation*sqrt(                    -log(real(boson_noise(:,:,mu))))&
+                                       * exp(.20000e+1_KK*pi*im_unit*aimag(boson_noise(:,:,mu)))
 
             !        call make_hermitian(boson_noise(:,:,mu),+.10000e+1_KK)
                      call make_traceless(boson_noise(:,:,mu))
@@ -142,27 +143,33 @@
               end do!mu=0,boson_degrees_of_freedom-1,+1
 
 
-        end subroutine make_boson_noise!standard_deviation
+        end function boson_noise!standard_deviation
 
 
-            subroutine make_fermi_noise(standard_deviation)
+            function fermi_noise(standard_deviation)
 
 
                   implicit none
 
 
-                  real(KK)::standard_deviation
+                  real(KK),intent(in   )::standard_deviation
 
 #                 ifndef OPTIMAL
+
+                  complex(KK),dimension(0:f_size-1)::fermi_noise
 
 
                   call random_number(fermi_noise)
 
-                                                              fermi_noise   &
-                 =standard_deviation*sqrt(-2        *log(real(fermi_noise)))&
-                                    * exp( 2*pi*im_unit*aimag(fermi_noise))
+                                                                        fermi_noise   &
+                 =standard_deviation*sqrt(                    -log(real(fermi_noise)))&
+                                    * exp(.20000e+1_KK*pi*im_unit*aimag(fermi_noise))
 
 #                 else
+
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
+                                        0:fermi_degrees_of_freedom-1)::fermi_noise
 
                   integer::a_
 
@@ -171,9 +178,9 @@
 
                      call random_number(fermi_noise(:,:,a_))
 
-                                                                 fermi_noise(:,:,a_)   &
-                    =standard_deviation*sqrt(-2        *log(real(fermi_noise(:,:,a_))))&
-                                       * exp( 2*pi*im_unit*aimag(fermi_noise(:,:,a_)))
+                                                                           fermi_noise(:,:,a_)   &
+                    =standard_deviation*sqrt(                    -log(real(fermi_noise(:,:,a_))))&
+                                       * exp(.20000e+1_KK*pi*im_unit*aimag(fermi_noise(:,:,a_)))
 
                      call make_traceless(fermi_noise(:,:,a_))
 
@@ -182,7 +189,7 @@
 #              endif
 
 
-        end subroutine make_fermi_noise!standard_deviation
+        end function fermi_noise!standard_deviation
 
 
             subroutine make_fields()
@@ -191,11 +198,19 @@
                   implicit none
 
 
+                  integer::mu
+
+
                   if(start_field_is_noisy) then
 
-                     call make_boson_noise(standard_deviation)
+                     a=boson_noise(.20000e+1_KK)
 
-                     a=real(boson_noise)
+                     do mu=0,boson_degrees_of_freedom-1,+1
+
+                        call make_hermitian(a(:,:,mu))
+                        call make_traceless(a(:,:,mu))
+
+              end    do!mu=0,boson_degrees_of_freedom-1,+1
 
                   else
 
@@ -290,7 +305,7 @@
                               exit
 
               end          if!inner_degrees_of_freedom*i2+j2==n_size-1
-
+.
                            do i1=0,inner_degrees_of_freedom-1,+1
 
                               do j1=0,inner_degrees_of_freedom-1,+1

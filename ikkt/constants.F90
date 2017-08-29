@@ -26,13 +26,11 @@
                                                                 [[+re_unit,    zero],[    zero,-re_unit]]]
 
             complex(KK),allocatable,dimension( : ,&
-                                               : ),public,protected::delta,&
-                                                                     delta_super_traceless
+                                               : ),public,protected::delta
             complex(KK),allocatable,dimension( : ,&
                                                : ,&
                                                : ),public,protected::gamma,&
                                                            conjugate_gamma
-
             complex(KK),allocatable,dimension( : ,&
                                                : ,&
                                                : ,&

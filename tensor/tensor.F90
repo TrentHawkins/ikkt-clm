@@ -1029,8 +1029,8 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
-                  real(   KK),                                   intent(in   )::factor
+                                        0:                     ),intent(inout)         ::matrix0
+                  real(   KK),                                   intent(in   ),optional::factor
 
                   integer::i,j
 
@@ -1040,11 +1040,11 @@
                      do i=0,j-1,+1
 
                         matrix0(i,j)=(conjg(matrix0(j,i))+matrix0(i,j))*(+.50000e+0_KK,&
-                                                                         +.00000e+0_KK)*factor
+                                                                         +.00000e+0_KK)
 
               end    do!i=0,j-1,+1
 
-                     matrix0(j,j)=real(matrix0(i,j))*factor
+                     matrix0(j,j)=real(matrix0(i,j))
 
               end do!j=0,size(matrix0,dim=2)-1,+1
 
@@ -1058,6 +1058,13 @@
 
               end do!j=0,size(matrix0,dim=2)-1,+1
 
+                  if(present(factor)) then
+
+                     matrix0&
+                    =matrix0*factor
+
+              end if!present(factor)
+
 
         end subroutine make_matrix_hermitian_K!matrix0,factor
 
@@ -1069,8 +1076,8 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
-                  real(   KK),                                   intent(in   )::factor
+                                        0:                     ),intent(inout)         ::matrix0
+                  real(   KK),                                   intent(in   ),optional::factor
 
 
                   integer::i,j
@@ -1080,7 +1087,7 @@
                      do i=0,j-1,+1
 
                         matrix0(i,j)=(conjg(matrix0(j,i))-matrix0(i,j))*(+.00000e+0_KK,&
-                                                                         +.50000e+0_KK)*factor
+                                                                         +.50000e+0_KK)
 
               end    do!i=0,j-1,+1
 
@@ -1097,6 +1104,13 @@
               end    do!i=j+1,size(matrix0,dim=1)-1,+1
 
               end do!j=0,size(matrix0,dim=2)-1,+1
+
+                  if(present(factor)) then
+
+                     matrix0&
+                    =matrix0*factor
+
+              end if!present(factor)
 
 
         end subroutine make_matrix_antihermitian_K!matrix0,factor
