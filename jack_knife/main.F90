@@ -149,7 +149,7 @@
                   integer       ::argind  ! current argument running index starting where the options end
                   integer       ::argnum  ! number of remaining indices options aside
 
-                  type(option)::options(3) ! list of long options
+                  type(option)::options(1:3) ! list of long options
 
 
                   options(1)=option("    jack-bins    ",.true. ,'j',"Number of jack-knife bins."                      ,"jack_bins")
@@ -158,20 +158,16 @@
 
                   do
 
-                     call getopt(options="j:w:v:x",&
-                                longopts=options ,&
-                                 optchar=optchar ,&
-                                  optarg=optarg  ,&
-                                  arglen=arglen  ,&
-                                    stat=stat    ,&
-                                  offset=argind  ,&
+                     call getopt(options="j:w:x",&
+                                longopts=options,&
+                                 optchar=optchar,&
+                                  optarg=optarg ,&
+                                  arglen=arglen ,&
+                                    stat=stat   ,&
+                                  offset=argind ,&
                                   remain=argnum)
 
-                     if(stat==1)then
-
-                        exit
-
-              end    if!stat==1
+                     if(stat==1) exit
 
                      select case(optchar)
 

@@ -50,10 +50,10 @@
 
             logical,public::fermions_included=.false.
 
-            complex(KK),dimension(0:inner_degrees_of_freedom-1,&
-                                  0:inner_degrees_of_freedom-1,&
-                                  0:boson_degrees_of_freedom-1),public::drift,&
-                                                                        noise
+            complex(KK),dimension( :                          ,&
+                                   :                          ,&
+                                   :                          ),allocatable,public::drift,&
+                                                                                    noise
 
             real(KK),public::drift_norm
 
@@ -71,6 +71,15 @@
 
                   implicit none
 
+
+                  if(allocated(drift)) deallocate(drift)
+                                         allocate(drift(0:inner_degrees_of_freedom-1,&
+                                                        0:inner_degrees_of_freedom-1,&
+                                                        0:boson_degrees_of_freedom-1))
+                  if(allocated(noise)) deallocate(noise)
+                                         allocate(noise(0:inner_degrees_of_freedom-1,&
+                                                        0:inner_degrees_of_freedom-1,&
+                                                        0:boson_degrees_of_freedom-1))
 
                   call make_constants(inner_degrees_of_freedom+1,&
                                       boson_degrees_of_freedom  )
@@ -234,7 +243,7 @@
                   integer::mu
 
 
-                  noise=boson_noise(.20000e+1_KK)
+                  noise=boson_noise(sqrt(.20000e+1_KK))
             !     noise=zero
 
                   do mu=0,boson_degrees_of_freedom-1,+1
@@ -246,6 +255,21 @@
 
 
         end subroutine make_noise!
+
+
+            subroutine eject_complex_langevin()
+
+
+                  implicit none
+
+
+                  call eject_gauge_cooler()
+
+                  deallocate(drift)
+                  deallocate(noise)
+
+
+        end subroutine eject_complex_langevin
 
 
   end module complex_langevin

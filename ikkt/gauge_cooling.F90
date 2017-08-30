@@ -35,9 +35,9 @@
 
             logical,public::gauge_cooling_active=.false.
 
-            complex(KK),dimension(0:inner_degrees_of_freedom-1,&
-                                  0:inner_degrees_of_freedom-1),private::h
-            real(   KK),dimension(0:inner_degrees_of_freedom-1),private::h_eigenvalues
+            complex(KK),dimension( :                          ,&
+                                   :                          ),allocatable,private::h
+            real(   KK),dimension( :                          ),allocatable,private::h_eigenvalues
 
             private::make_cooler
             private::h_diagonalized
@@ -61,6 +61,14 @@
 
                   integer::mu
 
+
+                  if(     allocated(h).and.(size(h,dim=1)/=inner_degrees_of_freedom&
+                                        .or.size(h,dim=2)/=inner_degrees_of_freedom)) deallocate(h)
+                  if(.not.allocated(h)) allocate(h(      0:inner_degrees_of_freedom-1,&
+                                                         0:inner_degrees_of_freedom-1))
+
+                  if(     allocated(h_eigenvalues).and. size(h_eigenvalues)/=inner_degrees_of_freedom) deallocate(h_eigenvalues)
+                  if(.not.allocated(h_eigenvalues)) allocate(h_eigenvalues(0:inner_degrees_of_freedom-1))
 
                   h=+.00000e+0_KK
 
@@ -227,6 +235,18 @@
 
 
         end subroutine print_guided_hermiticity_norm!step_100
+
+
+            subroutine eject_gauge_cooler()
+
+
+                  implicit none
+
+
+                  deallocate(h)
+
+
+        end subroutine eject_gauge_cooler!
 
 
   end module gauge_cooling

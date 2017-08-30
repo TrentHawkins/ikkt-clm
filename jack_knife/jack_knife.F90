@@ -59,12 +59,8 @@
 
                      do j=0,jack_bins-1
 
-                        if(i/bin_width/=j) then
-
-                           o(j)&
-                          =o(j)+record_values(i)/(record_size-bin_width)
-
-              end       if!i/bin_width/=j
+                        if(i/bin_width/=j) o(j)&
+                                          =o(j)+record_values(i)/(record_size-bin_width)
 
               end    do!j=0,jack_bins-1
 
@@ -129,13 +125,9 @@
 
                      do j=0,jack_bins-1
 
-                        if(i/bin_width/=j) then
-
-                           x(j)&
-                          =x(j)+(record_values(i)-o(j))&
-                               *(record_values(i)-o(j))/(record_size-bin_width)
-
-              end       if!i/bin_width/=j
+                        if(i/bin_width/=j) x(j)&
+                                          =x(j)+(record_values(i)-o(j))&
+                                               *(record_values(i)-o(j))/(record_size-bin_width)
 
               end    do!j=0,jack_bins-1
 
@@ -176,7 +168,7 @@
                            j,bin_width
 
 
-                  allocate(o(0:jack_bins-1));o=average()
+                    allocate(o(0:jack_bins-1));o=average()
 
                   bin_width=record_size/jack_bins
 
@@ -233,8 +225,8 @@
 
 
 
-                  allocate(o(0:jack_bins-1));o=average()
-                  allocate(x(0:jack_bins-1));x=average()
+                    allocate(o(0:jack_bins-1));o=average()
+                    allocate(x(0:jack_bins-1));x=average()
 
                   bin_width=record_size/jack_bins
 

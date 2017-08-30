@@ -18,8 +18,10 @@
 
 
             real(KK),public::time_setting=+.00000e+0_KK
-            real(KK),public::average_step=+.10000e-4
+            real(KK),public::measure_skip=+.00000e+0_KK
+            real(KK),public::average_step=+.00000e+0_KK
 
+            type(time(KK)),public::s
             type(time(KK)),public::t
 
             private::read_time_parameters
@@ -60,7 +62,8 @@
                   call read_time_parameters()
 
                   call   make_seed(                         )
-                  call t%make_time(time_setting,average_step)
+                  call s%make_time(time_setting,measure_skip)
+                  call t%make_time(measure_skip,average_step)
 
 
         end subroutine make_monte_carlo_K!
@@ -75,7 +78,8 @@
                   call read_time_parameters()
 
                   call   load_seed(                         )
-                  call t%load_time(time_setting,average_step)
+                  call s%load_time(time_setting,measure_skip)
+                  call t%load_time(measure_skip,average_step)
 
 
         end subroutine load_monte_carlo_K!
@@ -88,6 +92,7 @@
 
 
                   call   save_seed(                         )
+                  call s%save_time(                         )
                   call t%save_time(                         )
 
 
@@ -103,8 +108,13 @@
                   write(*,"(a)",advance="no") "time_setting: "
                    read(*,  *               )  time_setting
                   write(*,  *               )
+                  write(*,"(a)",advance="no") "measure_skip: "
+                   read(*,  *               )  measure_skip
+                  write(*,  *               )
                   write(*,"(a)",advance="no") "average_step: "
                    read(*,  *               )  average_step
+                  write(*,  *               )
+
                   write(*,  *               )
 
 

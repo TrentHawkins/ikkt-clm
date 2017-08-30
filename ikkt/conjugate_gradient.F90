@@ -63,11 +63,7 @@
 
                      cb=-ucv(r0,r0)/ucmmv(r0,a,r0);x1=x0-cb*p0
 
-                     if(sqrt(ucv(x1-x0,x1-x0))<tolerance) then
-
-                        exit
-
-              end    if!sqrt(ucv(x1-x0,x1-x0))<tolerance
+                     if(sqrt(ucv(x1-x0,x1-x0))<tolerance) exit
 
                      r1=r0+cb*cmmv(a,p0);ca=ucv(r1,r1)/ucv(r0,r0);p1=r1+ca*p0
 

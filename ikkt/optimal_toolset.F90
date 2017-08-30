@@ -19,11 +19,6 @@
             implicit none
 
 
-            complex(KK),dimension(0:inner_degrees_of_freedom-1,&
-                                  0:inner_degrees_of_freedom-1,&
-                                  0:fermi_degrees_of_freedom-1,&
-                                  0:boson_degrees_of_freedom-1,0:1,&
-                                                               0:1)::av_va
             public::ucv,mv,cmv,um,ucm,cmmv,ucmm,ucmmv,umav
 
 

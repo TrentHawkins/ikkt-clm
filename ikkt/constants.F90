@@ -76,14 +76,10 @@
                   integer,intent(in   )::size
 
 
-                  if(allocated(delta)) then
+                  if(allocated(delta)) return
 
-                     return
-
-              end if!allocated(delta)
-
-                  allocate(delta(0:size-1,&
-                                 0:size-1))
+                     allocate (delta(0:size-1,&
+                                     0:size-1))
 
                   delta=matrix(size,+re_unit)
 

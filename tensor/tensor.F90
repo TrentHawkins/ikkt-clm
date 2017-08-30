@@ -1058,12 +1058,8 @@
 
               end do!j=0,size(matrix0,dim=2)-1,+1
 
-                  if(present(factor)) then
-
-                     matrix0&
-                    =matrix0*factor
-
-              end if!present(factor)
+                  if(present(factor)) matrix0&
+                                     =matrix0*factor
 
 
         end subroutine make_matrix_hermitian_K!matrix0,factor
@@ -1105,12 +1101,8 @@
 
               end do!j=0,size(matrix0,dim=2)-1,+1
 
-                  if(present(factor)) then
-
-                     matrix0&
-                    =matrix0*factor
-
-              end if!present(factor)
+                  if(present(factor)) matrix0&
+                                     =matrix0*factor
 
 
         end subroutine make_matrix_antihermitian_K!matrix0,factor

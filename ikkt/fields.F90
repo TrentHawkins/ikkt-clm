@@ -29,46 +29,36 @@
             logical,public::start_field_is_noisy=.false.
             logical,public::massive_deformations=.false.
 
+            character(:),allocatable,public::stat_file_name
             character(:),allocatable,public::conf_file_name
 
-            integer,parameter,public::inner_degrees_of_freedom=8,&
-                                      boson_degrees_of_freedom=6,&
-                                      fermi_degrees_of_freedom=2 &
-                                   **(boson_degrees_of_freedom/2 &
-                                                              -1)
+            integer,public::inner_degrees_of_freedom,n,n_size,&
+                            boson_degrees_of_freedom,d,a_size,&
+                            fermi_degrees_of_freedom,p,f_size
 
-            integer,parameter,public::n=inner_degrees_of_freedom-1,&
-                                      d=boson_degrees_of_freedom-1,&
-                                      p=fermi_degrees_of_freedom-1
+            real(KK),                                                    public::epsilon
+            real(KK),dimension( :                          ),allocatable,public::boson_mass
+            real(KK),                                                    public::fermi_mass
 
-            integer,parameter,public::n_size= inner_degrees_of_freedom           &
-                                            * inner_degrees_of_freedom          ,&
-                                      a_size= boson_degrees_of_freedom* n_size  ,&
-                                      f_size= fermi_degrees_of_freedom*(n_size-1)
+            complex(KK),dimension( :                          ,&
+                                   :                          ,&
+                                   :                          ),allocatable,public::a
 
-            real(KK),                                        parameter,public::epsilon   = +.10000e+1_KK
-            real(KK),dimension(0:boson_degrees_of_freedom-1),parameter,public::boson_mass=[+.50000e+0_KK,&
-                                                                                           +.50000e+0_KK,&
-                                                                                           +.10000e+1_KK,&
-                                                                                           +.20000e+1_KK,&
-                                                                                           +.40000e+1_KK,&
-                                                                                           +.80000e+1_KK]
+#           ifdef OPTIMAL
 
-            real(KK),                                        parameter,public::fermi_mass= +.12500e+1_KK
+            complex(KK),dimension( :                          ,&
+                                   :                          ,&
+                                   :                          ),allocatable,public::f
 
-            complex(KK),dimension(0:inner_degrees_of_freedom-1,&
-                                  0:inner_degrees_of_freedom-1,&
-                                  0:boson_degrees_of_freedom-1),public::a
+#           else
 
-#           ifndef OPTIMAL
-
-            complex(KK),dimension(0:f_size-1),public::f,m_eigenvalues_
-            complex(KK),dimension(0:f_size-1,&
-                                  0:f_size-1),public::m,cm,cmm
-            complex(KK),dimension(0:f_size-1,&
-                                  0:f_size-1,0:inner_degrees_of_freedom-1,&
-                                             0:inner_degrees_of_freedom-1,&
-                                             0:boson_degrees_of_freedom-1),public::ma
+            complex(KK),dimension( :        ),allocatable,public::f,m_eigenvalues_
+            complex(KK),dimension( :        ,&
+                                   :        ),allocatable,public::m,cm,cmm
+            complex(KK),dimension( :        ,&
+                                   :        , :                          ,&
+                                              :                          ,&
+                                              :                          ),allocatable,public::ma
 
             private::make_m
             private::make_cm
@@ -79,27 +69,6 @@
             private::make_m_eigenvalues
 
             public::update_fermion_matrix
-
-#           else
-
-            complex(KK),dimension(0:inner_degrees_of_freedom-1,&
-                                  0:inner_degrees_of_freedom-1,&
-                                  0:fermi_degrees_of_freedom-1),public::f!m_eigenvalues_
-      !     complex(KK),dimension(0:inner_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
-      !                           0:fermi_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
-      !                           0:fermi_degrees_of_freedom-1),public::m,cm,cmm,m_kernel
-      !     complex(KK),dimension(0:inner_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
-      !                           0:fermi_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
-      !                           0:fermi_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
-      !                           0:inner_degrees_of_freedom-1,&
-      !                           0:boson_degrees_of_freedom-1),public::ma
 
 #        endif
 
@@ -112,6 +81,162 @@
 
 
       contains
+
+
+            subroutine  read_field_parameters(unit)
+
+
+                  use,intrinsic::iso_fortran_env,only:stdin=>input_unit,&
+                                                      stdout=>output_unit,&
+                                                      stderr=>error_unit
+
+
+                  implicit none
+
+
+                  integer,intent(inout),optional::unit
+
+                  integer::mu
+
+
+                  if(.not.present(unit)) unit=stdin
+
+                  write(   *,"(a)",advance="no") "inner_degrees_of_freedom: "
+                   read(unit,                 *)  inner_degrees_of_freedom
+                  write(   *,                 *)
+                  write(   *,"(a)",advance="no") "boson_degrees_of_freedom: "
+                   read(unit,                 *)  boson_degrees_of_freedom
+                  write(   *,                 *)
+
+                                               fermi_degrees_of_freedom=2 &
+                                            **(boson_degrees_of_freedom/2 &
+                                                                       -1)
+                                       n     = inner_degrees_of_freedom-1
+                                       d     = boson_degrees_of_freedom-1
+                                       p     = fermi_degrees_of_freedom-1
+                                       n_size= inner_degrees_of_freedom&
+                                             * inner_degrees_of_freedom
+                                       a_size= boson_degrees_of_freedom* n_size
+                                       f_size= fermi_degrees_of_freedom*(n_size-1)
+
+                  write(   *,*)
+
+                  if(massive_deformations) then
+
+                     write(   *,"(a)",advance="no") "epsilon: "
+                      read(unit,                 *)  epsilon
+                     write(   *,                 *)
+
+                     if(allocated(boson_mass)) deallocate(boson_mass)
+                                                 allocate(boson_mass(0:boson_degrees_of_freedom-1))
+
+                     do mu=0,boson_degrees_of_freedom-1,+1
+
+                        write(   *,"(a,i2,a)",advance="no") "boson_mass(",mu+1,"): "
+                         read(unit,                      *)  boson_mass(  mu    )
+                        write(   *,  *                    )
+
+              end    do!mu=0,boson_degrees_of_freedom-1,+1
+
+                     write(   *,"(a)",advance="no") "fermi_mass: "
+                      read(unit,                 *)  fermi_mass
+                     write(   *,                 *)
+
+              end if!massive_deformations
+
+                  write(   *,*)
+
+                  if(allocated(a)) deallocate(a)
+                                     allocate(a(0:inner_degrees_of_freedom-1,&
+                                                0:inner_degrees_of_freedom-1,&
+                                                0:boson_degrees_of_freedom-1))
+
+#                 ifdef OPTIMAL
+
+                  if(allocated(f)) deallocate(f)
+                                     allocate(f(0:inner_degrees_of_freedom-1,&
+                                                0:inner_degrees_of_freedom-1,&
+                                                0:fermi_degrees_of_freedom-1))
+
+#                 else
+
+                  if(allocated(f)) deallocate(f)
+                                     allocate(f(0:f_size-1))
+
+                  if(allocated(m_eigenvalues)) deallocate(m_eigenvalues)
+                                                 allocate(m_eigenvalues(0:f_size-1))
+
+                  if(allocated( m )) deallocate( m )
+                                       allocate( m (0:f_size-1,&
+                                                    0:f_size-1))
+                  if(allocated(cm )) deallocate(cm )
+                                       allocate(cm (0:f_size-1,&
+                                                    0:f_size-1))
+                  if(allocated(cmm)) deallocate(cmm)
+                                       allocate(cmm(0:f_size-1,&
+                                                    0:f_size-1))
+
+                  if(allocated(ma)) deallocate(ma)
+                                      allocate(ma(0:f_size-1,&
+                                                  0:f_size-1,0:inner_degrees_of_freedom-1,&
+                                                             0:inner_degrees_of_freedom-1,&
+                                                             0:boson_degrees_of_freedom-1))
+
+#              endif
+
+
+        end subroutine  read_field_parameters!unit
+
+
+            subroutine write_field_parameters(unit)
+
+
+                  implicit none
+
+
+                  integer,intent(in   )::unit
+
+                  integer::mu
+
+
+                  deallocate(a)
+                  deallocate(f)
+
+#              ifndef OPTIMAL
+
+                  deallocate(m_eigenvalues)
+
+                  deallocate( m )
+                  deallocate(cm )
+                  deallocate(cmm)
+
+                  deallocate(ma)
+
+#              endif
+
+                  write(unit,                 *)  inner_degrees_of_freedom
+                  write(unit,                 *)  boson_degrees_of_freedom
+
+                  if(massive_deformations) then
+
+                     write(unit,                 *)  epsilon
+
+                     do mu=0,boson_degrees_of_freedom-1,+1
+
+                        write(unit,                      *)  boson_mass(  mu    )
+
+              end    do!mu=0,boson_degrees_of_freedom-1,+1
+
+                     deallocate(boson_mass)
+
+                     write(unit,                 *)  fermi_mass
+
+              end if!massive_deformations
+
+                  write(unit,*)
+
+
+        end subroutine write_field_parameters!unit
 
 
             function boson_noise(standard_deviation)
@@ -201,6 +326,8 @@
                   integer::mu
 
 
+                  call  read_field_parameters()
+
                   if(start_field_is_noisy) then
 
                      a=boson_noise(.20000e+1_KK)
@@ -231,6 +358,12 @@
                   integer::unit
                   integer::mu
 
+
+                   open(newunit=unit,file=stat_file_name)
+
+                  call  read_field_parameters(unit)
+
+                  close(unit)
 
                    open(newunit=unit,file=conf_file_name)
 
@@ -270,6 +403,12 @@
 
                   close(unit)
 
+                   open(newunit=unit,file=stat_file_name)
+
+                  call write_field_parameters(unit)
+
+                  close(unit)
+
 
         end subroutine save_fields!
 
@@ -300,21 +439,13 @@
 
                         do j2=0,inner_degrees_of_freedom-1,+1
 
-                           if(inner_degrees_of_freedom*i2+j2==n_size-1) then
-
-                              exit
-
-              end          if!inner_degrees_of_freedom*i2+j2==n_size-1
+                           if(inner_degrees_of_freedom*i2+j2==n_size-1) exit
 .
                            do i1=0,inner_degrees_of_freedom-1,+1
 
                               do j1=0,inner_degrees_of_freedom-1,+1
 
-                                 if(inner_degrees_of_freedom*i1+j1==n_size-1) then
-
-                                    exit
-
-              end                if!inner_degrees_of_freedom*i1+j1==n_size-1
+                                 if(inner_degrees_of_freedom*i1+j1==n_size-1) exit
 
                                  a_delta(inner_degrees_of_freedom*i1+j1,&
                                          inner_degrees_of_freedom*i2+j2)= a(j1,i2,mu)*delta(j2,i1)              &
@@ -343,21 +474,13 @@
 
                         do j2=0,inner_degrees_of_freedom-1,+1
 
-                           if(inner_degrees_of_freedom*i2+j2==n_size-1) then
-
-                              exit
-
-              end          if!inner_degrees_of_freedom*i2+j2==n_size-1
+                           if(inner_degrees_of_freedom*i2+j2==n_size-1) exit
 
                            do i1=0,inner_degrees_of_freedom-1,+1
 
                               do j1=0,inner_degrees_of_freedom-1,+1
 
-                                 if(inner_degrees_of_freedom*i1+j1==n_size-1) then
-
-                                    exit
-
-              end                if!inner_degrees_of_freedom*i1+j1==n_size-1
+                                 if(inner_degrees_of_freedom*i1+j1==n_size-1) exit
 
                                  a_delta(n*i1+j1,n*i2+j2)=delta(j1,i2)&
                                                          *delta(j2,i1)
@@ -429,21 +552,13 @@
 
                               do j2=0,inner_degrees_of_freedom-1,+1
 
-                                 if(inner_degrees_of_freedom*i2+j2==n_size-1) then
-
-                                    exit
-
-              end                if!inner_degrees_of_freedom*i2+j2==n_size-1
+                                 if(inner_degrees_of_freedom*i2+j2==n_size-1) exit
 
                                  do i1=0,inner_degrees_of_freedom-1,+1
 
                                     do j1=0,inner_degrees_of_freedom-1,+1
 
-                                       if(inner_degrees_of_freedom*i1+j1==n_size-1) then
-
-                                          exit
-
-              end                      if!inner_degrees_of_freedom*i1+j1==n_size-1
+                                       if(inner_degrees_of_freedom*i1+j1==n_size-1) exit
 
                                        delta_3(inner_degrees_of_freedom*i1+j1,&
                                                inner_degrees_of_freedom*i2+j2)= delta(j1,j)*delta(i,i2)*delta(j2,i1)              &

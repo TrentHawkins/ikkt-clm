@@ -64,6 +64,8 @@
             character(:),allocatable::base_file_name
 
 
+            call signal(69,eject_main)
+
             call   begin_ikkt_simulation()
             call perform_ikkt_simulation()
             call     end_ikkt_simulation()
@@ -143,41 +145,37 @@
                   implicit none
 
 
-                  character     ::optchar ! currently parsed option
-                  character(500)::optarg  ! currently parsed argument value if not an option
-                  integer       ::arglen  ! currently parsed argument true length
-                  integer       ::stat    ! stat of parsing option
-                  integer       ::argind  ! current argument running index starting where the options end
-                  integer       ::argnum  ! number of remaining indices options aside
+                  character     ::option_character ! currently parsed option
+                  character(500)::option_argument  ! currently parsed argument value if not an option
+                  integer       ::argument_length  ! currently parsed argument true length
+                  integer       ::status           ! stat of parsing option
+                  integer       ::argument_index   ! current argument running index starting where the options end
+                  integer       ::argument_number  ! number of remaining indices options aside
 
-                  type(option)::options(6) ! list of long options
+                  type(option)::options(1:6) ! list of long options
 
 
                   options(1)=option(    "load-save"    ,.false.,'c',"Load previous configuration."                     ,"        ")
                   options(2)=option(   "start-field"   ,.true. ,'a',"New field configuration setting."                 ,"hot-cold")
                   options(3)=option("variable-timestep",.false.,'t',"Use variable timestep."                           ,"        ")
                   options(4)=option("fermions-included",.false.,'f',"Include fermions in simulation."                  ,"        ")
-                  options(5)=option("   gauge-cooling ",.false.,'g',"Apply gauge-cooling to configuratio"              ,"        ")
+                  options(5)=option("  gauge-cooling  ",.false.,'g',"Apply gauge-cooling to configuratio"              ,"        ")
                   options(6)=option("mass-deformations",.false.,'m',"Include massive deformations in Complex Langevin.","        ")
 
                   do
 
-                     call getopt(options="ca:tfgm",&
-                                longopts=options  ,&
-                                 optchar=optchar  ,&
-                                  optarg=optarg   ,&
-                                  arglen=arglen   ,&
-                                    stat=stat     ,&
-                                  offset=argind   ,&
-                                  remain=argnum)
+                     call getopt(options="ca:tfgm"       ,&
+                                longopts=options         ,&
+                                 optchar=option_character,&
+                                  optarg=option_argument ,&
+                                  arglen=argument_length ,&
+                                    stat=status          ,&
+                                  offset=argument_index  ,&
+                                  remain=argument_number)
 
-                     if(stat==1)then
+                     if(status==1) exit
 
-                        exit
-
-              end    if!stat==1
-
-                     select case(optchar)
+                     select case(option_character)
 
                      case('c')
 
@@ -185,7 +183,7 @@
 
                      case('a')
 
-                        select case(optarg)
+                        select case(option_argument)
 
                         case('0')
 
@@ -199,7 +197,7 @@
 
                            call print_opt(options(2),stderr)
 
-              end       select!case(optarg)
+              end       select!case(option_argument)
 
                      case('t')
 
@@ -227,13 +225,13 @@
                         call print_opt(options(6),stderr)
                         stop
 
-              end    select!case(optchar)
+              end    select!case(option_character)
 
               end do
 
-                  call get_command_argument(argind+1,optarg,stat)
+                  call get_command_argument(argument_index+1,option_argument,status)
 
-                  select case(stat)
+                  select case(status)
 
                   case(-1)
 
@@ -244,16 +242,34 @@
 
                      stop "Error: a base file name must be provided to store simulation status"
 
-              end select!case(optchar)
+              end select!case(status)
 
-                  allocate(character(len(trim(adjustl(optarg))))::base_file_name);base_file_name=trim(adjustl(optarg))
+                  allocate(character(len(trim(adjustl(option_argument))))::base_file_name)
+                                                                           base_file_name=trim(adjustl(option_argument))
 
                   allocate(character(len(base_file_name)+5)::seed_file_name);seed_file_name=trim(adjustl(base_file_name))//".seed"
                   allocate(character(len(base_file_name)+5)::time_file_name);time_file_name=trim(adjustl(base_file_name))//".time"
+                  allocate(character(len(base_file_name)+5)::stat_file_name);stat_file_name=trim(adjustl(base_file_name))//".stat"
                   allocate(character(len(base_file_name)+5)::conf_file_name);conf_file_name=trim(adjustl(base_file_name))//".conf"
                   allocate(character(len(base_file_name)+5)::meas_file_name);meas_file_name=trim(adjustl(base_file_name))//".meas"
 
+
         end subroutine read_options_and_arguments!
+
+
+            subroutine eject_main()
+
+                  implicit none
+
+
+                  call eject_complex_langevin()
+
+                  call end_ikkt_simulation()
+
+                  print *,"SIGINT!"
+
+
+        end subroutine eject_main!
 
 
   end program main

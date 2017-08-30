@@ -179,17 +179,8 @@
                   real(        KK ),intent(in   ),optional::value
 
 
-                  if(present(weight)) then
-
-                     this%weight=weight
-
-              end if!present(weight)
-
-                  if(present(value)) then
-
-                     this%value=value
-
-              end if!present(value)
+                  if(present(weight)) this%weight=weight
+                  if(present(value )) this%value =value
 
 
         end subroutine initialize_average_K!this,weight,value
