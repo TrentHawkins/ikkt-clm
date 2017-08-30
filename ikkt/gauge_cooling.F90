@@ -243,7 +243,9 @@
                   implicit none
 
 
-                  deallocate(h)
+                  if(allocated(h)) deallocate(h)
+
+                  if(allocated(h_eigenvalues)) deallocate(h_eigenvalues)
 
 
         end subroutine eject_gauge_cooler!

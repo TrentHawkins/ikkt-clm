@@ -13,9 +13,7 @@
 !     You may need the option "-mcmodel=medium" if the stored arrays are too large, which conflicts with the "-fast" option.
 !     Later when the optimized version using commutators is fixed, it will not be necessary, as the fermion matrix is bypassed.
 
-!     define BLAS
-!     define OPTIMAL
-
+#     include "main/signals.F90"
 #     include "main/getopts.F90"
 #     include "main/precision.F90"
 
@@ -34,6 +32,9 @@
 #     include "ikkt/complex_langevin.F90"
 #     include "ikkt/gauge_cooling.F90"
 #     include "ikkt/observables.F90"
+
+!     define BLAS
+!     define OPTIMAL
 
 
       program main
@@ -64,7 +65,7 @@
             character(:),allocatable::base_file_name
 
 
-            call signal(69,eject_main)
+            call signal_actions(eject_main)
 
             call   begin_ikkt_simulation()
             call perform_ikkt_simulation()
@@ -266,10 +267,33 @@
 
                   call end_ikkt_simulation()
 
-                  print *,"SIGINT!"
+                  print *
+                  print *,"Used memory deallocated."
+
+                  stop
 
 
         end subroutine eject_main!
+
+
+            subroutine signal_actions(handler)
+
+
+                  implicit none
+
+
+                  external::handler
+
+
+                  call signal(SIGHUP,handler)
+                  call signal(SIGINT,handler)
+                  call signal(SIGFPE,handler)
+
+                  call signal(SIGQUIT,handler)
+                  call signal(SIGABRT,handler)
+
+
+        end subroutine signal_actions!handler
 
 
   end program main

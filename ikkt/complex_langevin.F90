@@ -81,9 +81,6 @@
                                                         0:inner_degrees_of_freedom-1,&
                                                         0:boson_degrees_of_freedom-1))
 
-                  call make_constants(inner_degrees_of_freedom+1,&
-                                      boson_degrees_of_freedom  )
-
                   if(configuration_loaded) then
 
                      call load_monte_carlo()
@@ -95,6 +92,9 @@
                      call make_fields()
 
               end if!configuration_loaded
+
+                  call make_constants(inner_degrees_of_freedom+1,&
+                                      boson_degrees_of_freedom  )
 
 
         end subroutine boot_langevin!
@@ -265,8 +265,8 @@
 
                   call eject_gauge_cooler()
 
-                  deallocate(drift)
-                  deallocate(noise)
+                  if(allocated(drift)) deallocate(drift)
+                  if(allocated(drift)) deallocate(noise)
 
 
         end subroutine eject_complex_langevin

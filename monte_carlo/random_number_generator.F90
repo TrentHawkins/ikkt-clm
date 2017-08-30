@@ -83,7 +83,7 @@
 
                   call random_seed(put=seed)
 
-                  deallocate(seed)
+                  if(allocated(seed)) deallocate(seed)
 
 
         end subroutine load_seed!
@@ -106,7 +106,7 @@
                   write(        unit,     format_integer) seed
                   close(        unit                    )
 
-                  deallocate(seed)
+                  if(allocated(seed)) deallocate(seed)
 
 
         end subroutine save_seed!

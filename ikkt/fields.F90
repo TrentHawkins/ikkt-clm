@@ -86,20 +86,13 @@
             subroutine  read_field_parameters(unit)
 
 
-                  use,intrinsic::iso_fortran_env,only:stdin=>input_unit,&
-                                                      stdout=>output_unit,&
-                                                      stderr=>error_unit
-
-
                   implicit none
 
 
-                  integer,intent(inout),optional::unit
+                  integer,intent(in   )::unit
 
                   integer::mu
 
-
-                  if(.not.present(unit)) unit=stdin
 
                   write(   *,"(a)",advance="no") "inner_degrees_of_freedom: "
                    read(unit,                 *)  inner_degrees_of_freedom
@@ -199,18 +192,18 @@
                   integer::mu
 
 
-                  deallocate(a)
-                  deallocate(f)
+                  if(allocated(a)) deallocate(a)
+                  if(allocated(f)) deallocate(f)
 
 #              ifndef OPTIMAL
 
-                  deallocate(m_eigenvalues)
+                  if(allocated(m_eigenvalues)) deallocate(m_eigenvalues)
 
-                  deallocate( m )
-                  deallocate(cm )
-                  deallocate(cmm)
+                  if(allocated( m )) deallocate( m )
+                  if(allocated(cm )) deallocate(cm )
+                  if(allocated(cmm)) deallocate(cmm)
 
-                  deallocate(ma)
+                  if(allocated(ma)) deallocate(ma)
 
 #              endif
 
@@ -227,7 +220,7 @@
 
               end    do!mu=0,boson_degrees_of_freedom-1,+1
 
-                     deallocate(boson_mass)
+                     if(allocated(boson_mass)) deallocate(boson_mass)
 
                      write(unit,                 *)  fermi_mass
 
@@ -326,7 +319,7 @@
                   integer::mu
 
 
-                  call  read_field_parameters()
+                  call  read_field_parameters(5)
 
                   if(start_field_is_noisy) then
 
