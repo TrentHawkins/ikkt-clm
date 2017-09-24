@@ -1,7 +1,7 @@
-#     ifndef MONTE_CARLO_TIME_F90
-#     define MONTE_CARLO_TIME_F90
+#     ifndef TIME_F90
+#     define TIME_F90
 
-#     include "main/precision.F90"
+#     include "system/precision.F90"
 
 #     include "monte_carlo/average.F90"
 

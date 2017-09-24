@@ -1,7 +1,7 @@
-#     ifndef IKKT_OPTIMAL_TOOLSET_F90
-#     define IKKT_OPTIMAL_TOOLSET_F90
+#     ifndef OPTIMAL_TOOLSET_F90
+#     define OPTIMAL_TOOLSET_F90
 
-#     include "main/precision.F90"
+#     include "system/precision.F90"
 
 #     include "tensor/tensor.F90"
 

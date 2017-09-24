@@ -1,7 +1,7 @@
-#     ifndef TENSOR_TENSOR_F90
-#     define TENSOR_TENSOR_F90
+#     ifndef TENSOR_F90
+#     define TENSOR_F90
 
-#     include "main/precision.F90"
+#     include "system/precision.F90"
 
 #     include "tools/insert_sort.F90"
 

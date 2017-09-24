@@ -1,7 +1,7 @@
 #     ifndef GAUGE_COOLING_F90
 #     define GAUGE_COOLING_F90
 
-#     include "main/precision.F90"
+#     include "system/precision.F90"
 
 #     include "tensor/tensor.F90"
 
@@ -25,13 +25,14 @@
             implicit none
 
 
-            character(*),parameter,private::cooling_format=COMPLEXGK
+            character(*),parameter,private::           format_cooling=COMPLEXGK,&
+                                            text_field_format_cooling=COMPLEXAK
 
             real(KK),parameter,private::cooling_tolerance=TOLERANCEK
 
-            real(KK),private::min_alpha=TOLERANCEK
-            real(KK),private::mid_alpha=TOLERANCEK*10
-            real(KK),private::max_alpha=TOLERANCEK*100
+            real(KK),private::min_alpha=TOLERANCEK*1  ,&
+                              mid_alpha=TOLERANCEK*10 ,&
+                              max_alpha=TOLERANCEK*100
 
             logical,public::gauge_cooling_active=.false.
 
@@ -195,7 +196,7 @@
                                              max_alpha,guided_hermiticity_norm,cooling_tolerance,alpha_min)
 
                    open(newunit=mu,file="hermiticity.norm.minimum")
-                  write(        mu,                 cooling_format) alpha_min,min_hermiticity_norm
+                  write(        mu,                 format_cooling) alpha_min,min_hermiticity_norm
                   close(        mu)
 
                   do mu=0,boson_degrees_of_freedom-1,+1
@@ -226,11 +227,11 @@
 
                   do i=0,steps-1,+1
 
-                     write(unit,cooling_format) step*i,guided_hermiticity_norm(step*i)
+                     write(unit,format_cooling) step*i,guided_hermiticity_norm(step*i)
 
               end do!i=0,steps-1,+1
 
-                  write(unit,cooling_format) step*i,guided_hermiticity_norm(max_alpha)
+                  write(unit,format_cooling) step*i,guided_hermiticity_norm(max_alpha)
                   close(unit)
 
 

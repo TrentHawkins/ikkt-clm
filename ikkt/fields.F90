@@ -1,7 +1,8 @@
-#     ifndef IKKT_FIELDS_F90
-#     define IKKT_FIELDS_F90
+#     ifndef FIELDS_F90
+#     define FIELDS_F90
 
-#     include "main/precision.F90"
+#     include "system/precision.F90"
+#     include "system/text_format.F90"
 #     include "main/mathematical_constants.F90"
 
 #     include "tensor/tensor.F90"
@@ -15,6 +16,7 @@
             use::lapack95,only:geev,&
                                ggev
 
+            use::text_formatting
             use::mathematical_constants
 
             use::tensor_type
@@ -25,20 +27,27 @@
             implicit none
 
 
-            logical,public::configuration_loaded=.false.
-            logical,public::start_field_is_noisy=.false.
-            logical,public::massive_deformations=.false.
+            character(*),private,parameter::           format_stat_K=INTEGERGK,&
+                                            text_field_format_stat_K=INTEGERAK
 
-            character(:),allocatable,public::stat_file_name
-            character(:),allocatable,public::conf_file_name
+            character(*),private,parameter::           format_mass_K=REALGK,&
+                                            text_field_format_mass_K=REALAK
+
+            logical,public::configuration_loaded=.false.,&
+                            start_field_is_noisy=.false.,&
+                            fermions_included_in=.false.,&
+                            massive_deformations=.false.
+
+            character(:),allocatable,public::stat_file_name,&
+                                             conf_file_name
 
             integer,public::inner_degrees_of_freedom,n,n_size,&
                             boson_degrees_of_freedom,d,a_size,&
                             fermi_degrees_of_freedom,p,f_size
 
-            real(KK),                                                    public::epsilon
+            real(KK),                                                    public::boson_epsilon,&
+                                                                                 fermi_mass
             real(KK),dimension( :                          ),allocatable,public::boson_mass
-            real(KK),                                                    public::fermi_mass
 
             complex(KK),dimension( :                          ,&
                                    :                          ,&
@@ -60,24 +69,22 @@
                                               :                          ,&
                                               :                          ),allocatable,public::ma
 
-            private::make_m
-            private::make_cm
-            private::make_cmm
-
-            private::make_ma
-
-            private::make_m_eigenvalues
+            private::make_m            ,&
+                     make_cm           ,&
+                     make_cmm          ,&
+                     make_ma           ,&
+                     make_m_eigenvalues
 
             public::update_fermion_matrix
 
 #        endif
 
-            public::boson_noise
-            public::fermi_noise
+            public::boson_noise,&
+                    fermi_noise
 
-            public::make_fields
-            public::load_fields
-            public::save_fields
+            public::make_fields,&
+                    load_fields,&
+                    save_fields
 
 
       contains
@@ -94,12 +101,12 @@
                   integer::mu
 
 
-                  write(   *,"(a)",advance="no") "inner_degrees_of_freedom: "
-                   read(unit,                 *)  inner_degrees_of_freedom
-                  write(   *,                 *)
-                  write(   *,"(a)",advance="no") "boson_degrees_of_freedom: "
-                   read(unit,                 *)  boson_degrees_of_freedom
-                  write(   *,                 *)
+                  write(   *,"(2a)",advance="no") "inner_degrees_of_freedom: ",t_yellow
+                   read(unit,   *               )  inner_degrees_of_freedom
+                  write(   *,"( a)",advance="no")                              t_normal
+                  write(   *,"(2a)",advance="no") "boson_degrees_of_freedom: ",t_yellow
+                   read(unit,   *               )  boson_degrees_of_freedom
+                  write(   *,"( a)",advance="no")                              t_normal
 
                                                fermi_degrees_of_freedom=2 &
                                             **(boson_degrees_of_freedom/2 &
@@ -112,70 +119,82 @@
                                        a_size= boson_degrees_of_freedom* n_size
                                        f_size= fermi_degrees_of_freedom*(n_size-1)
 
-                  write(   *,*)
+                  write(   *,   *               )
 
                   if(massive_deformations) then
 
-                     write(   *,"(a)",advance="no") "epsilon: "
-                      read(unit,                 *)  epsilon
-                     write(   *,                 *)
+                     write(   *,"(2a)",advance="no") "boson_epsilon: ",t_yellow
+                      read(unit,   *               )  boson_epsilon
+                     write(   *,"( a)",advance="no")                   t_normal
+
+                     write(   *,   *               )
 
                      if(allocated(boson_mass)) deallocate(boson_mass)
                                                  allocate(boson_mass(0:boson_degrees_of_freedom-1))
 
                      do mu=0,boson_degrees_of_freedom-1,+1
 
-                        write(   *,"(a,i2,a)",advance="no") "boson_mass(",mu+1,"): "
-                         read(unit,                      *)  boson_mass(  mu    )
-                        write(   *,  *                    )
+                        write(   *,"(a,i2,2a)",advance="no") "boson_mass(",mu+1,"): ",t_yellow
+                         read(unit,        *               )  boson_mass(  mu    )
+                        write(   *,"(      a)",advance="no")                          t_normal
 
               end    do!mu=0,boson_degrees_of_freedom-1,+1
 
-                     write(   *,"(a)",advance="no") "fermi_mass: "
-                      read(unit,                 *)  fermi_mass
-                     write(   *,                 *)
+                     write(   *,        *               )
+
+                     if(fermions_included_in) then
+
+                        write(   *,"(2a)",advance="no") "fermi_mass: ",t_yellow
+                         read(unit,   *               )  fermi_mass
+                        write(   *,"( a)",advance="no")                t_normal
+
+                        write(   *,   *               )
+
+              end    if!fermions_included_in
 
               end if!massive_deformations
-
-                  write(   *,*)
 
                   if(allocated(a)) deallocate(a)
                                      allocate(a(0:inner_degrees_of_freedom-1,&
                                                 0:inner_degrees_of_freedom-1,&
                                                 0:boson_degrees_of_freedom-1))
 
-#                 ifdef OPTIMAL
+                  if(fermions_included_in) then
 
-                  if(allocated(f)) deallocate(f)
-                                     allocate(f(0:inner_degrees_of_freedom-1,&
-                                                0:inner_degrees_of_freedom-1,&
-                                                0:fermi_degrees_of_freedom-1))
+#                    ifdef OPTIMAL
 
-#                 else
+                     if(allocated(f)) deallocate(f)
+                                        allocate(f(0:inner_degrees_of_freedom-1,&
+                                                   0:inner_degrees_of_freedom-1,&
+                                                   0:fermi_degrees_of_freedom-1))
 
-                  if(allocated(f)) deallocate(f)
-                                     allocate(f(0:f_size-1))
+#                    else
 
-                  if(allocated(m_eigenvalues)) deallocate(m_eigenvalues)
-                                                 allocate(m_eigenvalues(0:f_size-1))
+                     if(allocated(f)) deallocate(f)
+                                        allocate(f(0:f_size-1))
 
-                  if(allocated( m )) deallocate( m )
-                                       allocate( m (0:f_size-1,&
-                                                    0:f_size-1))
-                  if(allocated(cm )) deallocate(cm )
-                                       allocate(cm (0:f_size-1,&
-                                                    0:f_size-1))
-                  if(allocated(cmm)) deallocate(cmm)
-                                       allocate(cmm(0:f_size-1,&
-                                                    0:f_size-1))
+                     if(allocated(m_eigenvalues_)) deallocate(m_eigenvalues_)
+                                                     allocate(m_eigenvalues_(0:f_size-1))
 
-                  if(allocated(ma)) deallocate(ma)
-                                      allocate(ma(0:f_size-1,&
-                                                  0:f_size-1,0:inner_degrees_of_freedom-1,&
-                                                             0:inner_degrees_of_freedom-1,&
-                                                             0:boson_degrees_of_freedom-1))
+                     if(allocated( m )) deallocate( m )
+                                          allocate( m (0:f_size-1,&
+                                                       0:f_size-1))
+                     if(allocated(cm )) deallocate(cm )
+                                          allocate(cm (0:f_size-1,&
+                                                       0:f_size-1))
+                     if(allocated(cmm)) deallocate(cmm)
+                                          allocate(cmm(0:f_size-1,&
+                                                       0:f_size-1))
 
-#              endif
+                     if(allocated(ma)) deallocate(ma)
+                                         allocate(ma(0:f_size-1,&
+                                                     0:f_size-1,0:inner_degrees_of_freedom-1,&
+                                                                0:inner_degrees_of_freedom-1,&
+                                                                0:boson_degrees_of_freedom-1))
+
+#                 endif
+
+              end if!fermions_included_in
 
 
         end subroutine  read_field_parameters!unit
@@ -193,36 +212,41 @@
 
 
                   if(allocated(a)) deallocate(a)
-                  if(allocated(f)) deallocate(f)
 
-#              ifndef OPTIMAL
+                  if(fermions_included_in) then
 
-                  if(allocated(m_eigenvalues)) deallocate(m_eigenvalues)
+                     if(allocated(f)) deallocate(f)
 
-                  if(allocated( m )) deallocate( m )
-                  if(allocated(cm )) deallocate(cm )
-                  if(allocated(cmm)) deallocate(cmm)
+#                    ifndef OPTIMAL
 
-                  if(allocated(ma)) deallocate(ma)
+                     if(allocated(m_eigenvalues_)) deallocate(m_eigenvalues_)
 
-#              endif
+                     if(allocated( m )) deallocate( m )
+                     if(allocated(cm )) deallocate(cm )
+                     if(allocated(cmm)) deallocate(cmm)
 
-                  write(unit,                 *)  inner_degrees_of_freedom
-                  write(unit,                 *)  boson_degrees_of_freedom
+                     if(allocated(ma)) deallocate(ma)
+
+#                 endif
+
+              end if!fermions_included_in
+
+                  write(unit,format_stat_K)  inner_degrees_of_freedom
+                  write(unit,format_stat_K)  boson_degrees_of_freedom
 
                   if(massive_deformations) then
 
-                     write(unit,                 *)  epsilon
+                     write(unit,format_mass_K)  boson_epsilon
 
                      do mu=0,boson_degrees_of_freedom-1,+1
 
-                        write(unit,                      *)  boson_mass(  mu    )
+                        write(unit,format_mass_K)  boson_mass(  mu    )
 
               end    do!mu=0,boson_degrees_of_freedom-1,+1
 
                      if(allocated(boson_mass)) deallocate(boson_mass)
 
-                     write(unit,                 *)  fermi_mass
+                     if(fermions_included_in) write(unit,format_mass_K)  fermi_mass
 
               end if!massive_deformations
 
@@ -255,7 +279,7 @@
                     =standard_deviation*sqrt(                    -log(real(boson_noise(:,:,mu))))&
                                        * exp(.20000e+1_KK*pi*im_unit*aimag(boson_noise(:,:,mu)))
 
-            !        call make_hermitian(boson_noise(:,:,mu),+.10000e+1_KK)
+                     call make_hermitian(boson_noise(:,:,mu))
                      call make_traceless(boson_noise(:,:,mu))
 
               end do!mu=0,boson_degrees_of_freedom-1,+1
@@ -321,22 +345,7 @@
 
                   call  read_field_parameters(5)
 
-                  if(start_field_is_noisy) then
-
                      a=boson_noise(.20000e+1_KK)
-
-                     do mu=0,boson_degrees_of_freedom-1,+1
-
-                        call make_hermitian(a(:,:,mu))
-                        call make_traceless(a(:,:,mu))
-
-              end    do!mu=0,boson_degrees_of_freedom-1,+1
-
-                  else
-
-                     a=zero
-
-              end if!start_field_is_noisy
 
 
         end subroutine make_fields!
@@ -433,7 +442,7 @@
                         do j2=0,inner_degrees_of_freedom-1,+1
 
                            if(inner_degrees_of_freedom*i2+j2==n_size-1) exit
-.
+
                            do i1=0,inner_degrees_of_freedom-1,+1
 
                               do j1=0,inner_degrees_of_freedom-1,+1

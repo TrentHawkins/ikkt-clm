@@ -1,7 +1,7 @@
-#     ifndef IKKT_OBSERVABLES_F90
-#     define IKKT_OBSERVABLES_F90
+#     ifndef OBSERVABLES_F90
+#     define OBSERVABLES_F90
 
-#     include "main/precision.F90"
+#     include "system/precision.F90"
 
 #     include "tensor/tensor.F90"
 
@@ -11,7 +11,7 @@
 
 #     ifdef OPTIMAL
 
-#     include "ikkt/optimal_toolset.F90"
+#     include "ikkt/tools/optimal_toolset.F90"
 
 #  endif
 
@@ -39,8 +39,8 @@
             implicit none
 
 
-            character(*),private,parameter::           format_observables_K=COMPLEXGK
-            character(*),private,parameter::text_field_format_observables_K=COMPLEXAK
+            character(*),private,parameter::           format_observables_K=COMPLEXGK,&
+                                            text_field_format_observables_K=COMPLEXAK
 
             character(:),allocatable,public::meas_file_name
 
@@ -74,7 +74,13 @@
 
                   if(massive_deformations) then
 
-                       write(unit,format_observables_K,advance="no") epsilon,fermi_mass
+                       write(unit,format_observables_K,advance="no") boson_epsilon
+
+                     if(fermions_included_in) then
+
+                       write(unit,format_observables_K,advance="no") fermi_mass
+
+              end    if!fermions_included_in
 
                      do mu=0,boson_degrees_of_freedom-1,+1
 
@@ -85,6 +91,12 @@
               end if!massive_deformations
 
                   write(unit,*)
+
+                  if(measure_time_skipped) then
+
+                     call s%push_time()
+
+              end if!measure_time_skipped
 
 
         end subroutine print_observables!unit,measurement_time
@@ -158,8 +170,8 @@
                      do mu=0,boson_degrees_of_freedom-1,+1
 
                         boson_action&
-                       =boson_action+boson_mass(mu)*lambda(mu)*epsilon*inner_degrees_of_freedom&
-                                                                      *inner_degrees_of_freedom/2
+                       =boson_action+boson_mass(mu)*lambda(mu)*boson_epsilon*inner_degrees_of_freedom&
+                                                                            *inner_degrees_of_freedom/2
 
               end    do!mu=0,boson_degrees_of_freedom-1,+1
 

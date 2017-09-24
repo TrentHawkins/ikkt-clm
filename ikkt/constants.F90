@@ -1,7 +1,7 @@
-#     ifndef IKKT_CONSTANTS_F90
-#     define IKKT_CONSTANTS_F90
+#     ifndef CONSTANTS_F90
+#     define CONSTANTS_F90
 
-#     include "main/precision.F90"
+#     include "system/precision.F90"
 #     include "main/mathematical_constants.F90"
 
 #     include "tensor/tensor.F90"
@@ -44,7 +44,7 @@
 
             public::determinant_degree
 
-            public::make_constants
+            public::make_constants,eject_constants
 
 
             contains
@@ -226,6 +226,21 @@
 
         end subroutine make_constants!inner_size,
       !                               boson_size
+
+
+            subroutine eject_constants
+
+
+                  implicit none
+
+
+                  if(allocated(          delta     )) deallocate(          delta     )
+                  if(allocated(          gamma     )) deallocate(          gamma     )
+                  if(allocated(conjugate_gamma     )) deallocate(conjugate_gamma     )
+                  if(allocated(          gamma_core)) deallocate(          gamma_core)
+
+
+        end subroutine eject_constants
 
 
             subroutine print_gamma()

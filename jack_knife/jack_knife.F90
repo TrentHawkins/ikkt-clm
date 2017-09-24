@@ -1,7 +1,7 @@
 #     ifndef JACK_KNIFE_F90
 #     define JACK_KNIFE_F90
 
-#     include "main/precision.F90"
+#     include "system/precision.F90"
 
 #     include "monte_carlo/average.F90"
 

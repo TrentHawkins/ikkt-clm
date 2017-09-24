@@ -1,8 +1,13 @@
 #     ifndef GETOPTS_F90
 #     define GETOPTS_F90
 
+#     include "system/text_format.F90"
+
 
       module get_options
+
+
+            use::text_formatting
 
 
             implicit none
@@ -429,19 +434,44 @@
             !     logical unit number
 
                   integer,intent(in)::unit
-                  integer::l,c1,c2
+                  integer::l,c1,c2,line_count,&
+                                   name_width,&
+                                   side_width,&
+                                   term_width
 
                   if(opt%has_arg) then
 
-                     write (unit,"(1x,'-',a,1x,a)") opt%chr,trim(opt%argname)
-                     write (unit,"(1x,'--',a,1x,a)") trim(opt%name),trim(opt%argname)
+                     write(unit,"(2x, '-',a,','  )",advance="no")      opt%chr
+                     write(unit,"(   '--',a,'=',a)",advance="no") trim(opt%name)   ,&
+                                                                  trim(opt%argname)
+
+                     name_width=len_trim(opt%chr    )&
+                               +len_trim(opt%name   )&
+                               +len_trim(opt%argname)+7
 
                   else
 
-                     write (unit,"(1x,'-',a)") opt%chr
-                     write (unit,"(1x,'--',a)") trim(opt%name)
+                     write(unit,"(2x, '-',a,',')",advance="no")      opt%chr
+                     write(unit,"(   '--',a    )",advance="no") trim(opt%name)
+
+                     name_width=len_trim(opt%chr    )&
+                               +len_trim(opt%name   )+6
 
               end if!opt%has_arg
+
+                  side_width=32
+                  term_width=80
+
+                  if(name_width<side_width) then
+
+                     write(unit,"(<side_width-name_width>x)",advance="no")
+                                   name_width=side_width
+
+                  else
+
+                     write(unit,"(2x)",advance="no")
+
+              end if!name_width<side_width
 
                   l=len_trim(opt%descr)
 
@@ -449,6 +479,8 @@
             !     c2 is one past the last character of the line
 
                   c1=1
+
+                  line_count=1
 
                   do
 
@@ -458,9 +490,21 @@
 
               end    if!c1>l
 
-            !        print at maximum 4+76=80 characters
+            !        print at maximum <term_width> characters
 
-                     c2=min(c1+76,500)
+                     if(line_count>1) then
+
+                        write(unit,"(<side_width>x)",advance="no")
+
+                        c2=min(c1+term_width  &
+                                 -side_width  ,500)
+
+                     else
+
+                        c2=min(c1+term_width  &
+                                 -name_width-2,500)
+
+              end    if!line_count>1
 
             !        if not at the end of the whole string
 
@@ -482,10 +526,14 @@
 
               end    if!c2/=500
 
-                     write (unit,"(4x,a)") opt%descr(c1:c2-1)
-                     c1=c2+1
+                     write(unit,"(a)") opt%descr(c1:c2-1)
+                                                 c1=c2+1
+                     line_count&
+                    =line_count+1
 
               end do
+
+                  write(unit,*)
 
 
         end subroutine

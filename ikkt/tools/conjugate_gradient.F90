@@ -1,12 +1,12 @@
-#     ifndef IKKT_CONJUGATE_GRADIENT_F90
-#     define IKKT_CONJUGATE_GRADIENT_F90
+#     ifndef CONJUGATE_GRADIENT_F90
+#     define CONJUGATE_GRADIENT_F90
 
-#     include "main/precision.F90"
+#     include "system/precision.F90"
 
 #     include "tensor/tensor.F90"
 
 #     include "ikkt/fields.F90"
-#     include "ikkt/optimal_toolset.F90"
+#     include "ikkt/tools/optimal_toolset.F90"
 
 
       module conjugate_gradient_method
@@ -34,7 +34,7 @@
       contains
 
 
-            function conjugate_gradient_K(a,b,x0) result(x1)
+            subroutine conjugate_gradient_K(a,b,x)
 
 
                   implicit none
@@ -48,33 +48,45 @@
                                         0:fermi_degrees_of_freedom-1),intent(in   )::b
                   complex(KK),dimension(0:inner_degrees_of_freedom-1,&
                                         0:inner_degrees_of_freedom-1,&
-                                        0:fermi_degrees_of_freedom-1),intent(inout)::x0
+                                        0:fermi_degrees_of_freedom-1),intent(inout)::x
 
                   complex(KK),dimension(0:inner_degrees_of_freedom-1,&
                                         0:inner_degrees_of_freedom-1,&
-                                        0:fermi_degrees_of_freedom-1)::r0,p0,x1,r1,p1
+                                        0:fermi_degrees_of_freedom-1)::r,&
+                                                                       p
 
-                  real(KK)::cb,ca
+                  real(KK)::cb,&
+                            ca,norm_r_old,&
+                               norm_r_new
 
 
-                  r0=b-cmmv(a,x0);p0=r0
+                  r=b-cmmv(a,x)
+                  p=r
 
                   do
 
-                     cb=-ucv(r0,r0)/ucmmv(r0,a,r0);x1=x0-cb*p0
+                     norm_r_old=ucv(r,r)
 
-                     if(sqrt(ucv(x1-x0,x1-x0))<tolerance) exit
+                     cb=-norm_r_old/ucmmv(r,a,r)
 
-                     r1=r0+cb*cmmv(a,p0);ca=ucv(r1,r1)/ucv(r0,r0);p1=r1+ca*p0
+                     x=x-cb*       p
+                     r=r+cb*cmmv(a,p)
 
-                     x0=x1
-                     r0=r1
-                     p0=p1
+                     norm_r_new=ucv(r,r)
+
+                     if(sqrt(norm_r_new)<tolerance) exit
+
+                     ca=norm_r_new&
+                       /norm_r_old
+
+                     p=r+ca*       p
 
               end do
 
+                  print *,"success"
 
-        end function conjugate_gradient_K!a,b,x0
+
+        end subroutine conjugate_gradient_K!a,b,x
 
 
   end module conjugate_gradient_method

@@ -1,5 +1,5 @@
-#     include "main/getopts.F90"
-#     include "main/precision.F90"
+#     include "system/getopts.F90"
+#     include "system/precision.F90"
 
 #     include "jack_knife.F90"
 
@@ -63,8 +63,8 @@
 
             if(weighted_averages) then
 
-               allocate(record_values (record_size))
-               allocate(record_weights(record_size))
+                 allocate(record_values (record_size))
+                 allocate(record_weights(record_size))
 
                do i=1,record_size-1,+1
 
@@ -91,6 +91,9 @@
                   write(*,                     *             )
 
            end if!susceptibility_in
+
+               deallocate(record_values )
+               deallocate(record_weights)
 
             else
 
@@ -122,6 +125,8 @@
                   write(*,            *             )
 
            end if!susceptibility_in
+
+               deallocate(record_values )
 
         end if!weighted_averages
 

@@ -1,7 +1,7 @@
-#     ifndef TOOLS_CONJUGATE_GRADIENT_F90
-#     define TOOLS_CONJUGATE_GRADIENT_F90
+#     ifndef CONJUGATE_GRADIENT_F90
+#     define CONJUGATE_GRADIENT_F90
 
-#     include "main/precision.F90"
+#     include "system/precision.F90"
 
 #     include "tensor/tensor.F90"
 
@@ -28,56 +28,48 @@
       contains
 
 
-            function conjugate_gradient_K(a,b,x0) result(x1)
+            subroutine conjugate_gradient_K(a,b,x)
 
 
                   implicit none
 
 
-                  complex(KK),dimension( :               ),intent(in   ):: b
+                  complex(KK),dimension( :               ),intent(in   )::b
                   complex(KK),dimension(0:size(b,dim=1)-1,&
-                                        0:size(b,dim=1)-1),intent(in   ):: a
-                  complex(KK),dimension(0:size(b,dim=1)-1),intent(inout)::x0
-                  complex(KK),dimension(0:size(b,dim=1)-1)              ::r0
-                  complex(KK),dimension(0:size(b,dim=1)-1)              ::p0
-                  real(   KK)                                           ::cb
-                  complex(KK),dimension(0:size(b,dim=1)-1)              ::x1
-                  complex(KK),dimension(0:size(b,dim=1)-1)              ::r1
-                  real(   KK)                                           ::ca
-                  complex(KK),dimension(0:size(b,dim=1)-1)              ::p1
+                                        0:size(b,dim=1)-1),intent(in   )::a
+                  complex(KK),dimension(0:size(b,dim=1)-1),intent(inout)::x
 
+                  complex(KK),dimension(0:size(b,dim=1)-1)              ::r,&
+                                                                          p
 
-                  r0=b-(a.o.x0)
-                  p0=       r0
+                  real(KK)::cb,&
+                            ca,norm_r_old,&
+                               norm_r_new
+
+                  r=b-(a.o.x)
+                  p=       r
 
                   do
 
-                     cb=-norm(r0  )&
-                        /norm(r0,a)
+                     norm_r_old=norm(r)
 
-                     x1=x0-cb*     p0
+                     if(norm_r_new<tolerance) exit
 
-                     if(norm(x1-x0)<tolerance) then
+                     cb=-norm_r_old/norm(r,a)
 
-                        exit
+                     x=x-cb*     p
+                     r=r+cb*(a.o.p)
 
-              end    if!norm(x1-x0)<tolerance)
+                     ca=norm_r_new&
+                       /norm_r_old
 
-                     r1=r0+cb*(a.o.p0)
-
-                     ca= norm(r1)&
-                        /norm(r0)
-
-                     p1=r1+ca*     p0
-
-                     x0=x1
-                     r0=r1
-                     p0=p1
+                     p=r+ca*     p
 
               end do
 
+                  print *,"success"
 
-        end function conjugate_gradient_K!a,b,x0
+        end subroutine conjugate_gradient_K!a,b,x
 
 
   end module conjugate_gradient_method

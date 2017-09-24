@@ -1,7 +1,7 @@
 #     ifndef MATHEMATICAL_CONSTANTS_F90
 #     define MATHEMATICAL_CONSTANTS_F90
 
-#     include "main/precision.F90"
+#     include "system/precision.F90"
 
 
       module mathematical_constants

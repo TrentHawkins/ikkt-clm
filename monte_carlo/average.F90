@@ -1,7 +1,7 @@
-#     ifndef MONTE_CARLO_AVERAGE_F90
-#     define MONTE_CARLO_AVERAGE_F90
+#     ifndef AVERAGE_F90
+#     define AVERAGE_F90
 
-#     include "main/precision.F90"
+#     include "system/precision.F90"
 
 
       module average_type

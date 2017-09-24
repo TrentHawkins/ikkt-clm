@@ -1,5 +1,8 @@
-#     ifndef MONTE_CARLO_MONTE_CARLO_F90
-#     define MONTE_CARLO_MONTE_CARLO_F90
+#     ifndef MONTE_CARLO_F90
+#     define MONTE_CARLO_F90
+
+#     include "system/precision.F90"
+#     include "system/text_format.F90"
 
 #     include "monte_carlo/random_number_generator.F90"
 #     include "monte_carlo/average.F90"
@@ -9,6 +12,8 @@
       module monte_carlo
 
 
+            use::text_formatting
+
             use::random_number_generator
             use::average_type
             use::time_type
@@ -16,6 +21,8 @@
 
             implicit none
 
+
+            logical::measure_time_skipped=.false.
 
             real(KK),public::time_setting=+.00000e+0_KK
             real(KK),public::measure_skip=+.00000e+0_KK
@@ -61,9 +68,18 @@
 
                   call read_time_parameters()
 
-                  call   make_seed(                         )
-                  call s%make_time(time_setting,measure_skip)
-                  call t%make_time(measure_skip,average_step)
+                  call make_seed()
+
+                  if(measure_time_skipped) then
+
+                     call s%make_time(time_setting,measure_skip)
+                     call t%make_time(measure_skip,average_step)
+
+                  else
+
+                     call t%make_time(time_setting,average_step)
+
+              end if!measure_time_skipped
 
 
         end subroutine make_monte_carlo_K!
@@ -77,9 +93,18 @@
 
                   call read_time_parameters()
 
-                  call   load_seed(                         )
-                  call s%load_time(time_setting,measure_skip)
-                  call t%load_time(measure_skip,average_step)
+                  call load_seed()
+
+                  if(measure_time_skipped) then
+
+                     call s%load_time(time_setting,measure_skip)
+                     call t%load_time(measure_skip,average_step)
+
+                  else
+
+                     call t%load_time(time_setting,average_step)
+
+              end if!measure_time_skipped
 
 
         end subroutine load_monte_carlo_K!
@@ -91,9 +116,15 @@
                   implicit none
 
 
-                  call   save_seed(                         )
-                  call s%save_time(                         )
-                  call t%save_time(                         )
+                  call save_seed()
+
+                  if(measure_time_skipped) then
+
+                     call s%save_time()
+
+              end if!measure_time_skipped
+
+                  call t%save_time()
 
 
         end subroutine save_monte_carlo_K!
@@ -105,17 +136,23 @@
                   implicit none
 
 
-                  write(*,"(a)",advance="no") "time_setting: "
-                   read(*,  *               )  time_setting
-                  write(*,  *               )
-                  write(*,"(a)",advance="no") "measure_skip: "
-                   read(*,  *               )  measure_skip
-                  write(*,  *               )
-                  write(*,"(a)",advance="no") "average_step: "
-                   read(*,  *               )  average_step
-                  write(*,  *               )
+                  write(*,"(2a)",advance="no") "time_setting: ",t_yellow
+                   read(*,   *               )  time_setting
+                  write(*,"(2a)",advance="no")                  t_normal
 
-                  write(*,  *               )
+                  if(measure_time_skipped) then
+
+                     write(*,"(2a)",advance="no") "measure_skip: ",t_yellow
+                      read(*,   *               )  measure_skip
+                     write(*,"(2a)",advance="no")                  t_normal
+
+              end if!measure_time_skipped
+
+                  write(*,"(2a)",advance="no") "average_step: ",t_yellow
+                   read(*,   *               )  average_step
+                  write(*,"(2a)",advance="no")                  t_normal
+
+                  write(*,   *               )
 
 
         end subroutine read_time_parameters!
