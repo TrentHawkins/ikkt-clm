@@ -1,0 +1,35 @@
+# ignore everything
+
+*
+
+# except for paths
+
+!/**/
+
+# ignore dotted files
+
+*.*
+
+# except for git files
+
+!.*
+
+# except for LyX files
+
+!*.lyx
+
+# for fortran source files
+
+!*.F90
+
+# for shell scripts
+
+!*.*sh
+
+# for README
+
+!README
+
+# for LICENCE
+
+!LICENCE
