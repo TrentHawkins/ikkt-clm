@@ -1,35 +1,29 @@
 # ignore everything
-
 *
 
 # except for paths
-
 !/**/
 
-# ignore dotted files
-
+# ignore dotted files except for
 *.*
 
-# except for git files
-
+# git repository and hidden files
 !.*
 
-# except for LyX files
-
+# LyX files
 !*.lyx
 
-# for fortran source files
+# fortran files
+!*.f*
 
-!*.F90
+# fortran files with preprocessor
+!*.F*
 
-# for shell scripts
-
+# shell scripts
 !*.*sh
 
-# for README
-
+# repository documentation
 !README
 
-# for LICENCE
-
+# repository licence
 !LICENCE
