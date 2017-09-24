@@ -1,10 +1,10 @@
 #     ifndef CONSTANTS_F90
 #     define CONSTANTS_F90
 
-#     include "system/precision.F90"
-#     include "main/mathematical_constants.F90"
+#     include "../system/precision.F90"
+#     include "../main/mathematical_constants.F90"
 
-#     include "tensor/tensor.F90"
+#     include "../tensor/tensor.F90"
 
 
       module constants
@@ -225,7 +225,7 @@
 
 
         end subroutine make_constants!inner_size,
-      !                               boson_size
+!                                     boson_size
 
 
             subroutine eject_constants

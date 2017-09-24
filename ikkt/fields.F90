@@ -1,13 +1,13 @@
 #     ifndef FIELDS_F90
 #     define FIELDS_F90
 
-#     include "system/precision.F90"
-#     include "system/text_format.F90"
-#     include "main/mathematical_constants.F90"
+#     include "../system/precision.F90"
+#     include "../system/text_format.F90"
+#     include "../main/mathematical_constants.F90"
 
-#     include "tensor/tensor.F90"
+#     include "../tensor/tensor.F90"
 
-#     include "ikkt/constants.F90"
+#     include "../ikkt/constants.F90"
 
 
       module fields
@@ -635,9 +635,9 @@
 
                    open(newunit=unit,file="fermion.matrix")
 
-            !     call write(   unit,m)
-            !     call write(   unit,cm)
-            !     call write(   unit,cmm)
+!                 call write(   unit,m)
+!                 call write(   unit,cm)
+!                 call write(   unit,cmm)
 
                   call write(unit,m_eigenvalues_)
 

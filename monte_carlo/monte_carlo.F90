@@ -1,12 +1,12 @@
 #     ifndef MONTE_CARLO_F90
 #     define MONTE_CARLO_F90
 
-#     include "system/precision.F90"
-#     include "system/text_format.F90"
+#     include "../system/precision.F90"
+#     include "../system/text_format.F90"
 
-#     include "monte_carlo/random_number_generator.F90"
-#     include "monte_carlo/average.F90"
-#     include "monte_carlo/time.F90"
+#     include "../monte_carlo/random_number_generator.F90"
+#     include "../monte_carlo/average.F90"
+#     include "../monte_carlo/time.F90"
 
 
       module monte_carlo

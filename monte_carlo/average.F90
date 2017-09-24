@@ -1,7 +1,7 @@
 #     ifndef AVERAGE_F90
 #     define AVERAGE_F90
 
-#     include "system/precision.F90"
+#     include "../system/precision.F90"
 
 
       module average_type
@@ -24,8 +24,8 @@
 
                procedure,private::initialize_average_K;generic::initialize_average=>initialize_average_K
 
-      !        procedure,public::weight_K
-      !        procedure,public::value__K
+!              procedure,public::weight_K
+!              procedure,public::value__K
 
                procedure,private::                is_equal_to_K;generic::                is_equal_to=>                is_equal_to_K
                procedure,private::   is_less_than_or_equal_to_K;generic::   is_less_than_or_equal_to=>   is_less_than_or_equal_to_K
@@ -43,17 +43,17 @@
 
         end interface average
 
-      !     interface weight
+!           interface weight
 
-      !        module procedure weight_K
+!              module procedure weight_K
 
-      ! end interface weight
+!       end interface weight
 
-      !     interface value
+!           interface value
 
-      !        module procedure value__K
+!              module procedure value__K
 
-      ! end interface value
+!       end interface value
 
             interface operator(+)
 
@@ -227,36 +227,36 @@
         end function average_constructor_K!weight,value
 
 
-      !     function weight_K(this) result(weight)
+!           function weight_K(this) result(weight)
 
 
-      !           implicit none
+!                 implicit none
 
 
-      !           type(average(KK)),intent(inout)::this
-      !           real(        KK )              ::weight
+!                 type(average(KK)),intent(inout)::this
+!                 real(        KK )              ::weight
 
 
-      !           weight=this%weight
+!                 weight=this%weight
 
 
-      ! end function weight_K!this
+!       end function weight_K!this
 
 
-      !     function value__K(this) result(value )
+!           function value__K(this) result(value )
 
 
-      !           implicit none
+!                 implicit none
 
 
-      !           type(average(KK)),intent(inout)::this
-      !           real(        KK )              ::value
+!                 type(average(KK)),intent(inout)::this
+!                 real(        KK )              ::value
 
 
-      !           value =this%value
+!                 value =this%value
 
 
-      ! end function value__K!this
+!       end function value__K!this
 
 
             function average_average__plus_K(average0) result(average_)

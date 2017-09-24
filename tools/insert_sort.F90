@@ -1,7 +1,7 @@
 #     ifndef   INSERT_SORT_F90
 #     define   INSERT_SORT_F90
 
-#     include "system/precision.F90"
+#     include "../system/precision.F90"
 
 
       module insertion_sort

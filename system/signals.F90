@@ -31,12 +31,12 @@
             external::handler
 
 
-      !     call signal(SIGHUP,handler)
+!           call signal(SIGHUP,handler)
             call signal(SIGINT,handler)
-      !     call signal(SIGFPE,handler)
+!           call signal(SIGFPE,handler)
 
-      !     call signal(SIGQUIT,handler)
-      !     call signal(SIGABRT,handler)
+!           call signal(SIGQUIT,handler)
+!           call signal(SIGABRT,handler)
 
 
   end subroutine signal_actions!handler

@@ -1,11 +1,11 @@
 #     ifndef OPTIMAL_TOOLSET_F90
 #     define OPTIMAL_TOOLSET_F90
 
-#     include "system/precision.F90"
+#     include "../system/precision.F90"
 
-#     include "tensor/tensor.F90"
+#     include "../tensor/tensor.F90"
 
-#     include "ikkt/fields.F90"
+#     include "../ikkt/fields.F90"
 
 
       module optimal_toolset
@@ -22,45 +22,45 @@
             public::ucv,mv,cmv,um,ucm,cmmv,ucmm,ucmmv,umav
 
 
-      !     interface operator( .o. )
+!           interface operator( .o. )
 
-      !        module procedure uov
+!              module procedure uov
 
-      ! end interface operator( .o. )
+!       end interface operator( .o. )
 
-      !     interface operator( .c. )
+!           interface operator( .c. )
 
-      !        module procedure ucv
+!              module procedure ucv
 
-      ! end interface operator( .c. )
+!       end interface operator( .c. )
 
-      !     interface operator( .m. )
+!           interface operator( .m. )
 
-      !        module procedure  mv
-      !        module procedure um
+!              module procedure  mv
+!              module procedure um
 
-      ! end interface operator( .m. )
+!       end interface operator( .m. )
 
-      !     interface operator( .cm. )
+!           interface operator( .cm. )
 
-      !        module procedure  cmv
-      !        module procedure ucm
+!              module procedure  cmv
+!              module procedure ucm
 
-      ! end interface operator( .cm. )
+!       end interface operator( .cm. )
 
-      !     interface operator( .cmm. )
+!           interface operator( .cmm. )
 
-      !        module procedure  cmmv
-      !        module procedure ucmm
-      !        module procedure ucmmv
+!              module procedure  cmmv
+!              module procedure ucmm
+!              module procedure ucmmv
 
-      ! end interface operator( .cmm. )
+!       end interface operator( .cmm. )
 
-      !     interface operator( .ma. )
+!           interface operator( .ma. )
 
-      !        module procedure umav
+!              module procedure umav
 
-      ! end interface operator( .ma. )
+!       end interface operator( .ma. )
 
 
       contains
@@ -453,11 +453,11 @@
                   real(KK)::ucmmv
 
 
-            !     ucmmv=ucv(u,cm(a,mv(a,v)))=ucv(u,cmmv(a,v))
+!                 ucmmv=ucv(u,cm(a,mv(a,v)))=ucv(u,cmmv(a,v))
 
                   ucmmv=uov(ucm(u,a),mv(a,v))
 
-            !     ucmmv=uov(um(ucm(u,a),a),v)=uov(ucmm(u,a),v)
+!                 ucmmv=uov(um(ucm(u,a),a),v)=uov(ucmm(u,a),v)
 
         end function ucmmv!u,a,v
 

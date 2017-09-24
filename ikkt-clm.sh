@@ -1,8 +1,6 @@
 #!/bin/bash --
 
 
-   cd ${PWD#"/bin"}
-
    A=$(tput cols)
 
 #  separator() {

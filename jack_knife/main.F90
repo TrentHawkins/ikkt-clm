@@ -1,7 +1,7 @@
-#     include "system/getopts.F90"
-#     include "system/precision.F90"
+#     include "../system/getopts.F90"
+#     include "../system/precision.F90"
 
-#     include "jack_knife.F90"
+#     include "../jack_knife.F90"
 
 
       program main

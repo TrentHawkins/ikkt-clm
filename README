@@ -1,19 +1,26 @@
 IKKT Matrix model: Complex Langevin method (object-oriented-implementation)
 
-compile in ./ without BLAS:
+compile in ./
 
-   ifort -module "ifort/modules" -fast -w main/main.F90
-   -mkl=sequential -lmkl_lapack95_lp64 -lmkl_core -lpthread -lm -ldl
+sequential:
 
-or with BLAS:
+   ifort -module "ifort/objects" -fast -nowarn -o ifort/bin/a.out
+         [-DBLAS] [-DOPTIMAL] main/main.F90 -mkl=sequential -lmkl_blas95_lp64 -lmkl_lapack95_lp64 -lmkl_core -lpthread -lm -ldl
 
-   ifort -module "ifort/modules" -fast -w -DBLAS main/main.F90
-   -mkl=sequential -lmkl_blas95_lp64 -lmkl_lapack95_lp64 -lmkl_core -lpthread -lm -ldl
+parallel:
+
+   ifort -module "ifort/objects" -fast -parallel -nowarn -o ifort/bin/a.out
+         [-DBLAS] [-DOPTIMAL] main/main.F90 -mkl=parallel -lmkl_blas95_lp64 -lmkl_lapack95_lp64 -lmkl_core -lpthread -lm -ldl
+
+Inside [...] are optional preprocesor flags:
+BLAS: use BLAS for internal linear algebra operations instead of Fortran's intrinsics
+OPTIMAL: use custom-tailored linear operations optimisation suitable for specific-form fermion matrices
+
 
 You may need the option "-mcmodel=medium" if the stored arrays are too large, which conflicts with the "-fast" option.
-Later when the optimized version using commutators is fixed, it will not be necessary, as the fermion matrix is bypassed.
+This is unnecessary in the optimized version using commutators, as the fermion matrix is bypassed.
 
-The compiled program takes 1 argument has 6 options:
+The compiled program takes 1 argument has 7 options:
 
 -c: use old configuration, filename is internal for now, so no argument (TODO)
 -a: use cold (0) or hot (1) initial field configuration. using this option is mandatory
@@ -35,10 +42,8 @@ Jack-knife is a separate program under "./jack_knife/". You compile seperately w
 Jack-knife has four versions, accounting on whether you wish to measure susceptibility as well, and whether the data are timed with
 a dynamic time-step instead of a static one.
 
-The compiled program takes 1 argument has 6 options:
-
 -j: how many jack-knife bins to take; it defines the jack-knife bin width later on
 -w: use weighted averages because you know the data are timed with a dynamic time-step
--x: measure susceptibility along with plain observable
+-x: measure susceptibility along with plain observables
 
 The argument is the time history file name to process.

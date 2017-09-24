@@ -1,21 +1,21 @@
 #     ifndef OBSERVABLES_F90
 #     define OBSERVABLES_F90
 
-#     include "system/precision.F90"
+#     include "../system/precision.F90"
 
-#     include "tensor/tensor.F90"
+#     include "../tensor/tensor.F90"
 
-#     include "monte_carlo/time.F90"
+#     include "../monte_carlo/time.F90"
 
-#     include "ikkt/fields.F90"
+#     include "../ikkt/fields.F90"
 
 #     ifdef OPTIMAL
 
-#     include "ikkt/tools/optimal_toolset.F90"
+#     include "../ikkt/optimal_toolset.F90"
 
 #  endif
 
-#     include "ikkt/complex_langevin.F90"
+#     include "../ikkt/complex_langevin.F90"
 
 
       module observables
@@ -50,7 +50,7 @@
             private::lambda
 
             public::boson_action
-      !     public::fermi_action
+!           public::fermi_action
 
 
       contains
@@ -67,7 +67,7 @@
                   integer::mu
 
 
-            !     call make_drift_norm()
+!                 call make_drift_norm()
 
                   call write(unit,                   t             )
                        write(unit,format_observables_K,advance="no") faraday_squared()
@@ -119,8 +119,8 @@
 
                      do nu=0,boson_degrees_of_freedom-1,+1
 
-            !           faraday_squared&
-            !          =faraday_squared+norm(a(:,:,mu).commutation.a(:,:,nu))
+!                       faraday_squared&
+!                      =faraday_squared+norm(a(:,:,mu).commutation.a(:,:,nu))
 
                         faraday_squared&
                        =faraday_squared-trace((a(:,:,mu).commutation.a(:,:,nu)) &
@@ -181,20 +181,20 @@
         end function boson_action
 
 
-      !     function fermi_action()
+!           function fermi_action()
 
 
-      !           implicit none
+!                 implicit none
 
 
-      !           complex(KK)::fermi_action
+!                 complex(KK)::fermi_action
 
 
-      !           fermi_action&
-      !          =fermi_action+determinant_degree(boson_degrees_of_freedom)*sum(log(m_eigenvalues_))
+!                 fermi_action&
+!                =fermi_action+determinant_degree(boson_degrees_of_freedom)*sum(log(m_eigenvalues_))
 
 
-      ! end function fermi_action
+!       end function fermi_action
 
 
   end module observables

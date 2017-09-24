@@ -1,7 +1,7 @@
 #     ifndef GETOPTS_F90
 #     define GETOPTS_F90
 
-#     include "system/text_format.F90"
+#     include "../system/text_format.F90"
 
 
       module get_options
@@ -38,11 +38,11 @@
 !           do
 !              call getopt (...,optchar=c,...)
 !              if(stat/=0) then
-!      !          optional error handling
+!     !           optional error handling
 !                 exit
 !       end    if
 !              select case (c)
-!      !          process options
+!     !           process options
 !       end    select
 !       end do
 
@@ -56,57 +56,57 @@
                   implicit none
 
 
-            !     String containing the characters that are valid short options. If present, command line arguments are scanned for
-            !     those options. If a character is followed by a colon (:) its corresponding option requires an argument.
-            !     E.g. "vn:" defines two options -v and -n with -n requiring an argument.
+!                 String containing the characters that are valid short options. If present, command line arguments are scanned for
+!                 those options. If a character is followed by a colon (:) its corresponding option requires an argument.
+!                 E.g. "vn:" defines two options -v and -n with -n requiring an argument.
 
                   character(*),intent(in),optional::options
 
-            !     Array of long options. If present,options of the form "--XXXX..." are recognised. Each option has an associated
-            !     option character. This can be any character of default kind,it is just an identifier. It can, but doesn"t have to,
-            !     match any character in the options argument. In fact itis possible to only pass long options and no short options
-            !     at all. Only name,has_arg and chr need to be set.
+!                 Array of long options. If present,options of the form "--XXXX..." are recognised. Each option has an associated
+!                 option character. This can be any character of default kind,it is just an identifier. It can, but doesn"t have to,
+!                 match any character in the options argument. In fact itis possible to only pass long options and no short options
+!                 at all. Only name,has_arg and chr need to be set.
 
                   type(option),intent(in),optional::longopts(:)
 
-            !     If stat is not 1,optchar contains the option character that was parsed. Otherwise its value is undefined.
+!                 If stat is not 1,optchar contains the option character that was parsed. Otherwise its value is undefined.
 
                   character,intent(out),optional::optchar
 
-            !     If stat is 0 and the parsed option requires an argument,optarg contains the first len(optarg) (but at most 500)
-            !     characters of that argument. Otherwise its value is undefined. If the arguments length exceeds 500 characters and
-            !     err is .true.,a warning is issued.
+!                 If stat is 0 and the parsed option requires an argument,optarg contains the first len(optarg) (but at most 500)
+!                 characters of that argument. Otherwise its value is undefined. If the arguments length exceeds 500 characters and
+!                 err is .true.,a warning is issued.
 
                   character(*),intent(out),optional::optarg
 
-            !     If stat is 0 and the parsed option requires an argument,arglen contains the actual length of that argument
-            !     Otherwise its value is undefined. This can be used to make sure the argument was not truncated by the limited
-            !     length of optarg.
+!                 If stat is 0 and the parsed option requires an argument,arglen contains the actual length of that argument
+!                 Otherwise its value is undefined. This can be used to make sure the argument was not truncated by the limited
+!                 length of optarg.
 
                   integer,intent(out),optional::arglen
 
-            !     Status indicator. Can have the following values:
-            !      0: An option was successfully parsed.
-            !      1: Parsing stopped successfully because a non-option or "--" was encountered.
-            !     -1: An unrecognised option was encountered.
-            !     -2: A required argument was missing.
-            !     Its value is never undefined.
+!                 Status indicator. Can have the following values:
+!                  0: An option was successfully parsed.
+!                  1: Parsing stopped successfully because a non-option or "--" was encountered.
+!                 -1: An unrecognised option was encountered.
+!                 -2: A required argument was missing.
+!                 Its value is never undefined.
 
                   integer,intent(out),optional::stat
 
-            !     If stat is 1, offset contains the number of the argument before the first non-option argument, i.e. offset+n is
-            !     the nth non-option argument. If stat is not 1, offset contains the number of the argument that would be parsed in
-            !     the next call to getopt. This number can be greater than the actual number of arguments.
+!                 If stat is 1, offset contains the number of the argument before the first non-option argument, i.e. offset+n is
+!                 the nth non-option argument. If stat is not 1, offset contains the number of the argument that would be parsed in
+!                 the next call to getopt. This number can be greater than the actual number of arguments.
 
                   integer,intent(out),optional::offset
 
-            !     If stat is 1, remain contains the number of remaining non-option arguments, i.e. the non-option arguments are in
-            !     the range (offset+1:offset+remain). If stat is not 1, remain is undefined.
+!                 If stat is 1, remain contains the number of remaining non-option arguments, i.e. the non-option arguments are in
+!                 the range (offset+1:offset+remain). If stat is not 1, remain is undefined.
 
                   integer,intent(out),optional::remain
 
-            !     If err is present and .true., getopt prints messages to the standard error unit if an error is encountered
-            !     (i.e. whenever stat would be set to a negative value).
+!                 If err is present and .true., getopt prints messages to the standard error unit if an error is encountered
+!                 (i.e. whenever stat would be set to a negative value).
 
                   logical,intent(in),optional::err
 
@@ -130,7 +130,7 @@
 
                   long=.false.
 
-            !     no more arguments left
+!                 no more arguments left
 
                   if(pos>cnt) then
 
@@ -142,13 +142,13 @@
 
                   call get_command_argument(pos,arg,length)
 
-            !     is argument an option?
+!                 is argument an option?
 
                   if(arg(1:1)=="-") then
 
                      chr=arg(2:2)
 
-               !     too long ("-xxxx...") for one dash?
+   !                 too long ("-xxxx...") for one dash?
 
                      if(chr/="-".and.len_trim(arg)>2) then
 
@@ -157,7 +157,7 @@
 
               end    if!chr/="-".and.len_trim(arg)>2
 
-            !        forced stop ("--")
+!                    forced stop ("--")
 
                      if(chr=="-".and.arg(3:3)==" ") then
 
@@ -166,17 +166,17 @@
 
               end    if!chr=="-".and.arg(3:3)==" "
 
-            !        long option ("--xxx...")
+!                    long option ("--xxx...")
 
                      if(chr=="-") then
 
                         long=.true.
 
-            !           check if valid
+!                       check if valid
 
                         id=lookup(arg(3:))
 
-            !           option is invalid, stop
+!                       option is invalid, stop
 
                         if(id==0) then
 
@@ -187,7 +187,7 @@
 
                         chr=longopts(id)%chr
 
-            !           check if option requires an argument
+!                       check if option requires an argument
 
                         if(.not.longopts(id)%has_arg) then
 
@@ -196,7 +196,7 @@
 
               end       if!.not.longopts(id)%has_arg
 
-            !           check if there are still arguments left
+!                       check if there are still arguments left
 
                         if(pos==cnt) then
 
@@ -205,15 +205,15 @@
 
               end       if!pos==cnt
 
-            !           go to next position
+!                       go to next position
 
                         pos=pos+1
 
-            !           get argument
+!                       get argument
 
                         call get_command_argument(pos,arg,length)
 
-            !           make sure it is not an option
+!                       make sure it is not an option
 
                         if(arg(1:1)=="-") then
 
@@ -225,9 +225,9 @@
 
               end    if!chr=="-"
 
-            !        short option
+!                    short option
 
-            !        check if valid
+!                    check if valid
 
                      if(present(options)) then
 
@@ -239,7 +239,7 @@
 
               end    if!present(options)
 
-            !        option is invalid, stop
+!                    option is invalid, stop
 
                      if(chrpos==0) then
 
@@ -248,13 +248,13 @@
 
               end    if!chrpos==0
 
-            !        look for argument requirement
+!                    look for argument requirement
 
                      if(chrpos<len_trim(options)) then
 
                         if(options(chrpos+1:chrpos+1)==":") then
 
-            !              check if there are still arguments left
+!                          check if there are still arguments left
 
                            if(pos==cnt) then
 
@@ -263,15 +263,15 @@
 
               end          if!pos==cnt
 
-            !              go to next position
+!                          go to next position
 
                            pos=pos+1
 
-            !              get argument
+!                          get argument
 
                            call get_command_argument(pos,arg,length)
 
-            !              make sure it is not an option
+!                          make sure it is not an option
 
                            if(arg(1:1)=="-") then
 
@@ -285,24 +285,24 @@
 
               end    if!chrpos<len_trim(options)
 
-            !        if we get to this point, no error happened
-            !        return option and the argument (if there is one)
+!                    if we get to this point, no error happened
+!                    return option and the argument (if there is one)
 
                      st=0
                      goto 10
 
               end if!arg(1:1)=="-"
 
-            !     not an option, parsing stops
+!                 not an option, parsing stops
 
                   st=1
 
-            !     we are already at the first non-option argument
-            !     go one step back to the last option or option argument
+!                 we are already at the first non-option argument
+!                 go one step back to the last option or option argument
 
                   pos=pos-1
 
-            !     error handling and setting of return values
+!                 error handling and setting of return values
 
    10             continue
 
@@ -370,7 +370,7 @@
 
               end if!present(remain)
 
-            !     setup pos for next call to getopt
+!                 setup pos for next call to getopt
 
                   pos=pos+1
 
@@ -387,7 +387,7 @@
                         character(*),intent(in)::name
                         integer::i
 
-                  !     if there are no long options,skip the loop
+!                       if there are no long options,skip the loop
 
                         if(.not.present(longopts)) then
 
@@ -406,7 +406,7 @@
 
                     end do!i=1,size(longopts)
 
-            !           if we get to this point,the option was not found
+!                       if we get to this point,the option was not found
 
    20                   lookup=0
 
@@ -417,8 +417,8 @@
         end subroutine
 
 
-      !     Print an option in the style of a man page.
-      !     -o arg, --option arg  [description]
+!           Print an option in the style of a man page.
+!           -o arg, --option arg  [description]
 
 
             subroutine print_opt(opt,unit)
@@ -427,11 +427,11 @@
                   implicit none
 
 
-            !     the option
+!                 the option
 
                   class(option),intent(in)::opt
 
-            !     logical unit number
+!                 logical unit number
 
                   integer,intent(in)::unit
                   integer::l,c1,c2,line_count,&
@@ -475,8 +475,8 @@
 
                   l=len_trim(opt%descr)
 
-            !     c1 is the first character of the line
-            !     c2 is one past the last character of the line
+!                 c1 is the first character of the line
+!                 c2 is one past the last character of the line
 
                   c1=1
 
@@ -490,7 +490,7 @@
 
               end    if!c1>l
 
-            !        print at maximum <term_width> characters
+!                    print at maximum <term_width> characters
 
                      if(line_count>1) then
 
@@ -506,11 +506,11 @@
 
               end    if!line_count>1
 
-            !        if not at the end of the whole string
+!                    if not at the end of the whole string
 
                      if(c2/=500) then
 
-            !           find the end of a word
+!                       find the end of a word
 
                         do
 

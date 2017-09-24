@@ -1,9 +1,9 @@
 #     ifndef CONJUGATE_GRADIENT_F90
 #     define CONJUGATE_GRADIENT_F90
 
-#     include "system/precision.F90"
+#     include "../system/precision.F90"
 
-#     include "tensor/tensor.F90"
+#     include "../tensor/tensor.F90"
 
 
       module conjugate_gradient_method

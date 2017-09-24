@@ -1,7 +1,7 @@
 #     ifndef RANDOM_NUMBER_GENERATOR_F90
 #     define RANDOM_NUMBER_GENERATOR_F90
 
-#     include "system/precision.F90"
+#     include "../system/precision.F90"
 
 
       module random_number_generator

@@ -1,7 +1,7 @@
 #     ifndef BRENT_MINIMIZATION_F90
 #     define BRENT_MINIMIZATION_F90
 
-#     include "system/precision.F90"
+#     include "../system/precision.F90"
 
 
 !     BRENT MINIMIZATION
@@ -75,25 +75,25 @@
                   real(KK)::x
                   real(KK)::xm
 
-            !     a and b must be in ascending order, though the input abscissas need not be.
+!                 a and b must be in ascending order, though the input abscissas need not be.
 
                   a=min(ax,cx)
                   b=max(ax,cx)
                   v=bx
 
-            !     Initializations...
+!                 Initializations...
 
                   w=v
                   x=v
 
-            !     This will be the distance moved on the step before last.
+!                 This will be the distance moved on the step before last.
 
                   e=+.00000e+0_KK
                   fx=f(x)
                   fv=fx
                   fw=fx
 
-            !     Main program loop.
+!                 Main program loop.
 
                   do iter=1,itmax
 
@@ -101,14 +101,14 @@
                      tol1=tol*abs(x)+zeps
                      tol2=+.20000e+1_KK*tol1
 
-            !        Test for done here.
+!                    Test for done here.
                      if(abs(x-xm).le.(tol2-.50000e+0_KK*(b-a))) then
 
                         goto 103
 
               end    if!abs(x-xm).le.(tol2-.50000e+0_KK*(b-a))
 
-            !        Construct a trial parabolic fit.
+!                    Construct a trial parabolic fit.
 
                      if(abs(e).gt.tol1) then
 
@@ -133,8 +133,8 @@
 
               end       if!abs(p).ge.abs(+.50000e+0_KK*q*etemp).or.p.le.q*(a-x).or.p.ge.q*(b-x)
 
-            !           The above conditions determine the acceptability of the parabolic fit. here it is O.K.:
-            !           Take the parabolic step.
+!                       The above conditions determine the acceptability of the parabolic fit. here it is O.K.:
+!                       Take the parabolic step.
 
                         d=p/q
                         u=x+d
@@ -145,13 +145,13 @@
 
               end       if!u-a.lt.tol2or.b-u.lt.tol2
 
-            !           Skip over the golden section step.
+!                       Skip over the golden section step.
 
                         goto 102
 
               end    if!abs(e).gt.tol1
 
-            !        We arrive here for a golden section step, which we take into the larger of the two segments.
+!                    We arrive here for a golden section step, which we take into the larger of the two segments.
 
               101    if(x.ge.xm) then
 
@@ -163,11 +163,11 @@
 
               end    if!x.ge.xm
 
-            !        Take the golden section step.
+!                    Take the golden section step.
 
                      d=cgold*e
 
-            !        Arrive here with d computed either from parabolic fit, or else from golden section.
+!                    Arrive here with d computed either from parabolic fit, or else from golden section.
 
               102    if(abs(d).ge.tol1) then
 
@@ -181,8 +181,8 @@
 
                      fu=f(u)
 
-            !        This is the one function evaluation per iteration, and now we have to decide what to do with our evaluation.
-            !        Housekeeping follows:
+!                    This is the one function evaluation per iteration, and now we have to decide what to do with our evaluation.
+!                    Housekeeping follows:
 
                      if(fu.le.fx) then
 
@@ -235,12 +235,12 @@
 
               end    if!fu.le.fx
 
-            !        Done with housekeeping. Back for another iteration.
+!                    Done with housekeeping. Back for another iteration.
 
               end do!iter=1,itmax
 
-            !     Pause ’brent exceed maximum iterations’.
-            !     Arrive here ready to exit with best values.
+!                 Pause ’brent exceed maximum iterations’.
+!                 Arrive here ready to exit with best values.
 
               103 xmin=x
                   brent_K=fx

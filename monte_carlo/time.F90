@@ -1,9 +1,9 @@
 #     ifndef TIME_F90
 #     define TIME_F90
 
-#     include "system/precision.F90"
+#     include "../system/precision.F90"
 
-#     include "monte_carlo/average.F90"
+#     include "../monte_carlo/average.F90"
 
 
       module time_type
@@ -184,14 +184,14 @@
                         time_left_K=.false.
 
               end    if!this%current_time&
-            !          <this%closing_time-time_tolerance_K
+!                      <this%closing_time-time_tolerance_K
 
                   else
 
                      time_left_K=.false.
 
               end if!this%current_time&
-            !       <this%closing_time
+!                   <this%closing_time
 
                   if(.not.time_left_K) then
 
@@ -230,8 +230,8 @@
                   type(time(KK)),intent(inout)::this
 
 
-            !     this%current_time&
-            !    =this%current_time+this%time_step()
+!                 this%current_time&
+!                =this%current_time+this%time_step()
 
                   this%log_average_control&
                  =this%log_average_control+average(this%time_step())

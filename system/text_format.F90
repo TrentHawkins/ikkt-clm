@@ -65,15 +65,15 @@
 
               end    if!c0>l
 
-            !        print at maximum <text_width> characters
+!                    print at maximum <text_width> characters
 
                      c1=min(c0+text_width,text_length)
 
-            !        if not at the end of the whole string
+!                    if not at the end of the whole string
 
                      if(c1/=text_length) then
 
-            !           find the end of a word
+!                       find the end of a word
 
                         do
 

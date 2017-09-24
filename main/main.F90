@@ -13,29 +13,29 @@
 !     You may need the option "-mcmodel=medium" if the stored arrays are too large, which conflicts with the "-fast" option.
 !     Later when the optimized version using commutators is fixed, it will not be necessary, as the fermion matrix is bypassed.
 
-#     include "system/text_format.F90"
-#     include "system/signals.F90"
-#     include "system/getopts.F90"
-#     include "system/precision.F90"
+#     include "../system/text_format.F90"
+#     include "../system/signals.F90"
+#     include "../system/getopts.F90"
+#     include "../system/precision.F90"
 
-!     include "tensor/tensor.F90"
+!     include "../tensor/tensor.F90"
 
-!     include "monte_carlo/random_number_generator.F90"
-!     include "monte_carlo/average.F90"
-!     include "monte_carlo/time.F90"
-#     include "monte_carlo/monte_carlo.F90"
+!     include "../monte_carlo/random_number_generator.F90"
+!     include "../monte_carlo/average.F90"
+!     include "../monte_carlo/time.F90"
+#     include "../monte_carlo/monte_carlo.F90"
 
-!     include "tools/brent_minimization.F90"
-!     include "tools/conjugate_gradient.F90"
-!     include "tools/insert_sort.F90"
+!     include "../tools/brent_minimization.F90"
+!     include "../tools/conjugate_gradient.F90"
+!     include "../tools/insert_sort.F90"
 
-!     include "ikkt/constants.F90"
-!     include "ikkt/fields.F90"
-!     include "ikkt/tools/optimal_toolset.F90"
-!     include "ikkt/tools/conjugate_gradient.F90"
-!     include "ikkt/tools/gauge_cooling.F90"
-#     include "ikkt/complex_langevin.F90"
-#     include "ikkt/observables.F90"
+!     include "../ikkt/constants.F90"
+!     include "../ikkt/fields.F90"
+!     include "../ikkt/optimal_toolset.F90"
+!     include "../ikkt/conjugate_gradient.F90"
+!     include "../ikkt/gauge_cooling.F90"
+#     include "../ikkt/complex_langevin.F90"
+#     include "../ikkt/observables.F90"
 
 !     define BLAS
 !     define OPTIMAL
@@ -46,19 +46,19 @@
 
             use::get_options
 
-      !     use::tensor_type
+!           use::tensor_type
 
-      !     use::random_number_generator
-      !     use::average_type
-      !     use::time_type
+!           use::random_number_generator
+!           use::average_type
+!           use::time_type
             use::monte_carlo
 
-      !     use::brent_minimization
-      !     use::conjugate_gradient_method
+!           use::brent_minimization
+!           use::conjugate_gradient_method
 
-      !     use::constants
-      !     use::fields
-      !     use::complex_langevin
+!           use::constants
+!           use::fields
+!           use::complex_langevin
             use::gauge_cooling
             use::observables
 
@@ -66,10 +66,12 @@
             implicit none
 
 
+            character(4),parameter::simulation_path="data"
+
             character(:),allocatable::base_file_name
 
 
-      !     call signal_actions(eject_main)
+!           call signal_actions(eject_main)
 
             call   begin_ikkt_simulation()
             call perform_ikkt_simulation()
@@ -99,7 +101,7 @@
 
 
                   integer::unit!s_counter,&
-            !                   t_counter
+!                               t_counter
 
 
                    open(newunit=unit,file=meas_file_name)
@@ -170,7 +172,7 @@
                   character     ::option_character ! currently parsed option
                   character(500)::option_argument  ! currently parsed argument value if not an option
                   integer       ::argument_length  ! currently parsed argument true length
-                  integer       ::status           ! stat of parsing option
+                  integer       ::status     !       stat of parsing option
                   integer       ::argument_index   ! current argument running index starting where the options end
                   integer       ::argument_number  ! number of remaining indices options aside
 
@@ -280,13 +282,13 @@
 
                      stop "Error: a base file name must be provided to store simulation status"
 
-                  default
+                  case default
 
-                     continue 100
+                     continue
 
               end select!case(status)
 
-              100 allocate(character(len(trim(adjustl(option_argument))))::base_file_name)
+                  allocate(character(len(trim(adjustl(option_argument))))::base_file_name)
                                                                            base_file_name=trim(adjustl(option_argument))
 
                   call execute_command_line("mkdir --parents -- "//'"'//"${PWD#'ifort/bin'}"//simulation_path//'"')

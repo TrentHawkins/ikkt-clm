@@ -1,9 +1,9 @@
 #     ifndef TENSOR_F90
 #     define TENSOR_F90
 
-#     include "system/precision.F90"
+#     include "../system/precision.F90"
 
-#     include "tools/insert_sort.F90"
+#     include "../tools/insert_sort.F90"
 
 
       module tensor_type
@@ -677,7 +677,7 @@
 
               end do!index=0,size(matrix0,dim=1)-1,+1
 
-      !           scalar_=sum(vector(matrix0))
+!                 scalar_=sum(vector(matrix0))
 
 
         end function matrix_trace_K!matrix0
@@ -816,7 +816,7 @@
 
               end do!j=0,size(matrix_,dim=2)-1,+1
 
-            !     matrix_=conjg(transpose(matrix0))
+!                 matrix_=conjg(transpose(matrix0))
 
 
         end function matrix_conjugate_K!matrix0
@@ -859,8 +859,8 @@
 
               end do!j=0,size(matrix_,dim=2)-1,+1
 
-            !     matrix_=(conjugate(matrix0)+matrix0)*(+.50000e+0_KK,&
-            !                                           +.00000e+0_KK)
+!                 matrix_=(conjugate(matrix0)+matrix0)*(+.50000e+0_KK,&
+!                                                       +.00000e+0_KK)
 
 
         end function matrix_hermitian_K!matrix0
@@ -902,8 +902,8 @@
 
               end do!j=0,size(matrix_,dim=2)-1,+1
 
-            !     matrix_=(conjugate(matrix0)-matrix0)*(+.00000e+0_KK,&
-            !                                           +.50000e+0_KK)
+!                 matrix_=(conjugate(matrix0)-matrix0)*(+.00000e+0_KK,&
+!                                                       +.50000e+0_KK)
 
 
         end function matrix_antihermitian_K!matrix0
@@ -936,7 +936,7 @@
 
 
                   scalar_=real(  sum(conjg(vector0)* vector0))
-            !     scalar_=real(            vector0.c.vector0)
+!                 scalar_=real(            vector0.c.vector0)
 
 
         end function vector_norm_squared_K!vector0
@@ -954,7 +954,7 @@
 
 
                   scalar_=real(  sum(conjg(matrix0)* matrix0))
-            !     scalar_=real(trace(      matrix0.c.matrix0))
+!                 scalar_=real(trace(      matrix0.c.matrix0))
 
         end function matrix_norm_squared_K!matrix0
 
@@ -996,7 +996,7 @@
 
               end do!index=0,size(matrix0,dim=1)-1,+1
 
-            !     matrix0=matrix0-matrix(size(matrix0,dim=1),eigenvalue)
+!                 matrix0=matrix0-matrix(size(matrix0,dim=1),eigenvalue)
 
 
         end subroutine make_matrix_eigenmatrix_K!matrix0,eigenvalue
@@ -1011,9 +1011,9 @@
                   complex(KK),dimension(0:                     ,&
                                         0:                     ),intent(inout)::matrix0
 
-            !     call make_eigenmatrix(matrix0,trace_piece(matrix0))
+!                 call make_eigenmatrix(matrix0,trace_piece(matrix0))
 
-            !     call make_eigenmatrix(matrix0,trace(matrix0)/real(size(matrix0,dim=1)))
+!                 call make_eigenmatrix(matrix0,trace(matrix0)/real(size(matrix0,dim=1)))
 
                   matrix0(size(matrix0,dim=1)-1,size(matrix0,dim=2)-1)&
                  =matrix0(size(matrix0,dim=1)-1,size(matrix0,dim=2)-1)-trace(matrix0)

@@ -1,13 +1,13 @@
 #     ifndef GAUGE_COOLING_F90
 #     define GAUGE_COOLING_F90
 
-#     include "system/precision.F90"
+#     include "../system/precision.F90"
 
-#     include "tensor/tensor.F90"
+#     include "../tensor/tensor.F90"
 
-#     include "ikkt/fields.F90"
+#     include "../ikkt/fields.F90"
 
-#     include "tools/brent_minimization.F90"
+#     include "../tools/brent_minimization.F90"
 
 
       module gauge_cooling

@@ -1,9 +1,9 @@
 #     ifndef JACK_KNIFE_F90
 #     define JACK_KNIFE_F90
 
-#     include "system/precision.F90"
+#     include "../system/precision.F90"
 
-#     include "monte_carlo/average.F90"
+#     include "../monte_carlo/average.F90"
 
 
       module jack_knife
@@ -143,7 +143,7 @@
 
 
         end subroutine jack_ox!record_size,jack_bins,record_values,average_o,error_o,&
-      !                                                            average_x,error_x
+!                                                                  average_x,error_x
 
 
             subroutine jack_weighted_o(record_size,jack_bins,record_values ,&
@@ -196,7 +196,7 @@
 
 
         end subroutine jack_weighted_o!record_size,jack_bins,record_values ,&
-      !                                                      record_weights,average_o,error_o
+!                                                            record_weights,average_o,error_o
 
 
             subroutine jack_weighted_ox(record_size,jack_bins,record_values ,&
@@ -273,8 +273,8 @@
 
 
         end subroutine jack_weighted_ox!record_size,jack_bins,record_values ,&
-      !                                                       record_weights,average_o,error_o,&
-      !                                                                      average_x,error_x
+!                                                             record_weights,average_o,error_o,&
+!                                                                            average_x,error_x
 
 
   end module jack_knife
