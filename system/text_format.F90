@@ -11,29 +11,29 @@
             character(2),parameter::escape0x1B=achar(27)//'['
             character(1),parameter::terminator=           'm'
 
-            character(4),parameter::t_normal   =escape0x1B// "0"//terminator,&
-                                    t_bold     =escape0x1B// "1"//terminator,&
-                                    t_italics  =escape0x1B// "3"//terminator,&
-                                    t_underline=escape0x1B// "4"//terminator,&
-                                    t_blink    =escape0x1B// "5"//terminator,&
-                                    t_highlight=escape0x1B// "7"//terminator,&
-                                    t_hide     =escape0x1B// "8"//terminator
+            character(4),parameter::t_normal   =escape0x1B// "0"//terminator
+            character(4),parameter::t_bold     =escape0x1B// "1"//terminator
+            character(4),parameter::t_italics  =escape0x1B// "3"//terminator
+            character(4),parameter::t_underline=escape0x1B// "4"//terminator
+            character(4),parameter::t_blink    =escape0x1B// "5"//terminator
+            character(4),parameter::t_highlight=escape0x1B// "7"//terminator
+            character(4),parameter::t_hide     =escape0x1B// "8"//terminator
 
-            character(5),parameter::s_bold     =escape0x1B//"22"//terminator,&
-                                    s_italics  =escape0x1B//"23"//terminator,&
-                                    s_underline=escape0x1B//"24"//terminator,&
-                                    s_blink    =escape0x1B//"25"//terminator,&
-                                    s_highlight=escape0x1B//"27"//terminator,&
-                                    s_hide     =escape0x1B//"28"//terminator
+            character(5),parameter::s_bold     =escape0x1B//"22"//terminator
+            character(5),parameter::s_italics  =escape0x1B//"23"//terminator
+            character(5),parameter::s_underline=escape0x1B//"24"//terminator
+            character(5),parameter::s_blink    =escape0x1B//"25"//terminator
+            character(5),parameter::s_highlight=escape0x1B//"27"//terminator
+            character(5),parameter::s_hide     =escape0x1B//"28"//terminator
 
-            character(5),parameter::t_black    =escape0x1B//"30"//terminator,&
-                                    t_red      =escape0x1B//"31"//terminator,&
-                                    t_green    =escape0x1B//"32"//terminator,&
-                                    t_yellow   =escape0x1B//"33"//terminator,&
-                                    t_blue     =escape0x1B//"34"//terminator,&
-                                    t_purple   =escape0x1B//"35"//terminator,&
-                                    t_cyan     =escape0x1B//"36"//terminator,&
-                                    t_white    =escape0x1B//"37"//terminator
+            character(5),parameter::t_black    =escape0x1B//"30"//terminator
+            character(5),parameter::t_red      =escape0x1B//"31"//terminator
+            character(5),parameter::t_green    =escape0x1B//"32"//terminator
+            character(5),parameter::t_yellow   =escape0x1B//"33"//terminator
+            character(5),parameter::t_blue     =escape0x1B//"34"//terminator
+            character(5),parameter::t_purple   =escape0x1B//"35"//terminator
+            character(5),parameter::t_cyan     =escape0x1B//"36"//terminator
+            character(5),parameter::t_white    =escape0x1B//"37"//terminator
 
 
       contains
@@ -45,17 +45,19 @@
                   implicit none
 
 
-                  integer     ,intent(in   )::unit,&
-                                              text_width
+                  integer     ,intent(in   )::unit
+                  integer     ,intent(in   )::text_width
                   character(*),intent(in   )::text
 
-                  integer::c0,&
-                           c1,text_length
+                  integer::c0
+                  integer::c1
+
+                  integer::text_length
 
 
-                              text_length=len(text)
+                  text_length=len(text)
 
-                           c0=1
+                  c0=1
 
                   do
 

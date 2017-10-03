@@ -29,15 +29,16 @@
 
             character(:),allocatable::file_name
 
-            integer::jack_bins=10,record_index=0,&
-                                  record_size =0,&
-                                  record_unit
+            integer::jack_bins   =10
+            integer::record_index=0
+            integer::record_size =0
+            integer::record_unit
 
-            real(KK)::average_o,error_o,&
-                      average_x,error_x
+            real(KK)::average_o,error_o
+            real(KK)::average_x,error_x
 
-            real(KK),dimension(:),allocatable::record_values ,&
-                                               record_weights
+            real(KK),dimension(:),allocatable::record_values
+            real(KK),dimension(:),allocatable::record_weights
 
             integer::i,j
 

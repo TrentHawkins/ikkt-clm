@@ -499,11 +499,11 @@
 
 #                 ifndef BLAS
 
-                  vector_=matmul(conjg(matrix0),vector1)
+                  vector_=matmul(conjugate(matrix0),vector1)
 
 #                 else
 
-                  call gemv(conjg(matrix0),vector1,vector_,trans='N')
+                  call gemv(matrix0,vector1,vector_,trans='C')
 
 #              endif
 
@@ -527,11 +527,11 @@
 
 #                 ifndef BLAS
 
-                  matrix_=matmul(conjg(matrix0),matrix1)
+                  matrix_=matmul(conjugate(matrix0),matrix1)
 
 #                 else
 
-                  call gemm(conjg(matrix0),matrix1,matrix_,transa='N',transb='N')
+                  call gemm(matrix0,matrix1,matrix_,transa='C',transb='N')
 
 #              endif
 

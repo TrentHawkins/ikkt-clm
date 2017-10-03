@@ -39,8 +39,8 @@
             implicit none
 
 
-            character(*),private,parameter::           format_observables_K=COMPLEXGK,&
-                                            text_field_format_observables_K=COMPLEXAK
+            character(*),private,parameter::           format_observables_K=COMPLEXGK
+            character(*),private,parameter::text_field_format_observables_K=COMPLEXAK
 
             character(:),allocatable,public::meas_file_name
 
@@ -62,7 +62,7 @@
                   implicit none
 
 
-                  integer        ,intent(in   )::unit
+                  integer,intent(in   )::unit
 
                   integer::mu
 

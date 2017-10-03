@@ -25,14 +25,14 @@
             implicit none
 
 
-            character(*),parameter,private::           format_cooling=COMPLEXGK,&
-                                            text_field_format_cooling=COMPLEXAK
+            character(*),parameter,private::           format_cooling=COMPLEXGK
+            character(*),parameter,private::text_field_format_cooling=COMPLEXAK
 
             real(KK),parameter,private::cooling_tolerance=TOLERANCEK
 
-            real(KK),private::min_alpha=TOLERANCEK*1  ,&
-                              mid_alpha=TOLERANCEK*10 ,&
-                              max_alpha=TOLERANCEK*100
+            real(KK),private::min_alpha=TOLERANCEK*1
+            real(KK),private::mid_alpha=TOLERANCEK*10
+            real(KK),private::max_alpha=TOLERANCEK*100
 
             logical,public::gauge_cooling_active=.false.
 

@@ -44,7 +44,8 @@
 
             public::determinant_degree
 
-            public::make_constants,eject_constants
+            public:: make_constants
+            public::eject_constants
 
 
             contains
@@ -250,6 +251,7 @@
 
 
                   integer::unit
+
                   integer::mu,nu
 
 

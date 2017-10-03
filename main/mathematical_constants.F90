@@ -20,6 +20,25 @@
             real(KK),parameter,public::pi    =acos(-.10000e+1_KK)
 
 
+            contains
+
+
+            function log2(x) result(y)
+
+
+               implicit none
+
+
+               real(KK),intent(in   )::x
+               real(KK)              ::y
+
+
+               y=log10(x)/log10(.20000e+1_KK)
+
+
+        end function log2!x
+
+
   end module mathematical_constants
 
 #  endif

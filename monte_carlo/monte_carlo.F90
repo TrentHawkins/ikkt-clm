@@ -31,7 +31,7 @@
             type(time(KK)),public::s
             type(time(KK)),public::t
 
-            private::read_time_parameters
+            public::read_time_parameters
 
             public::make_monte_carlo_K
             public::load_monte_carlo_K
@@ -72,12 +72,12 @@
 
                   if(measure_time_skipped) then
 
-                     call s%make_time(time_setting,measure_skip)
-                     call t%make_time(measure_skip,average_step)
+                     call s%set(time_setting,measure_skip)
+                     call t%set(measure_skip,average_step)
 
                   else
 
-                     call t%make_time(time_setting,average_step)
+                     call t%set(time_setting,average_step)
 
               end if!measure_time_skipped
 
@@ -91,20 +91,27 @@
                   implicit none
 
 
+                  integer::unit
+
+
                   call read_time_parameters()
 
                   call load_seed()
 
+                   open(newunit=unit,file=time_file_name)
+
                   if(measure_time_skipped) then
 
-                     call s%load_time(time_setting,measure_skip)
-                     call t%load_time(measure_skip,average_step)
+                     call s%read(unit,time_setting,measure_skip)
+                     call t%read(unit,measure_skip,average_step)
 
                   else
 
-                     call t%load_time(time_setting,average_step)
+                     call t%read(unit,time_setting,average_step)
 
               end if!measure_time_skipped
+
+                  close(        unit                    )
 
 
         end subroutine load_monte_carlo_K!
@@ -116,16 +123,22 @@
                   implicit none
 
 
+                  integer::unit
+
+
                   call save_seed()
+
+                   open(newunit=unit,file=time_file_name)
 
                   if(measure_time_skipped) then
 
-                     call s%save_time()
+                     call s%write(unit)
 
               end if!measure_time_skipped
 
-                  call t%save_time()
+                  call t%write(unit)
 
+                  close(        unit                    )
 
         end subroutine save_monte_carlo_K!
 
@@ -136,23 +149,43 @@
                   implicit none
 
 
+!                 character(*)::temp_file_name
+
+
                   write(*,"(2a)",advance="no") "time_setting: ",t_yellow
                    read(*,   *               )  time_setting
                   write(*,"(2a)",advance="no")                  t_normal
 
-                  if(measure_time_skipped) then
-
-                     write(*,"(2a)",advance="no") "measure_skip: ",t_yellow
-                      read(*,   *               )  measure_skip
-                     write(*,"(2a)",advance="no")                  t_normal
-
-              end if!measure_time_skipped
+                  write(*,"(2a)",advance="no") "measure_skip: ",t_yellow
+                   read(*,   *               )  measure_skip
+                  write(*,"(2a)",advance="no")                  t_normal
 
                   write(*,"(2a)",advance="no") "average_step: ",t_yellow
                    read(*,   *               )  average_step
                   write(*,"(2a)",advance="no")                  t_normal
 
                   write(*,   *               )
+
+                  if(measure_skip/= .00000e+0) measure_time_skipped=.true.
+
+!                 write(temp_file_name,"(a2,sp,i2.1)")  ":t",nint(log10(time_setting))
+
+!                 time_file_name&
+!                =time_file_name//trim(temp_file_name)
+
+!                 if(measure_time_skipped) then
+
+!                    write(temp_file_name,"(a3,sp,i2.1)") ":Dt",nint(log10(measure_skip))
+
+!                    time_file_name&
+!                   =time_file_name//trim(temp_file_name)
+
+!             end if!measure_time_skipped
+
+!                 write(temp_file_name,"(a3,sp,i2.1)") ":dt",nint(log10(average_step))
+
+!                 time_file_name&
+!                =time_file_name//trim(temp_file_name)
 
 
         end subroutine read_time_parameters!

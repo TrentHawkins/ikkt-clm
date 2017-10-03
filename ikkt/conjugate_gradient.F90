@@ -52,12 +52,17 @@
 
                   complex(KK),dimension(0:inner_degrees_of_freedom-1,&
                                         0:inner_degrees_of_freedom-1,&
-                                        0:fermi_degrees_of_freedom-1)::r,&
-                                                                       p
+                                        0:fermi_degrees_of_freedom-1)::r
+                  complex(KK),dimension(0:inner_degrees_of_freedom-1,&
+                                        0:inner_degrees_of_freedom-1,&
+                                        0:fermi_degrees_of_freedom-1)::p
 
-                  real(KK)::cb,&
-                            ca,norm_r_old,&
-                               norm_r_new
+
+                  real(KK)::cb
+                  real(KK)::ca
+
+                  real(KK)::norm_r_old
+                  real(KK)::norm_r_new
 
 
                   r=b-cmmv(a,x)
@@ -82,8 +87,6 @@
                      p=r+ca*       p
 
               end do
-
-                  print *,"success"
 
 
         end subroutine conjugate_gradient_K!a,b,x

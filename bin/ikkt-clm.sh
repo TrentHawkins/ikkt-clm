@@ -71,16 +71,6 @@
 
          ;; # Choose base BINARY_NAME for the simulation compiled binary file.
 
-      's')
-
-         switch="${switch} --skip-time"
-
-         ;; # Use a fixed time to skip before measuring
-            # observables. This is supposed tobe at least an
-            # order of magnitude larger than the average
-            # timestep, and usually is comparable to the
-            # autocorrelation time of the time history.
-
       't')
 
          switch="${switch} --variable-timestep"
@@ -155,15 +145,13 @@
    echo
 
    module_path="ifort/modules" ; mkdir --parents -- "${module_path}"
-   module_path="ifort/objects" ; mkdir --parents -- "${object_path}"
+   object_path="ifort/objects" ; mkdir --parents -- "${object_path}"
    binary_path="ifort/bin"     ; mkdir --parents -- "${binary_path}" ; binary="${binary_path}/${binary}"
 
    printf \
-"\033[32;1mifort\033[22m -module \"${module_path}\" -fast${parallel} -nowarn -o ${binary}${preprocessor}\
- \033[1mmain/main.F90\033[22m -mkl=${mkl_parallel} -lmkl_blas95_lp64 -lmkl_lapack95_lp64 -lmkl_core -lpthread -lm -ldl\n\n\033[31m"\
+"\033[1mifort\033[22m -module \"${module_path}\" -fast${parallel} -nowarn -o ${binary}${preprocessor}\
+ \033[1mmain/main.F90\033[22m -mkl=${mkl_parallel} -lmkl_blas95_lp64 -lmkl_lapack95_lp64 -lmkl_core -lpthread -lm -ldl\n\n\033[0m"\
  1> >(fold --width=80 --spaces)
-
-   echo ${PWD}
 
    ifort -module "${module_path}" \
          -fast                     \
@@ -238,98 +226,15 @@
 
       fi # [[ "${switch}" =~ "--mass-deformations" ]]
 
-      if   [[ "${switch}" =~ "--skip-time" ]]
-      then
+      for    t_time in ${time_setting[@]}
+      do
 
-         for    t_time in ${time_setting[@]}
+         simulation_path="${simulation_path}.${t_time}"
+
+         for    t_skip in ${measure_skip[@]}
          do
 
-            simulation_path="${simulation_path}.${t_time}"
-
-            for    t_skip in ${measure_skip[@]}
-            do
-
-               simulation_path="${simulation_path}.${t_skip}"
-
-               for    t_step in ${average_step[@]}
-               do
-
-                  simulation_path="${simulation_path}.${t_step}"
-
-                  for    n_ in ${inner_degrees_of_freedom[@]}
-                  do
-
-                     simulation_path="${simulation_path}.${n_}"
-
-                     for    d_ in ${boson_degrees_of_freedom[@]}
-                     do
-
-                        simulation_path="${simulation_path}.${d_}"
-
-                        printf "% 15.8e time setting\n" ${t_time}  > "${input}"
-                        printf "% 15.8e measure skip\n" ${t_skip} >> "${input}"
-                        printf "% 15.8e average step\n" ${t_step} >> "${input}"
-
-                        printf "% 11i     inner_degrees_of_freedom\n" ${n_} >> "${input}"
-                        printf "% 11i     boson_degrees_of_freedom\n" ${d_} >> "${input}"
-
-                        if   [[ "${switch}" =~ "--mass-deformations" ]]
-                        then
-
-                           for    b_mass in ${boson_epsilon[@]}
-                           do
-
-                              printf "  ${b_mass}  boson_epsilon" >> "${input}"
-
-                              for    mu in ${boson_degrees_of_freedom[d_]}
-                              do
-
-                                 printf "  ${boson_mass[mu]}  boson mass ${mu}" >> "${input}"
-
-                              done # mu in ${boson_degrees_of_freedom[d_]}
-
-                              if   [[ "${switch}" =~ "--fermions-included" ]]
-                              then
-
-                                 for    f_mass in ${boson_epsilon[@]}
-                                 do
-
-                                    printf "  ${f_mass}  fermi_mass" >> "${input}"
-
-                                    ${binary} ${switch} ${basename} < ${input}
-
-                                 done # f_mass in ${boson_epsilon[@]}
-
-                              # else
-
-                                 ${binary} ${switch} ${basename} < ${input}
-
-                              fi # [[ "${switch}" =~ "--fermions-included" ]]
-
-                           done # b_mass in ${boson_epsilon[@]}
-
-                        # else
-
-                           ${binary} ${switch} ${basename} < ${input}
-
-                        fi # [[ "${switch}" =~ "--mass-deformations" ]]
-
-                     done # d_ in ${boson_degrees_of_freedom[@]}
-
-                  done # n_ in ${inner_degrees_of_freedom[@]}
-
-               done # t_step in ${average_step[@]}
-
-            done # t_skip in ${measure_skip[@]}
-
-         done # t_time in ${time_setting[@]}
-
-      else
-
-         for    t_time in ${time_setting[@]}
-         do
-
-            simulation_path="${simulation_path}.${t_time}"
+            simulation_path="${simulation_path}.${t_skip}"
 
             for    t_step in ${average_step[@]}
             do
@@ -347,6 +252,7 @@
                      simulation_path="${simulation_path}.${d_}"
 
                      printf "% 15.8e time setting\n" ${t_time}  > "${input}"
+                     printf "% 15.8e measure skip\n" ${t_skip} >> "${input}"
                      printf "% 15.8e average step\n" ${t_step} >> "${input}"
 
                      printf "% 11i     inner_degrees_of_freedom\n" ${n_} >> "${input}"
@@ -358,14 +264,14 @@
                         for    b_mass in ${boson_epsilon[@]}
                         do
 
-                           printf "  ${b_mass}  boson_epsilon" >> "${input}"
+                           printf "% 15.8e boson_epsilon" ${b_mass} >> "${input}"
 
-                           for    mu in ${boson_degrees_of_freedom[d_]}
+                           for    mu in ${!boson_degrees_of_freedom[@]}
                            do
 
-                              printf "  ${boson_mass[mu]}  boson mass ${mu}" >> "${input}"
+                              printf "% 15.8e boson mass ${mu}" ${boson_mass[mu]} >> "${input}"
 
-                           done # mu in ${boson_degrees_of_freedom[d_]}
+                           done # mu in ${!boson_degrees_of_freedom[@]}
 
                            if   [[ "${switch}" =~ "--fermions-included" ]]
                            then
@@ -373,7 +279,7 @@
                               for    f_mass in ${boson_epsilon[@]}
                               do
 
-                                 printf "  ${f_mass}  fermi_mass" >> "${input}"
+                                 printf "% 15.8e fermi_mass" ${f_mass} >> "${input}"
 
                                  ${binary} ${switch} ${basename} < ${input}
 
@@ -387,7 +293,7 @@
 
                         done # b_mass in ${boson_epsilon[@]}
 
-                     # else
+                     else
 
                         ${binary} ${switch} ${basename} < ${input}
 
@@ -399,9 +305,9 @@
 
             done # t_step in ${average_step[@]}
 
-         done # t_time in ${time_setting[@]}
+         done # t_skip in ${measure_skip[@]}
 
-      if # [[ "${switch}" =~ "--skip-time" ]]
+      done # t_time in ${time_setting[@]}
 
    fi # [[ "${switch}" =~ "--help" ]]
 

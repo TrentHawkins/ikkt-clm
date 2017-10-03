@@ -1,6 +1,8 @@
 #     ifndef PRECISION_F90
 #     define PRECISION_F90
 
+#     define CHAR 1023
+
 !                                             +127 i04.03
 !                                           +32767 i06.05
 !                                      +2147483647 i11.10
@@ -19,7 +21,7 @@
 #     define  INTEGERA3                   "(     x,a20      )"
 #     define  INTEGERA4                   "(     x,a40      )"
 
-!                                     +.____       f06.04
+!                                     +__.__       f06.04
 !                                    +._____e+_    e10.05e1
 !                                +.340282347e+39   e15.09e2
 !                        +.17976931348623157e+309  e24.17e3

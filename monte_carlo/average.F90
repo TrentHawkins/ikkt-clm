@@ -24,9 +24,6 @@
 
                procedure,private::initialize_average_K;generic::initialize_average=>initialize_average_K
 
-!              procedure,public::weight_K
-!              procedure,public::value__K
-
                procedure,private::                is_equal_to_K;generic::                is_equal_to=>                is_equal_to_K
                procedure,private::   is_less_than_or_equal_to_K;generic::   is_less_than_or_equal_to=>   is_less_than_or_equal_to_K
                procedure,private::               is_less_than_K;generic::               is_less_than=>               is_less_than_K

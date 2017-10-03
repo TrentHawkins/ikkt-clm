@@ -13,13 +13,17 @@
             implicit none
 
 
+            integer,parameter::len_name   =  32
+            integer,parameter::len_descr  =1024
+            integer,parameter::len_argname=  32
+
             type option
 
-               character(100)::name ! Long name.
+               character(len_name)::name ! Long name.
                logical::has_arg ! Does the option require an argument?
                character::chr ! Corresponding short name.
-               character(500)::descr ! Description.
-               character(20)::argname ! Argument name,if required.
+               character(len_descr)::descr ! Description.
+               character(len_argname)::argname ! Argument name,if required.
 
             contains
 
@@ -73,9 +77,9 @@
 
                   character,intent(out),optional::optchar
 
-!                 If stat is 0 and the parsed option requires an argument,optarg contains the first len(optarg) (but at most 500)
-!                 characters of that argument. Otherwise its value is undefined. If the arguments length exceeds 500 characters and
-!                 err is .true.,a warning is issued.
+!                 If stat is 0 and the parsed option requires an argument,optarg contains the first len(optarg) (but at most
+!                 len_descr) characters of that argument. Otherwise its value is undefined. If the arguments length exceeds
+!                 len_descr characters and err is .true.,a warning is issued.
 
                   character(*),intent(out),optional::optarg
 
@@ -112,7 +116,7 @@
 
                   integer,save::pos=1
                   integer,save::cnt=0
-                  character(500),save::arg
+                  character(len_descr),save::arg
 
                   integer::chrpos
                   integer::length
@@ -497,18 +501,18 @@
                         write(unit,"(<side_width>x)",advance="no")
 
                         c2=min(c1+term_width  &
-                                 -side_width  ,500)
+                                 -side_width  ,len_descr)
 
                      else
 
                         c2=min(c1+term_width  &
-                                 -name_width-2,500)
+                                 -name_width-2,len_descr)
 
               end    if!line_count>1
 
 !                    if not at the end of the whole string
 
-                     if(c2/=500) then
+                     if(c2/=len_descr) then
 
 !                       find the end of a word
 
@@ -524,7 +528,7 @@
 
               end       do
 
-              end    if!c2/=500
+              end    if!c2/=len_descr
 
                      write(unit,"(a)") opt%descr(c1:c2-1)
                                                  c1=c2+1

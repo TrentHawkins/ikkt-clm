@@ -27,27 +27,27 @@
             implicit none
 
 
-            character(*),private,parameter::           format_stat_K=INTEGERGK,&
-                                            text_field_format_stat_K=INTEGERAK
+            character(*),private,parameter::           format_stat_K=INTEGERGK
+            character(*),private,parameter::text_field_format_stat_K=INTEGERAK
 
-            character(*),private,parameter::           format_mass_K=REALGK,&
-                                            text_field_format_mass_K=REALAK
+            character(*),private,parameter::           format_mass_K=REALGK
+            character(*),private,parameter::text_field_format_mass_K=REALAK
 
-            logical,public::configuration_loaded=.false.,&
-                            start_field_is_noisy=.false.,&
-                            fermions_included_in=.false.,&
-                            massive_deformations=.false.
+            logical,public::configuration_loaded=.false.
+            logical,public::start_field_is_noisy=.false.
+            logical,public::fermions_included_in=.false.
+            logical,public::massive_deformations=.false.
 
-            character(:),allocatable,public::stat_file_name,&
-                                             conf_file_name
+            character(:),allocatable,public::conf_file_name
 
-            integer,public::inner_degrees_of_freedom,n,n_size,&
-                            boson_degrees_of_freedom,d,a_size,&
-                            fermi_degrees_of_freedom,p,f_size
+            integer,public::inner_degrees_of_freedom,n,n_size
+            integer,public::boson_degrees_of_freedom,d,a_size
+            integer,public::fermi_degrees_of_freedom,p,f_size
 
-            real(KK),                                                    public::boson_epsilon,&
-                                                                                 fermi_mass
+            real(KK),                                                    public::boson_epsilon
+
             real(KK),dimension( :                          ),allocatable,public::boson_mass
+            real(KK),                                                    public::fermi_mass
 
             complex(KK),dimension( :                          ,&
                                    :                          ,&
@@ -69,86 +69,188 @@
                                               :                          ,&
                                               :                          ),allocatable,public::ma
 
-            private::make_m            ,&
-                     make_cm           ,&
-                     make_cmm          ,&
-                     make_ma           ,&
-                     make_m_eigenvalues
+            private::make_m
+            private::make_cm
+            private::make_cmm
+            private::make_ma
+            private::make_m_eigenvalues
 
             public::update_fermion_matrix
 
 #        endif
 
-            public::boson_noise,&
-                    fermi_noise
+            public::read_field_parameters
 
-            public::make_fields,&
-                    load_fields,&
-                    save_fields
+            public::make_fields
+            public::load_fields
+            public::save_fields
+            public::boson_noise
+            public::fermi_noise
 
 
       contains
 
 
-            subroutine  read_field_parameters(unit)
+            subroutine make_fields()
 
 
                   implicit none
 
 
-                  integer,intent(in   )::unit
-
                   integer::mu
 
 
-                  write(   *,"(2a)",advance="no") "inner_degrees_of_freedom: ",t_yellow
-                   read(unit,   *               )  inner_degrees_of_freedom
-                  write(   *,"( a)",advance="no")                              t_normal
-                  write(   *,"(2a)",advance="no") "boson_degrees_of_freedom: ",t_yellow
-                   read(unit,   *               )  boson_degrees_of_freedom
-                  write(   *,"( a)",advance="no")                              t_normal
+                  call read_field_parameters()
 
-                                               fermi_degrees_of_freedom=2 &
-                                            **(boson_degrees_of_freedom/2 &
-                                                                       -1)
-                                       n     = inner_degrees_of_freedom-1
-                                       d     = boson_degrees_of_freedom-1
-                                       p     = fermi_degrees_of_freedom-1
-                                       n_size= inner_degrees_of_freedom&
-                                             * inner_degrees_of_freedom
-                                       a_size= boson_degrees_of_freedom* n_size
-                                       f_size= fermi_degrees_of_freedom*(n_size-1)
+                  a=boson_noise(.20000e+1_KK)
 
-                  write(   *,   *               )
+
+        end subroutine make_fields!
+
+
+            subroutine load_fields()
+
+
+                  implicit none
+
+
+                  integer::unit
+                  integer::mu
+
+
+                  call read_field_parameters()
+
+                   open(newunit=unit,file=conf_file_name)
+
+                  do mu=0,boson_degrees_of_freedom-1,+1
+
+                     call  read(unit,a(:,:,mu))
+
+              end do!mu=0,boson_degrees_of_freedom-1,+1
+
+                   read(unit,*)
+
+                  close(unit)
+
+
+        end subroutine load_fields!
+
+
+            subroutine save_fields()
+
+
+                  implicit none
+
+
+                  integer::unit
+                  integer::mu
+
+
+                   open(newunit=unit,file=conf_file_name)
+
+                  do mu=0,boson_degrees_of_freedom-1,+1
+
+                     call write(unit,a(:,:,mu))
+
+              end do!mu=0,boson_degrees_of_freedom-1,+1
+
+                  write(unit,*)
+
+                  close(unit)
+
+
+        end subroutine save_fields!
+
+
+            subroutine  read_field_parameters()
+
+
+                  implicit none
+
+
+                  integer::mu
+
+!                 character(*)::temp_file_name
+
+
+                  write(*,"(2a)",advance="no") "inner_degrees_of_freedom: ",t_yellow
+                   read(*,   *               )  inner_degrees_of_freedom
+                  write(*,"( a)",advance="no")                              t_normal
+                  write(*,"(2a)",advance="no") "boson_degrees_of_freedom: ",t_yellow
+                   read(*,   *               )  boson_degrees_of_freedom
+                  write(*,"( a)",advance="no")                              t_normal
+
+                                                   fermi_degrees_of_freedom=2 &
+                                                **(boson_degrees_of_freedom/2 &
+                                                                           -1)
+                                           n     = inner_degrees_of_freedom-1
+                                           d     = boson_degrees_of_freedom-1
+                                           p     = fermi_degrees_of_freedom-1
+                                           n_size= inner_degrees_of_freedom&
+                                                 * inner_degrees_of_freedom
+                                           a_size= boson_degrees_of_freedom* n_size
+                                           f_size= fermi_degrees_of_freedom*(n_size-1)
+
+!                 write(temp_file_name,"(2(a2,i2.2))") ":n",inner_degrees_of_freedom,&
+!                                                      ":d",boson_degrees_of_freedom
+
+!                 conf_file_name&
+!                =conf_file_name//trim(temp_file_name)
+
+!                 if(fermions_included_in) then
+
+!                    write(temp_file_name,"(a2,i2.2)") ":p",inner_degrees_of_freedom
+
+!                    conf_file_name&
+!                   =conf_file_name//trim(temp_file_name)
+
+!             end if!fermions_included_in
+
+                  write(*,   *               )
 
                   if(massive_deformations) then
 
-                     write(   *,"(2a)",advance="no") "boson_epsilon: ",t_yellow
-                      read(unit,   *               )  boson_epsilon
-                     write(   *,"( a)",advance="no")                   t_normal
+                     write(*,"(2a)",advance="no") "boson_epsilon: ",t_yellow
+                      read(*,   *               )  boson_epsilon
+                     write(*,"( a)",advance="no")                   t_normal
 
-                     write(   *,   *               )
+!                    write(temp_file_name,"(a2,f4.2,a2)") ":b",boson_epsilon,":m"
+
+!                    conf_file_name&
+!                   =conf_file_name//trim(temp_file_name)
+
+                     write(*,   *               )
 
                      if(allocated(boson_mass)) deallocate(boson_mass)
                                                  allocate(boson_mass(0:boson_degrees_of_freedom-1))
 
                      do mu=0,boson_degrees_of_freedom-1,+1
 
-                        write(   *,"(a,i2,2a)",advance="no") "boson_mass(",mu+1,"): ",t_yellow
-                         read(unit,        *               )  boson_mass(  mu    )
-                        write(   *,"(      a)",advance="no")                          t_normal
+                        write(*,"(a,i2.2,2a)",advance="no") "boson_mass[",mu+1,"]: ",t_yellow
+                         read(*,          *               )  boson_mass(  mu    )
+                        write(*,"(        a)",advance="no")                          t_normal
+
+!                       write(temp_file_name,"(sp,f4.1)") log2(boson_mass(mu))
+
+!                       conf_file_name&
+!                      =conf_file_name//trim(temp_file_name)
 
               end    do!mu=0,boson_degrees_of_freedom-1,+1
 
-                     write(   *,        *               )
+                     write(*,          *               )
 
                      if(fermions_included_in) then
 
-                        write(   *,"(2a)",advance="no") "fermi_mass: ",t_yellow
-                         read(unit,   *               )  fermi_mass
-                        write(   *,"( a)",advance="no")                t_normal
+                        write(*,"(2a)",advance="no") "fermi_mass: ",t_yellow
+                         read(*,   *               )  fermi_mass
+                        write(*,"( a)",advance="no")                t_normal
 
-                        write(   *,   *               )
+!                       write(temp_file_name,"(a2,f4.2)") ":f",fermi_mass
+
+!                       conf_file_name&
+!                      =conf_file_name//trim(temp_file_name)
+
+                        write(*,   *               )
 
               end    if!fermions_included_in
 
@@ -197,63 +299,7 @@
               end if!fermions_included_in
 
 
-        end subroutine  read_field_parameters!unit
-
-
-            subroutine write_field_parameters(unit)
-
-
-                  implicit none
-
-
-                  integer,intent(in   )::unit
-
-                  integer::mu
-
-
-                  if(allocated(a)) deallocate(a)
-
-                  if(fermions_included_in) then
-
-                     if(allocated(f)) deallocate(f)
-
-#                    ifndef OPTIMAL
-
-                     if(allocated(m_eigenvalues_)) deallocate(m_eigenvalues_)
-
-                     if(allocated( m )) deallocate( m )
-                     if(allocated(cm )) deallocate(cm )
-                     if(allocated(cmm)) deallocate(cmm)
-
-                     if(allocated(ma)) deallocate(ma)
-
-#                 endif
-
-              end if!fermions_included_in
-
-                  write(unit,format_stat_K)  inner_degrees_of_freedom
-                  write(unit,format_stat_K)  boson_degrees_of_freedom
-
-                  if(massive_deformations) then
-
-                     write(unit,format_mass_K)  boson_epsilon
-
-                     do mu=0,boson_degrees_of_freedom-1,+1
-
-                        write(unit,format_mass_K)  boson_mass(  mu    )
-
-              end    do!mu=0,boson_degrees_of_freedom-1,+1
-
-                     if(allocated(boson_mass)) deallocate(boson_mass)
-
-                     if(fermions_included_in) write(unit,format_mass_K)  fermi_mass
-
-              end if!massive_deformations
-
-                  write(unit,*)
-
-
-        end subroutine write_field_parameters!unit
+        end subroutine  read_field_parameters!
 
 
             function boson_noise(standard_deviation)
@@ -334,87 +380,6 @@
         end function fermi_noise!standard_deviation
 
 
-            subroutine make_fields()
-
-
-                  implicit none
-
-
-                  integer::mu
-
-
-                  call  read_field_parameters(5)
-
-                     a=boson_noise(.20000e+1_KK)
-
-
-        end subroutine make_fields!
-
-
-            subroutine load_fields()
-
-
-                  implicit none
-
-
-                  integer::unit
-                  integer::mu
-
-
-                   open(newunit=unit,file=stat_file_name)
-
-                  call  read_field_parameters(unit)
-
-                  close(unit)
-
-                   open(newunit=unit,file=conf_file_name)
-
-                  do mu=0,boson_degrees_of_freedom-1,+1
-
-                     call  read(unit,a(:,:,mu))
-
-              end do!mu=0,boson_degrees_of_freedom-1,+1
-
-                   read(unit,*)
-
-                  close(unit)
-
-
-        end subroutine load_fields!
-
-
-            subroutine save_fields()
-
-
-                  implicit none
-
-
-                  integer::unit
-                  integer::mu
-
-
-                   open(newunit=unit,file=conf_file_name)
-
-                  do mu=0,boson_degrees_of_freedom-1,+1
-
-                     call write(unit,a(:,:,mu))
-
-              end do!mu=0,boson_degrees_of_freedom-1,+1
-
-                  write(unit,*)
-
-                  close(unit)
-
-                   open(newunit=unit,file=stat_file_name)
-
-                  call write_field_parameters(unit)
-
-                  close(unit)
-
-
-        end subroutine save_fields!
-
-
 #           ifndef OPTIMAL
 
 
@@ -430,8 +395,6 @@
                                         0:n_size-2)::a_delta
 
                   m=zero
-
-                   open(unit=11,file="a.delta")
 
                   do mu=0,boson_degrees_of_freedom-1,+1
 
@@ -622,29 +585,6 @@
 
 
         end subroutine update_fermion_matrix!
-
-
-            subroutine print_fermion_matrix()
-
-
-                  implicit none
-
-
-                  integer::unit
-
-
-                   open(newunit=unit,file="fermion.matrix")
-
-!                 call write(   unit,m)
-!                 call write(   unit,cm)
-!                 call write(   unit,cmm)
-
-                  call write(unit,m_eigenvalues_)
-
-                  close(        unit                      )
-
-
-        end subroutine print_fermion_matrix!
 
 
 #        endif

@@ -155,8 +155,8 @@
 
                   integer,intent(in   )::record_size,jack_bins
 
-                  real(KK),dimension(0:record_size-1),intent(in  )::record_values ,&
-                                                                    record_weights
+                  real(KK),dimension(0:record_size-1),intent(in  )::record_values
+                  real(KK),dimension(0:record_size-1),intent(in  )::record_weights
 
                   real(KK),intent(  out)::average_o,error_o
 
@@ -209,8 +209,8 @@
 
                   integer,intent(in   )::record_size,jack_bins
 
-                  real(KK),dimension(0:record_size-1),intent(in  )::record_values ,&
-                                                                    record_weights
+                  real(KK),dimension(0:record_size-1),intent(in  )::record_values
+                  real(KK),dimension(0:record_size-1),intent(in  )::record_weights
 
                   real(KK),intent(  out)::average_o,error_o,&
                                           average_x,error_x

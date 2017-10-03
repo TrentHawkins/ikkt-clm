@@ -27,3 +27,6 @@
 
 # repository licence
 !LICENCE
+
+# ignore directory file
+.directory

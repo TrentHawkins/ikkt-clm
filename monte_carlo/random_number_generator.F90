@@ -18,7 +18,7 @@
             integer,                                     private::size_seed
             integer,allocatable,dimension( :           ),private::     seed
 
-            private::prepare_seed
+            public::prepare_seed
 
             public::make_seed
             public::load_seed
@@ -46,7 +46,7 @@
 
                   else
 
-                     allocate(seed(0:size_seed))
+                     allocate(seed(1:size_seed))
 
               end if!allocated(seed)
 
@@ -81,7 +81,7 @@
                    read(        unit,     format_integer) seed
                   close(        unit                    )
 
-                  call random_seed(put=seed)
+                  if(.not.allocated(seed)) stop "NOPUT"; call random_seed(put=seed)
 
                   if(allocated(seed)) deallocate(seed)
 
@@ -100,7 +100,7 @@
 
                   call prepare_seed()
 
-                  call random_seed(get=seed)
+                  if(.not.allocated(seed)) stop "NOGET"; call random_seed(get=seed)
 
                    open(newunit=unit,file=seed_file_name)
                   write(        unit,     format_integer) seed
