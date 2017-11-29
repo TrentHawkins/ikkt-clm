@@ -57,7 +57,7 @@
                   implicit none
 
 
-                  integer,intent(in   )::size
+                  integer,intent(inout)::size
 
                   integer::gamma_size
 
@@ -74,7 +74,7 @@
                   implicit none
 
 
-                  integer,intent(in   )::size
+                  integer,intent(inout)::size
 
 
                   if(allocated(delta)) return
@@ -94,7 +94,7 @@
                   implicit none
 
 
-                  integer,intent(in   )::size
+                  integer,intent(inout)::size
 
 
                   allocate(gamma(0:gamma_size(size)-1,&
@@ -149,7 +149,7 @@
                   implicit none
 
 
-                  integer,intent(in   )::size
+                  integer,intent(inout)::size
 
                   integer::mu,nu
 
@@ -186,7 +186,7 @@
                   implicit none
 
 
-                  integer,intent(in   )::size
+                  integer,intent(inout)::size
 
                   real(KK)::determinant_degree
 
@@ -214,15 +214,15 @@
                   implicit none
 
 
-                  integer,intent(in   )::inner_size
-                  integer,intent(in   )::boson_size
+                  integer,intent(inout)::inner_size
+                  integer,intent(inout)::boson_size
 
 
                   call make_delta     (inner_size)
                   call make_gamma     (boson_size)
                   call make_gamma_core(boson_size)
 
-                  call print_gamma()
+!                 call print_gamma()
 
 
         end subroutine make_constants!inner_size,

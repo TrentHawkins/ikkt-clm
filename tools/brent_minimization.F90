@@ -33,7 +33,7 @@
       contains
 
 
-            function brent_K(ax,bx,cx,f,tol,xmin)
+            function brent_K(ax,bx,cx,f,tol,xmin,iter)
 
 
                   implicit none
@@ -48,13 +48,13 @@
                   real(KK)::cx
                   real(KK)::tol
                   real(KK)::xmin
+                  integer ::iter
                   real(KK)::f;external f
 
                   real(KK)::cgold;parameter(cgold=(+.30000e+1_KK  &
                                              -sqrt(+.50000e+1_KK))&
                                              /     +.20000e+1_KK)
                   real(KK)::zeps ;parameter(zeps = +.10000e-9_KK)
-                  integer ::iter
                   real(KK)::a
                   real(KK)::b
                   real(KK)::d

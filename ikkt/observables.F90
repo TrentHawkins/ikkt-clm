@@ -44,10 +44,13 @@
 
             character(:),allocatable,public::meas_file_name
 
+            private::print_signature
+
             public::print_observables
 
-            private::faraday_squared
-            private::lambda
+            public::boson_kinetic
+            public::faraday_squared
+            public::lambda
 
             public::boson_action
 !           public::fermi_action
@@ -62,15 +65,13 @@
                   implicit none
 
 
-                  integer,intent(in   )::unit
+                  integer,intent(inout)::unit
 
                   integer::mu
 
 
-!                 call make_drift_norm()
-
                   call write(unit,                   t             )
-                       write(unit,format_observables_K,advance="no") faraday_squared()
+                       write(unit,format_observables_K,advance="no") boson_kinetic()
 
                   if(massive_deformations) then
 
@@ -102,36 +103,47 @@
         end subroutine print_observables!unit,measurement_time
 
 
-            function faraday_squared()
+            function boson_kinetic()
 
 
                   implicit none
 
 
-                  real(KK)::faraday_squared
+                  complex(KK)::boson_kinetic
 
                   integer::mu,nu
 
 
-                  faraday_squared=+.00000e+0_KK
+                  boson_kinetic=+.00000e+0_KK
 
                   do mu=0,boson_degrees_of_freedom-1,+1
 
                      do nu=0,boson_degrees_of_freedom-1,+1
 
-!                       faraday_squared&
-!                      =faraday_squared+norm(a(:,:,mu).commutation.a(:,:,nu))
-
-                        faraday_squared&
-                       =faraday_squared-trace((a(:,:,mu).commutation.a(:,:,nu)) &
-                                           .o.(a(:,:,mu).commutation.a(:,:,nu)))/inner_degrees_of_freedom
+                        boson_kinetic&
+                       =boson_kinetic-norm(a(:,:,mu).commutation.a(:,:,nu))
 
               end    do!nu=0,boson_degrees_of_freedom-1,+1
 
               end do!mu=0,boson_degrees_of_freedom-1,+1
 
 
-        end function faraday_squared
+        end function boson_kinetic
+
+
+            function faraday_squared()
+
+
+                  implicit none
+
+
+                  complex(KK)::faraday_squared
+
+
+                  faraday_squared=boson_kinetic()/inner_degrees_of_freedom
+
+
+        end function faraday_squared!
 
 
             function lambda(k)
@@ -140,7 +152,7 @@
                   implicit none
 
 
-                  integer,intent(in   )::k
+                  integer,intent(inout)::k
 
                   complex(KK)::lambda
 
@@ -162,8 +174,7 @@
                   integer::mu
 
 
-                  boson_action=faraday_squared()*inner_degrees_of_freedom&
-                                                *inner_degrees_of_freedom/4
+                  boson_action=boson_kinetic()*inner_degrees_of_freedom/4
 
                   if(massive_deformations) then
 

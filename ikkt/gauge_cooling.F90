@@ -25,14 +25,19 @@
             implicit none
 
 
-            character(*),parameter,private::           format_cooling=COMPLEXGK
-            character(*),parameter,private::text_field_format_cooling=COMPLEXAK
+            character(*),parameter,private::           format_minimization=INTEGERG2
+            character(*),parameter,private::text_field_format_minimization=INTEGERA2
+
+            character(*),parameter,private::           format_gauge_cooling_K=COMPLEXGK
+            character(*),parameter,private::text_field_format_gauge_cooling_K=COMPLEXAK
 
             real(KK),parameter,private::cooling_tolerance=TOLERANCEK
 
             real(KK),private::min_alpha=TOLERANCEK*1
             real(KK),private::mid_alpha=TOLERANCEK*10
             real(KK),private::max_alpha=TOLERANCEK*100
+
+            real(KK),private::alpha_min
 
             logical,public::gauge_cooling_active=.false.
 
@@ -49,6 +54,7 @@
             public::apply_cooling
 
             public::print_guided_hermiticity_norm
+            public::print_gauge_cooling
 
 
       contains
@@ -92,7 +98,7 @@
                   implicit none
 
 
-                  real(KK),intent(in   )::alpha
+                  real(KK),intent(inout)::alpha
 
                   complex(KK),dimension(0:inner_degrees_of_freedom-1,&
                                         0:inner_degrees_of_freedom-1)::h_diagonalized
@@ -134,7 +140,7 @@
                   implicit none
 
 
-                  real(KK),intent(in   )::alpha
+                  real(KK),intent(inout)::alpha
 
                   real(KK)::guided_hermiticity_norm
 
@@ -180,7 +186,6 @@
                   implicit none
 
 
-                  real(KK)::alpha_min
                   real(KK)::min_hermiticity_norm
 
                   integer::mu
@@ -189,14 +194,14 @@
                   call make_cooler()
                   call find_cooling_range()
 
-                  call print_guided_hermiticity_norm(100)
+!                 call print_guided_hermiticity_norm(100)
 
                   min_hermiticity_norm=brent(min_alpha,&
                                              mid_alpha,&
-                                             max_alpha,guided_hermiticity_norm,cooling_tolerance,alpha_min)
+                                             max_alpha,guided_hermiticity_norm,cooling_tolerance,alpha_min,iterations)
 
                    open(newunit=mu,file="hermiticity.norm.minimum")
-                  write(        mu,                 format_cooling) alpha_min,min_hermiticity_norm
+                  write(        mu,                 format_gauge_cooling_K) alpha_min,min_hermiticity_norm
                   close(        mu)
 
                   do mu=0,boson_degrees_of_freedom-1,+1
@@ -215,7 +220,7 @@
                   implicit none
 
 
-                  integer,intent(in   )::step_100
+                  integer,intent(inout)::step_100
 
                   integer::unit,i,steps
 
@@ -223,19 +228,39 @@
 
                   steps=(nint(max_alpha/min_alpha)+1)*step_100;step=min_alpha/step_100
 
-                   open(unit,file="hermiticity.norm")
+                   open(newunit=unit,file="hermiticity.norm")
 
                   do i=0,steps-1,+1
 
-                     write(unit,format_cooling) step*i,guided_hermiticity_norm(step*i)
+                     write(unit,format_gauge_cooling_K) step*i,guided_hermiticity_norm(step*i)
 
               end do!i=0,steps-1,+1
 
-                  write(unit,format_cooling) step*i,guided_hermiticity_norm(max_alpha)
-                  close(unit)
+                  write(unit,format_gauge_cooling_K) step*i,guided_hermiticity_norm(max_alpha)
+
+                  close(        unit                        )
 
 
         end subroutine print_guided_hermiticity_norm!step_100
+
+
+            subroutine print_gauge_cooling(unit,tag)
+
+
+                  implicit none
+
+
+                  integer     ,intent(inout)::unit
+                  character(*),intent(inout)::tag
+
+
+                  call write(unit,size(tag),tag)
+
+                  write(unit,format_minimization   ,advance="no") iterations
+                  write(unit,format_gauge_cooling_K,advance="no") alpha_min,hermiticity_norm()
+
+
+        end subroutine pring_gauge_cooling!unit,tag
 
 
             subroutine eject_gauge_cooler()

@@ -73,6 +73,8 @@
 
         end interface operator(.z.)
 
+            interface operator
+
             interface operator(.commutation.)
 
                module procedure matrix_matrix_matrix_commutation_K
@@ -187,7 +189,7 @@
 
 
                   complex(KK),dimension(0:                  ,&
-                                        0:                  ),intent(in   )::this
+                                        0:                  ),intent(inout)::this
                   complex(KK),dimension(0:size(this,dim=1)-1)              ::that
 
                   integer::index
@@ -209,8 +211,8 @@
                   implicit none
 
 
-                  integer    ,                    intent(in   )::size
-                  complex(KK),                    intent(in   )::factor
+                  integer    ,                    intent(inout)::size
+                  complex(KK),                    intent(inout)::factor
                   complex(KK),dimension(0:size-1,&
                                         0:size-1)              ::that
 
@@ -236,7 +238,7 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                  ),intent(in   )::this
+                  complex(KK),dimension(0:                  ),intent(inout)::this
                   complex(KK),dimension(0:size(this,dim=1)-1,&
                                         0:size(this,dim=1)-1)              ::that
 
@@ -262,8 +264,8 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(in   )::vector0
-                  complex(KK),dimension(0:size(vector0,dim=1)-1),intent(in   )::vector1
+                  complex(KK),dimension(0:                     ),intent(inout)::vector0
+                  complex(KK),dimension(0:size(vector0,dim=1)-1),intent(inout)::vector1
                   complex(KK)                                                 ::scalar_
 
 
@@ -287,9 +289,9 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(in   )::vector0
+                  complex(KK),dimension(0:                     ),intent(inout)::vector0
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix1
+                                        0:                     ),intent(inout)::matrix1
                   complex(KK),dimension(0:size(matrix1,dim=2)-1)              ::vector_
 
 
@@ -314,8 +316,8 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
-                  complex(KK),dimension(0:size(matrix0,dim=2)-1),intent(in   )::vector1
+                                        0:                     ),intent(inout)::matrix0
+                  complex(KK),dimension(0:size(matrix0,dim=2)-1),intent(inout)::vector1
                   complex(KK),dimension(0:size(matrix0,dim=1)-1)              ::vector_
 
 
@@ -340,9 +342,9 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix1
+                                        0:                     ),intent(inout)::matrix1
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix1,dim=2)-1)              ::matrix_
 
@@ -367,8 +369,8 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(in   )::vector0
-                  complex(KK),dimension(0:                     ),intent(in   )::vector1
+                  complex(KK),dimension(0:                     ),intent(inout)::vector0
+                  complex(KK),dimension(0:                     ),intent(inout)::vector1
                   complex(KK),dimension(0:size(vector0,dim=1)   &
                                          *size(vector1,dim=1)-1)              ::vector_
 
@@ -398,9 +400,9 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix1
+                                        0:                     ),intent(inout)::matrix1
                   complex(KK),dimension(0:size(matrix0,dim=1)   &
                                          *size(matrix1,dim=1)-1,&
                                         0:size(matrix0,dim=2)   &
@@ -440,8 +442,8 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(in   )::vector0
-                  complex(KK),dimension(0:size(vector0,dim=1)-1),intent(in   )::vector1
+                  complex(KK),dimension(0:                     ),intent(inout)::vector0
+                  complex(KK),dimension(0:size(vector0,dim=1)-1),intent(inout)::vector1
                   complex(KK)                                                 ::scalar_
 
 
@@ -465,9 +467,9 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(in   )::vector0
+                  complex(KK),dimension(0:                     ),intent(inout)::vector0
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix1
+                                        0:                     ),intent(inout)::matrix1
                   complex(KK),dimension(0:size(matrix1,dim=2)-1)              ::vector_
 
 
@@ -492,8 +494,8 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
-                  complex(KK),dimension(0:size(matrix0,dim=2)-1),intent(in   )::vector1
+                                        0:                     ),intent(inout)::matrix0
+                  complex(KK),dimension(0:size(matrix0,dim=2)-1),intent(inout)::vector1
                   complex(KK),dimension(0:size(matrix0,dim=1)-1)              ::vector_
 
 
@@ -518,9 +520,9 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix1
+                                        0:                     ),intent(inout)::matrix1
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix1,dim=2)-1)              ::matrix_
 
@@ -545,8 +547,8 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(in   )::vector0
-                  complex(KK),dimension(0:                     ),intent(in   )::vector1
+                  complex(KK),dimension(0:                     ),intent(inout)::vector0
+                  complex(KK),dimension(0:                     ),intent(inout)::vector1
                   complex(KK),dimension(0:size(vector0,dim=1)   &
                                          *size(vector1,dim=1)-1)              ::vector_
 
@@ -576,9 +578,9 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix1
+                                        0:                     ),intent(inout)::matrix1
                   complex(KK),dimension(0:size(matrix0,dim=1)   &
                                          *size(matrix1,dim=1)-1,&
                                         0:size(matrix0,dim=2)   &
@@ -619,9 +621,9 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   complex(KK),dimension(0:size(matrix0,dim=2)-1,&
-                                        0:size(matrix0,dim=1)-1),intent(in   )::matrix1
+                                        0:size(matrix0,dim=1)-1),intent(inout)::matrix1
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix1,dim=2)-1)              ::matrix_
 
@@ -640,9 +642,9 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   complex(KK),dimension(0:size(matrix0,dim=2)-1,&
-                                        0:size(matrix0,dim=1)-1),intent(in   )::matrix1
+                                        0:size(matrix0,dim=1)-1),intent(inout)::matrix1
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix1,dim=2)-1)              ::matrix_
 
@@ -661,7 +663,7 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   complex(KK)                                                 ::scalar_
 
                   integer::index
@@ -690,7 +692,7 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   complex(KK)                                                 ::scalar_
 
                   real(KK):: real_vector_matrix0(0:size(matrix0,dim=1)-1)
@@ -714,7 +716,7 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   complex(KK)                                                 ::scalar_
 
                   integer::k
@@ -750,12 +752,12 @@
 
 
                         complex(KK),dimension(0:                     ,&
-                                              0:                     ),intent(in   )::matrix0
+                                              0:                     ),intent(inout)::matrix0
                         complex(KK),dimension(0:size(matrix0,dim=1)-2,&
                                               0:size(matrix0,dim=2)-2)              ::matrix_
 
-                        integer,intent(in   )::i0
-                        integer,intent(in   )::j0
+                        integer,intent(inout)::i0
+                        integer,intent(inout)::j0
                         integer              ::i
                         integer              ::j
 
@@ -780,7 +782,7 @@
                         implicit none
 
 
-                        integer,intent(in   )::exponent
+                        integer,intent(inout)::exponent
                         integer              ::sign
 
 
@@ -800,7 +802,7 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix0,dim=2)-1)              ::matrix_
 
@@ -829,7 +831,7 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix0,dim=2)-1)              ::matrix_
 
@@ -873,7 +875,7 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix0,dim=2)-1)              ::matrix_
 
@@ -915,7 +917,7 @@
                   implicit none
 
 
-                  complex(KK)                                   ,intent(in   )::scalar0
+                  complex(KK)                                   ,intent(inout)::scalar0
                   real(   KK)                                                 ::scalar_
 
 
@@ -931,7 +933,7 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(in   )::vector0
+                  complex(KK),dimension(0:                     ),intent(inout)::vector0
                   real(   KK)                                                 ::scalar_
 
 
@@ -949,7 +951,7 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
                   real(   KK)                                                 ::scalar_
 
 
@@ -965,9 +967,9 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(in   )::vector0
+                  complex(KK),dimension(0:                     ),intent(inout)::vector0
                   complex(KK),dimension(0:size(vector0,dim=1)-1,&
-                                        0:size(vector0,dim=1)-1),intent(in   )::matrix0
+                                        0:size(vector0,dim=1)-1),intent(inout)::matrix0
                   real(   KK)                                                 ::scalar_
 
 
@@ -985,7 +987,7 @@
 
                   complex(KK),dimension(0:                     ,&
                                         0:                     ),intent(inout)::matrix0
-                  complex(KK)                                   ,intent(in   )::eigenvalue
+                  complex(KK)                                   ,intent(inout)::eigenvalue
 
                   integer::index
 
@@ -1030,7 +1032,7 @@
 
                   complex(KK),dimension(0:                     ,&
                                         0:                     ),intent(inout)         ::matrix0
-                  real(   KK),                                   intent(in   ),optional::factor
+                  real(   KK),                                   intent(inout),optional::factor
 
                   integer::i,j
 
@@ -1073,7 +1075,7 @@
 
                   complex(KK),dimension(0:                     ,&
                                         0:                     ),intent(inout)         ::matrix0
-                  real(   KK),                                   intent(in   ),optional::factor
+                  real(   KK),                                   intent(inout),optional::factor
 
 
                   integer::i,j
@@ -1163,7 +1165,7 @@
                   implicit none
 
 
-                  integer    ,                                   intent(in   )::unit
+                  integer    ,                                   intent(inout)::unit
                   complex(KK),dimension(0:                     ),intent(inout)::vector0
 
                   integer::i
@@ -1187,7 +1189,7 @@
                   implicit none
 
 
-                  integer    ,                                   intent(in   )::unit
+                  integer    ,                                   intent(inout)::unit
                   complex(KK),dimension(0:                     ,&
                                         0:                     ),intent(inout)::matrix0
 
@@ -1218,8 +1220,8 @@
                   implicit none
 
 
-                  integer    ,                                   intent(in   )::unit
-                  complex(KK),dimension(0:                     ),intent(in   )::vector0
+                  integer    ,                                   intent(inout)::unit
+                  complex(KK),dimension(0:                     ),intent(inout)::vector0
 
                   integer::i
 
@@ -1242,9 +1244,9 @@
                   implicit none
 
 
-                  integer    ,                                   intent(in   )::unit
+                  integer    ,                                   intent(inout)::unit
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(in   )::matrix0
+                                        0:                     ),intent(inout)::matrix0
 
                   integer::i
                   integer::j

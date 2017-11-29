@@ -36,18 +36,43 @@
             character(5),parameter::t_white    =escape0x1B//"37"//terminator
 
 
+            interface write
+
+               module procedure write_tag
+               module procedure write_par
+
+        end interface write
+
+
       contains
 
 
-            subroutine write_par(unit,text_width,text)
+            subroutine write_tag(unit,text_width,text)
 
 
                   implicit none
 
 
-                  integer     ,intent(in   )::unit
-                  integer     ,intent(in   )::text_width
-                  character(*),intent(in   )::text
+                  integer     ,intent(inout)::unit
+                  integer     ,intent(inout)::text_width
+                  character(*),intent(inout)::text
+
+
+                  write(unit,"(a<text_width>,x)",advance="no") text
+
+
+        end subroutine write_tag!unit,text_width,text
+
+
+            subroutine write_par(unit,text_width,text_width,text)
+
+
+                  implicit none
+
+
+                  integer     ,intent(inout)::unit
+                  integer     ,intent(inout)::text_width
+                  character(*),intent(inout)::text
 
                   integer::c0
                   integer::c1

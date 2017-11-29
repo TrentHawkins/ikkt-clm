@@ -18,307 +18,256 @@
             character(*),private,parameter::           format_time_K=REALGK
             character(*),private,parameter::text_field_format_time_K=REALAK
 
-            real(KK),parameter::time_tolerance_K=TOLERANCEK
-
             character(:),allocatable,public::time_file_name
 
-            logical                 ,public::timestep_is_variable=.false.
+            logical,public::auto_save_field_conf=.false.
+            logical,public::measure_time_skipped=.false.
+            logical,public::timestep_is_adaptive=.false.
 
-            type::time(precision)
+!           type::time(precision)
 
-               integer,kind::precision
+!              integer,kind::precision
 
-               real(precision),private::closing_time
-               real(precision),private::time_setting
-               real(precision),private::average_step
+!              type(average(precision)),private::m_current_time
+!              type(average(precision)),private::m_current_step
 
-               type(average(precision)),private::log_average_control
-               type(average(precision)),private::log_current_control
+!              real(precision),private::m_life_time
+!              real(precision),private::m_time_step
 
-            contains
+!           contains
 
-               procedure,public ::   set_K;generic::   set=>   set_K
-               procedure,public ::  read_K;generic::  read=>  read_K
-               procedure,public :: write_K;generic:: write=> write_K
-               procedure,private::rewind_K;generic::rewind=>rewind_K
+!              procedure,public::time_K;generic::time=>time_K
+!              procedure,public::step_K;generic::step=>step_K
 
-               procedure,public ::current_time_K;generic::current_time=>current_time_K
-               procedure,public ::current_step_K;generic::current_step=>current_step_K
+!              procedure,public::make_time_K;generic::make_time=>make_time_K
+!              procedure,public::load_time_K;generic::load_time=>load_time_K
+!              procedure,public::save_time_K;generic::save_time=>save_time_K
+!              procedure,public::time_left_K;generic::time_left=>time_left_K
+!              procedure,public::push_time_K;generic::push_time=>push_time_K
 
-               procedure,public ::        time_left_K;generic::time_left=>        time_left_K
-               procedure,private::        zero_time_K;generic::zero_time=>        zero_time_K
-               procedure,public :: static_push_time_K;generic::push_time=> static_push_time_K
-               procedure,public ::dynamic_push_time_K;generic::push_time=>dynamic_push_time_K
+!              procedure,public::agnostically_adapt_time_step_K;generic::adapt_time_step=>agnostically_adapt_time_step_K
 
-        end type  time
+!       end type  time
 
 
-            interface  read
+!           interface  read
 
-               module procedure  read_time_K
+!              module procedure  read_time_K
 
-        end interface  read
+!       end interface  read
 
-            interface write
+!           interface write
 
-               module procedure write_time_K
+!              module procedure write_time_K
 
-        end interface write
+!       end interface write
 
 
-      contains
+!     contains
 
 
-            subroutine    set_K(this,time_setting,average_step)
+!           function time_K(this) result(time)
 
 
-                  implicit none
+!                 implicit none
 
 
-                  type(time(KK)),intent(inout)::this
+!                 type(time(KK))::this
 
-                  real(KK),intent(in   )::time_setting
-                  real(KK),intent(in   )::average_step
+!                 real(KK)::time
 
 
-                  this%log_average_control=average(            )
-                  this%log_current_control=average(average_step)
+!                 time=this%m_current_time%weight()
 
-                  call this%rewind(time_setting,average_step)
 
+!       end function time_K!this
 
-        end subroutine    set_K!this,time_setting,average_step
 
+!           function step_K(this) result(step)
 
-            subroutine   read_K(this,unit,time_setting,average_step)
 
+!                 implicit none
 
-                  implicit none
 
+!                 type(time(KK))::this
 
-                  type(time(KK)),intent(inout)::this
+!                 real(KK)::step
 
-                  integer ,intent(in   )::unit
-                  real(KK),intent(in   )::time_setting
-                  real(KK),intent(in   )::average_step
 
+!                 step=this%m_current_step%weight()
 
-                  call  read(unit,this)
-                        read(unit,   *)
 
-                  call this%rewind(time_setting,average_step)
+!       end function step_K!this
 
 
-        end subroutine   read_K!unit,this
+!           subroutine make_time_K(this,life_time,time_step)
 
 
-            subroutine  write_K(this,unit)
+!                 implicit none
 
 
-                  implicit none
+!                 type(time(KK))::this
 
+!                 real(KK)::life_time
+!                 real(KK)::time_step
 
-                  type(time(KK)),intent(in   )::this
 
-                  integer ,intent(in   )::unit
+!                 this%m_current_time=average(         )
+!                 this%m_current_step=average(time_step)
 
+!                 this%m_life_time=life_time+this%m_current_time%weight()
+!                 this%m_time_step=time_step
 
-                  call write(unit,this)
-                       write(unit,   *)
 
+!       end subroutine make_time_K!this,life_time,time_step
 
-        end subroutine  write_K!unit,this
 
+!           subroutine load_time_K(this,life_time,time_step)
 
-            subroutine rewind_K(this,time_setting,average_step)
 
+!                 implicit none
 
-                  type(time(KK)),intent(inout)::this
 
-                  real(KK),intent(in   )::time_setting
-                  real(KK),intent(in   )::average_step
+!                 type(time(KK))::this
 
+!                 real(KK)::life_time
+!                 real(KK)::time_step
 
-                  this%time_setting&
-                      =time_setting
 
-                  this%average_step&
-                      =average_step
+!                  open(unit=time_unit,file=time_file_name)
 
-                  this%closing_time&
-                 =this%time_setting+nint(this%log_average_control%weight &
-                                        /this%log_current_control%weight)&
-                                        *this%log_current_control%weight
+!                 call  read(time_unit,this%m_current_time)
+!                 call  read(time_unit,this%m_current_step)
 
+!                 close(     time_unit                    )
 
-        end subroutine rewind_K!this,time_setting,average_step
+!                 this%m_life_time=life_time+this%m_current_time%weight()
+!                 this%m_time_step=time_step
 
 
-            function current_time_K(this) result(current_time)
+!       end subroutine load_time_K!this,life_time,time_step
 
 
-                  implicit none
+!           subroutine save_time_K(this)
 
 
-                  type(time(KK)),intent(in   )::this
+!                 implicit none
 
-                  real(KK)::current_time
 
+!                 type(time(KK))::this
 
-                  current_time=this%log_average_control%weight
 
+!                  open(unit=time_unit,file=time_file_name)
 
-        end function current_time_K!this
+!                 call write(unit,this%m_current_time)
+!                 call write(unit,this%m_current_step)
 
+!                 close(     time_unit                    )
 
-            function current_step_K(this) result(current_step)
 
+!       end subroutine save_time_K!this
 
-                  implicit none
 
+!           function time_left_K(this) result(time_left)
 
-                  type(time(KK)),intent(in   )::this
 
-                  real(KK)::current_step
+!                 implicit none
 
 
-                  current_step=this%log_current_control%weight
+!                 type(time(KK))::this
 
+!                 logical::time_left
 
-        end function current_step_K!this
 
+!                 if(this%m_current_time<=this%m_life_time) then
 
-            logical function time_left_K(this)
+!                    if(this%m_current_step>this%m_life_time-this%m_current_time%weight()) &
+!                       this%m_current_step=this%m_life_time-this%m_current_time%weight()
 
+!                    time_left=.true.
 
-                  implicit none
+!                 else
 
+!                    this%m_life_time&
+!                   =this%m_life_time+this%m_current_time%weight()
 
-                  type(time(KK)),intent(inout)::this
+!                    time_left=.false.
 
+!             end if!this%m_current_time<=this%m_life_time
 
-                  if(this%current_time() &
-                    <this%closing_time ) then
 
-                     if(this%current_time(                ) &
-                       <this%closing_time-time_tolerance_K) then
+!       end         function time_left_K!this
 
-                        time_left_K=.true.
 
-                     else
+!           subroutine push_time_K(this)
 
-                        time_left_K=.false.
 
-              end    if!this%current_time(                ) &
-!                      <this%closing_time-time_tolerance_K
+!                 implicit none
 
-                  else
 
-                     time_left_K=.false.
+!                 type(time(KK))::this
 
-              end if!this%current_time() &
-!                   <this%closing_time
 
-                  if(.not.time_left_K) then
+!                 this%m_current_time&
+!                =this%m_current_time&
+!                +this%m_current_step
 
-                     call this%zero_time()
 
-              end if!.not.time_left_K
+!       end subroutine push_time_K!this
 
 
-        end         function time_left_K!this
+!           subroutine agnostically_adapt_time_step_K(this,exp_current_step_value)
 
 
-            subroutine zero_time_K(this)
+!                 implicit none
 
 
-                  implicit none
+!                 type(time(KK))::this
 
+!                 real(KK),intent(inout)::exp_current_step_value
 
-                  type(time(KK)),intent(inout)::this
+!                 real(KK)::current_step_value
 
 
-                  this%closing_time&
-                 =this%closing_time&
-                 +this%time_setting
+!                 call this%m_current_step%set_average(this%m_time_step*exp(this%m_current_time%value())/exp_current_step_value,&
+!                                                                                                    log(exp_current_step_value))
 
 
-        end subroutine zero_time_K!this
+!       end subroutine agnostically_adapt_time_step_K!this,exp_current_step_value
 
 
-            subroutine static_push_time_K(this)
+!           subroutine  read_time_K(unit,this)
 
 
-                  implicit none
+!                 implicit none
 
 
-                  type(time(KK)),intent(inout)::this
+!                 integer       ,intent(inout)::unit
+!                 type(time(KK)),intent(inout)::this
 
 
-                  this%log_average_control&
-                 =this%log_average_control+average(this%current_step())
+!                 call  read(unit,this%m_current_time)
+!                 call  read(unit,this%m_current_step)
 
 
-        end subroutine static_push_time_K!this
+!       end subroutine  read_time_K!unit,this
 
 
-            subroutine dynamic_push_time_K(this,current_control)
+!           subroutine write_time_K(unit,this)
 
 
-                  implicit none
+!                 implicit none
 
 
-                  type(time(KK)),intent(inout)::this
+!                 integer       ,intent(inout)::unit
+!                 type(time(KK)),intent(inout)::this
 
-                  real(KK),intent(in   )::current_control
-                  real(KK)              ::current_step
 
+!                 call write(unit,this%m_current_time)
+!                 call write(unit,this%m_current_step)
 
-                                                   current_step=this%average_step*(exp(this%log_average_control%value)&
-                                                                                 /              current_control      )
-                  this%log_current_control=average(current_step,&
-                       log(current_control))
 
-                  this%log_average_control&
-                 =this%log_average_control&
-                 +this%log_current_control
-
-
-        end subroutine dynamic_push_time_K!this,current_control
-
-
-            subroutine  read_time_K(unit,this)
-
-
-                  implicit none
-
-
-                  integer       ,intent(in   )::unit
-                  type(time(KK)),intent(inout)::this
-
-
-                  call  read(unit,this%log_average_control)
-                  call  read(unit,this%log_current_control)
-
-
-        end subroutine  read_time_K!unit,this
-
-
-            subroutine write_time_K(unit,this)
-
-
-                  implicit none
-
-
-                  integer       ,intent(in   )::unit
-                  type(time(KK)),intent(in   )::this
-
-
-                  call write(unit,this%log_average_control)
-                  call write(unit,this%log_current_control)
-
-
-        end subroutine write_time_K!unit,this
+!       end subroutine write_time_K!unit,this
 
 
   end module time_type

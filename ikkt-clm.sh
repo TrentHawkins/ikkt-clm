@@ -20,7 +20,6 @@
 
 #  } # separator()
 
-
    A=$(($(tput cols)+2))
 
    separator() {
@@ -33,6 +32,29 @@
       printf "${VECTOR// /$STRING}"
 
    } # separator()
+
+   log() {
+
+      local x=${1} n=2 l=-1
+
+      if [ "${2}" != "" ]
+      then
+
+         n=${x}
+         x=${2}
+
+      fi
+
+      while (( x ))
+      do
+
+         let l+=1 x/=n
+
+      done
+
+      echo ${l}
+
+   } # log()
 
 
    preprocessor=""
@@ -183,19 +205,17 @@
 
    else
 
-      cd ${PWD#"/bin"}
-
-                         simulation_path="data"
+                         simulation_path="./data"
 
                                              basename="${1}"
                 input="${simulation_path}/.${basename}.in"
-      echo > "${input}"
+      echo > "${input}" ; echo "${input}"
 
       echo -e "\033[0m"
 
-      declare -a time_setting ; printf "\033[0mtime_setting: \033[33m" ; read -a time_setting
-      declare -a measure_skip ; printf "\033[0mmeasure_skip: \033[33m" ; read -a measure_skip
-      declare -a average_step ; printf "\033[0maverage_step: \033[33m" ; read -a average_step
+      declare -a life_time ; printf "\033[0mlife_time: \033[33m" ; read -a life_time
+      declare -a time_skip ; printf "\033[0mtime_skip: \033[33m" ; read -a time_skip
+      declare -a time_step ; printf "\033[0mtime_step: \033[33m" ; read -a time_step
 
       echo -e "\033[0m"
 
@@ -203,6 +223,12 @@
       declare -a boson_degrees_of_freedom ; printf "\033[0mboson_degrees_of_freedom: \033[33m" ; read -a boson_degrees_of_freedom
 
       echo -e "\033[0m"
+
+   (( period = ${#life_time[@]} \
+             * ${#time_skip[@]} \
+             * ${#time_step[@]} * ${#inner_degrees_of_freedom[@]} \
+                                   * ${#boson_degrees_of_freedom[@]} ))
+
 
       if   [[ "${switch}" =~ "--mass-deformations" ]]
       then
@@ -215,6 +241,8 @@
 
          echo -e "\033[0m"
 
+      (( period *= ${#boson_epsilon[@]} ))
+
          if   [[ "${switch}" =~ "--fermions-included" ]]
          then
 
@@ -222,41 +250,35 @@
 
             echo -e "\033[0m"
 
+         (( period *= ${#fermi_mass[@]} ))
+
          fi # [[ "${switch}" =~ "--fermions-included" ]]
 
       fi # [[ "${switch}" =~ "--mass-deformations" ]]
 
-      for    t_time in ${time_setting[@]}
+      period=$(($(log 10 ${period})+1)) ; counter=0 ; printf -v modifier "%0${period}d" ${counter}
+
+      for    t_time in ${life_time[@]}
       do
 
-         simulation_path="${simulation_path}.${t_time}"
-
-         for    t_skip in ${measure_skip[@]}
+         for    t_skip in ${time_skip[@]}
          do
 
-            simulation_path="${simulation_path}.${t_skip}"
-
-            for    t_step in ${average_step[@]}
+            for    t_step in ${time_step[@]}
             do
-
-               simulation_path="${simulation_path}.${t_step}"
 
                for    n_ in ${inner_degrees_of_freedom[@]}
                do
 
-                  simulation_path="${simulation_path}.${n_}"
-
                   for    d_ in ${boson_degrees_of_freedom[@]}
                   do
-
-                     simulation_path="${simulation_path}.${d_}"
 
                      printf "% 15.8e time setting\n" ${t_time}  > "${input}"
                      printf "% 15.8e measure skip\n" ${t_skip} >> "${input}"
                      printf "% 15.8e average step\n" ${t_step} >> "${input}"
 
-                     printf "% 11i     inner_degrees_of_freedom\n" ${n_} >> "${input}"
-                     printf "% 11i     boson_degrees_of_freedom\n" ${d_} >> "${input}"
+                     printf "% 11i     inner_degrees_of_freedom\n" $((10#${n_})) >> "${input}"
+                     printf "% 11i     boson_degrees_of_freedom\n" $((10#${d_})) >> "${input}"
 
                      if   [[ "${switch}" =~ "--mass-deformations" ]]
                      then
@@ -276,18 +298,26 @@
                            if   [[ "${switch}" =~ "--fermions-included" ]]
                            then
 
-                              for    f_mass in ${boson_epsilon[@]}
+                              for    f_mass in ${fermi_mass[@]}
                               do
 
                                  printf "% 15.8e fermi_mass" ${f_mass} >> "${input}"
 
-                                 ${binary} ${switch} ${basename} < ${input}
+                                 ${binary} ${switch} ${basename}.${modifier} < ${input}
 
-                              done # f_mass in ${boson_epsilon[@]}
+                                 echo ${basename}.${modifier}
+
+                              (( counter += 1 )) ; printf -v modifier "%0${period}d" ${counter}
+
+                              done # f_mass in ${fermi_mass[@]}
 
                            else
 
-                              ${binary} ${switch} ${basename} < ${input}
+                              ${binary} ${switch} ${basename}.${modifier} < ${input}
+
+                              echo ${basename}.${modifier}
+
+                              (( counter += 1 )) ; printf -v modifier "%0${period}d" ${counter}
 
                            fi # [[ "${switch}" =~ "--fermions-included" ]]
 
@@ -295,7 +325,11 @@
 
                      else
 
-                        ${binary} ${switch} ${basename} < ${input}
+                        ${binary} ${switch} ${basename}.${modifier} < ${input}
+
+                        echo ${basename}.${modifier}
+
+                        (( counter += 1 )) ; printf -v modifier "%0${period}d" ${counter}
 
                      fi # [[ "${switch}" =~ "--mass-deformations" ]]
 
@@ -303,11 +337,11 @@
 
                done # n_ in ${inner_degrees_of_freedom[@]}
 
-            done # t_step in ${average_step[@]}
+            done # t_step in ${time_step[@]}
 
-         done # t_skip in ${measure_skip[@]}
+         done # t_skip in ${time_skip[@]}
 
-      done # t_time in ${time_setting[@]}
+      done # t_time in ${life_time[@]}
 
    fi # [[ "${switch}" =~ "--help" ]]
 

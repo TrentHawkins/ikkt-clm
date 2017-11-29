@@ -55,15 +55,13 @@
                                    :                          ,&
                                    :                          ),allocatable,public::noise
 
-            real(KK),public::drift_norm
-
             public::boot_langevin
             public::langevin_step
             public::wrap_langevin
 
             public::make_drift
             public::make_noise
-            public::make_drift_norm
+            public::drift_norm
 
 
       contains
@@ -113,25 +111,11 @@
                   call make_noise()
 
                   a&
-                 =a+drift*     t%current_step()&
-                   +noise*sqrt(t%current_step())
+                 =a+drift*     time(step) &
+                   +noise*sqrt(time(step))
 
-                  if(gauge_cooling_active) then
-
-                     call apply_cooling()
-
-              end if!gauge_cooling_active
-
-                  if(timestep_is_variable) then
-
-                     call make_drift_norm()
-                     call t%push_time(drift_norm)
-
-                  else
-
-                     call t%push_time()
-
-              end if!timestep_is_variable
+                  if(gauge_cooling_active) call apply_cooling()
+                  if(timestep_is_adaptive) call agnostically_adapt_time_step(drift_norm())
 
 
         end subroutine langevin_step!
@@ -227,31 +211,6 @@
         end subroutine make_drift!
 
 
-            subroutine make_drift_norm()
-
-
-                  implicit none
-
-
-                  integer::mu
-
-
-                  drift_norm=+.00000e+0_KK
-
-                  do mu=1,boson_degrees_of_freedom-1,+1
-
-                     drift_norm&
-                    =drift_norm+norm(drift(:,:,mu))
-
-              end do!mu= ,boson_degrees_of_freedom-1,+1
-
-                  drift_norm&
-                 =drift_norm/a_size
-
-
-        end subroutine make_drift_norm!
-
-
             subroutine make_noise()
 
 
@@ -265,6 +224,33 @@
 
 
         end subroutine make_noise!
+
+
+            function drift_norm()
+
+
+                  implicit none
+
+
+                  real(KK)::drift_norm
+
+                  integer::mu
+
+
+                  drift_norm=+.00000e+0_KK
+
+                  do mu=1,boson_degrees_of_freedom-1,+1
+
+                     drift_norm&
+                    =drift_norm+norm(drift(:,:,mu))
+
+              end do!mu= ,boson_degrees_of_freedom-1,+1
+
+                       drift_norm&
+                 =sqrt(drift_norm/a_size)
+
+
+        end function drift_norm!
 
 
             subroutine eject_complex_langevin()

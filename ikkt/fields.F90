@@ -39,6 +39,7 @@
             logical,public::massive_deformations=.false.
 
             character(:),allocatable,public::conf_file_name
+            character(:),allocatable,public::save_file_name
 
             integer,public::inner_degrees_of_freedom,n,n_size
             integer,public::boson_degrees_of_freedom,d,a_size
@@ -147,6 +148,8 @@
 
 
                    open(newunit=unit,file=conf_file_name)
+
+
 
                   do mu=0,boson_degrees_of_freedom-1,+1
 
@@ -287,12 +290,11 @@
                      if(allocated(cmm)) deallocate(cmm)
                                           allocate(cmm(0:f_size-1,&
                                                        0:f_size-1))
-
-                     if(allocated(ma)) deallocate(ma)
-                                         allocate(ma(0:f_size-1,&
-                                                     0:f_size-1,0:inner_degrees_of_freedom-1,&
-                                                                0:inner_degrees_of_freedom-1,&
-                                                                0:boson_degrees_of_freedom-1))
+                     if(allocated( ma)) deallocate( ma)
+                                          allocate( ma(0:f_size-1,&
+                                                       0:f_size-1,0:inner_degrees_of_freedom-1,&
+                                                                  0:inner_degrees_of_freedom-1,&
+                                                                  0:boson_degrees_of_freedom-1))
 
 #                 endif
 
@@ -308,7 +310,7 @@
                   implicit none
 
 
-                  real(KK),intent(in   )::standard_deviation
+                  real(KK),intent(inout)::standard_deviation
 
                   complex(KK),dimension(0:inner_degrees_of_freedom-1,&
                                         0:inner_degrees_of_freedom-1,&
@@ -340,7 +342,7 @@
                   implicit none
 
 
-                  real(KK),intent(in   )::standard_deviation
+                  real(KK),intent(inout)::standard_deviation
 
 #                 ifndef OPTIMAL
 
@@ -580,8 +582,6 @@
                   call make_ma()
 
                   call make_m_eigenvalues()
-
-                  call print_fermion_matrix()
 
 
         end subroutine update_fermion_matrix!

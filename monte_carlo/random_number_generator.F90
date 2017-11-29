@@ -10,22 +10,89 @@
             implicit none
 
 
-            character(*),private,parameter::           format_integer=INTEGERG2
-            character(*),private,parameter::text_field_format_integer=INTEGERA2
+            character(*),private,parameter::           format_seed=INTEGERG2
+            character(*),private,parameter::text_field_format_seed=INTEGERA2
 
             character(:),allocatable,public::seed_file_name
 
             integer,                                     private::size_seed
             integer,allocatable,dimension( :           ),private::     seed
 
-            public::prepare_seed
-
             public::make_seed
             public::load_seed
             public::save_seed
 
+            private::prepare_seed
+
 
       contains
+
+
+            subroutine make_seed()
+
+
+                  implicit none
+
+
+                  call random_seed()
+
+
+        end subroutine make_seed!
+
+
+            subroutine load_seed(file_name)
+
+
+                  implicit none
+
+
+                  integer::unit
+
+
+                  call prepare_seed()
+                  call random_seed(put=seed)
+
+                   open(newunit=unit,file=seed_file_name)
+
+                   read(unit,          *)
+                   read(unit,          *)
+                   read(unit,          *)
+                   read(unit,format_seed) seed
+
+                  close(        unit                    )
+
+                  if(allocated(seed)) deallocate(seed)
+
+
+        end subroutine load_seed!
+
+
+            subroutine save_seed()
+
+
+                  implicit none
+
+
+                  integer::unit
+
+
+                  call prepare_seed()
+                  call random_seed(get=seed)
+
+                   open(newunit=unit,file=seed_file_name)
+
+                  write(unit,          *) "LAST RANDOM NUMBER GENERATOR SEED"
+                  write(unit,          *) "___________","___________","___________","___________","___________","___________",&
+                                          "___________","___________","___________","___________","___________","___________"
+                  write(unit,          *)
+                  write(unit,format_seed) seed
+
+                  close(        unit                    )
+
+                  if(allocated(seed)) deallocate(seed)
+
+
+        end subroutine save_seed!
 
 
             subroutine prepare_seed()
@@ -52,64 +119,6 @@
 
 
         end subroutine prepare_seed!
-
-
-            subroutine make_seed()
-
-
-                  implicit none
-
-
-                  call random_seed()
-
-
-        end subroutine make_seed!
-
-
-            subroutine load_seed()
-
-
-                  implicit none
-
-
-                  integer::unit
-
-
-                  call prepare_seed()
-
-                   open(newunit=unit,file=seed_file_name)
-                   read(        unit,     format_integer) seed
-                  close(        unit                    )
-
-                  if(.not.allocated(seed)) stop "NOPUT"; call random_seed(put=seed)
-
-                  if(allocated(seed)) deallocate(seed)
-
-
-        end subroutine load_seed!
-
-
-            subroutine save_seed()
-
-
-                  implicit none
-
-
-                  integer::unit
-
-
-                  call prepare_seed()
-
-                  if(.not.allocated(seed)) stop "NOGET"; call random_seed(get=seed)
-
-                   open(newunit=unit,file=seed_file_name)
-                  write(        unit,     format_integer) seed
-                  close(        unit                    )
-
-                  if(allocated(seed)) deallocate(seed)
-
-
-        end subroutine save_seed!
 
 
   end module random_number_generator

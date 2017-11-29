@@ -35,7 +35,7 @@
                   implicit none
 
 
-                  integer,intent(in   )::record_size,jack_bins
+                  integer,intent(inout)::record_size,jack_bins
 
                   real(KK),dimension(0:record_size-1),intent(in  )::record_values
 
@@ -82,7 +82,7 @@
                   implicit none
 
 
-                  integer,intent(in   )::record_size,jack_bins
+                  integer,intent(inout)::record_size,jack_bins
 
                   real(KK),dimension(0:record_size-1),intent(in  )::record_values
 
@@ -153,7 +153,7 @@
                   implicit none
 
 
-                  integer,intent(in   )::record_size,jack_bins
+                  integer,intent(inout)::record_size,jack_bins
 
                   real(KK),dimension(0:record_size-1),intent(in  )::record_values
                   real(KK),dimension(0:record_size-1),intent(in  )::record_weights
@@ -189,8 +189,8 @@
 
               end do!i=0,record_size-1
 
-                  average_=sum(o);average_o=average_%value;error_o=sqrt(sum((o%value-average_o)&
-                                                                           *(o%value-average_o)))
+                  average_=sum(o);average_o=value(average_);error_o=sqrt(sum((value(o)-average_o)&
+                                                                            *(value(o)-average_o)))
 
                   deallocate(o)
 
@@ -207,7 +207,7 @@
                   implicit none
 
 
-                  integer,intent(in   )::record_size,jack_bins
+                  integer,intent(inout)::record_size,jack_bins
 
                   real(KK),dimension(0:record_size-1),intent(in  )::record_values
                   real(KK),dimension(0:record_size-1),intent(in  )::record_weights
@@ -254,8 +254,8 @@
                         if(i/bin_width/=j) then
 
                            x(j)&
-                          =x(j)+average(record_weights(i),(record_values(i)-o(j)%value)&
-                                                         *(record_values(i)-o(j)%value))
+                          =x(j)+average(record_weights(i),(record_values(i)-value(o(j)))&
+                                                         *(record_values(i)-value(o(j))))
 
               end       if!i/bin_width/=j
 
@@ -263,10 +263,10 @@
 
               end do!i=0,record_size-1
 
-                  average_=sum(o);average_o=average_%value;error_o=sqrt(sum((o%value-average_o)&
-                                                                           *(o%value-average_o)))
-                  average_=sum(x);average_x=average_%value;error_x=sqrt(sum((x%value-average_x)&
-                                                                           *(x%value-average_x)))
+                  average_=sum(o);average_o=value(average_);error_o=sqrt(sum((value(o)-average_o)&
+                                                                            *(value(o)-average_o)))
+                  average_=sum(x);average_x=value(average_);error_x=sqrt(sum((value(x)-average_x)&
+                                                                            *(value(x)-average_x)))
 
                   deallocate(o)
                   deallocate(x)

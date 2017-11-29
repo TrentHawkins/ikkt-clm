@@ -29,7 +29,7 @@
                implicit none
 
 
-               real(KK),intent(in   )::x
+               real(KK),intent(inout)::x
                real(KK)              ::y
 
 

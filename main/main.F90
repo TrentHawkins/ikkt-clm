@@ -46,7 +46,7 @@
 !     include "../ikkt/fields.F90"
 !     include "../ikkt/gauge_cooling.F90"
 #     include "../ikkt/complex_langevin.F90"
-#     include "../ikkt/observables.F90"
+!     include "../ikkt/observables.F90"
 
 !     define BLAS
 !     define OPTIMAL
@@ -80,17 +80,16 @@
 
 !           use::constants
 !           use::fields
-!           use::complex_langevin
+            use::complex_langevin
             use::gauge_cooling
-            use::observables
+!           use::observables
 
 
             implicit none
 
 
 
-            character(*),parameter::base_path_name="${PWD##""/ifort/bin""}/"
-            character(*),parameter::data_path_name=                       "data/"
+            character(*),parameter::data_path_name="data/"
 
             character(:),allocatable::base_file_name
 
@@ -114,6 +113,9 @@
                   call read_options_and_arguments()
                   call boot_langevin()
 
+                   open(newunit=meas_unit,file=meas_file_name)
+                   open(newunit=auto_unit,file=auto_file_name)
+
 
         end subroutine begin_ikkt_simulation!
 
@@ -127,32 +129,50 @@
                   integer::unit
 
 
-                   open(newunit=unit,file=meas_file_name)
+                  do while(life<=life_time)
 
-                  if(measure_time_skipped) then
+                     if(timestep_is_adaptive) call agnostically_adapt_time_step(drift_norm())
 
-                     do while(s%time_left())
+                     life&
+                    =life+step
 
-                        do while(t%time_left())
+                     call langevin_step()
 
-                           call langevin_step()
+                     if(measure_time_skipped) then
 
-              end       do!while(t%time_left())
+                        if(skip<=life) then
 
-                        call print_observables(unit)
+                           skip&
+                          =skip+time_skip
 
-              end    do!while(s%time_left())
+                           go to 231
 
-                  else
+              end       if!skip<=life
 
-                     do while(t%time_left())
+                     else
 
-                        call langevin_step()
-                        call print_observables(unit)
+              231       call print_observables()
 
-              end    do!while(t%time_left())
+              end    if!measure_time_skipped
 
-              end if!measure_time_skipped
+                     if(auto_save_field_conf) then
+
+                        if(auto<=life) then
+
+                           skip&
+                          =skip+time_skip
+
+                           go to 232
+
+              end       if!auto<=life
+
+                     else
+
+              232       call add_to_connfigurations()
+
+              end    if!auto_save_field_conf
+
+              end do!while(life<=life_time)
 
                   close(        unit                    )
 
@@ -196,42 +216,39 @@
 
                   type(option)::options(0:6) ! list of long options
 
-                  integer::index
+                  integer::index,time_stamp(8)
 
 
                   options(1)=option("variable-timestep",.false.,'t',"Use variable timestep with fixed timestep as average. This &
                                                                     &alelviates drift divergence due to instabilities in either a &
                                                                     &poorly chosen starting configuration or a large timestep.","")
-
                   options(2)=option("noisy-start-field",.false.,'a',"Start with a (gausssian) noisy (hot) initial configuration &
                                                                     &instead of the default zero (cold) initial configuration. &
                                                                     &Overriden by "//t_bold//"-c"//s_bold//" when loading a &
                                                                     &previously saved configuration.","")
-
                   options(3)=option(    "load-save"    ,.false.,'c',"Load simulation stats and field configuration from a previous &
                                                                     &simulation. This helps in storing thermalized configurations, &
                                                                     &and reusing instead of repeating thermalizations. Overrides "&
                                                                     &//t_bold//"-a"//s_bold//" when not starting a simulation from &
                                                                     &scratch.","")
-
-                  options(4)=option("fermions-included",.false.,'f',"Include fermions in simulation, for simulating the full IKKT &
+                  options(4)=option( "run-observables" ,.false.,'o',"Load a sample of configurations for re-calculating &
+                                                                    &observables, to prevent re-runnning simulations for new &
+                                                                    &calculations.","configuration file")
+                  options(5)=option("fermions-included",.false.,'f',"Include fermions in simulation, for simulating the full IKKT &
                                                                     &model.","")
-
-                  options(5)=option(  "gauge-cooling"  ,.false.,'g',"Applythe standard gauge-cooling post-processing to &
+                  options(6)=option(  "gauge-cooling"  ,.false.,'g',"Applythe standard gauge-cooling post-processing to &
                                                                     &configurations after each langevin step. This alleviates &
                                                                     &simulation journeys in the imaginary direction.","")
-
-                  options(6)=option("mass-deformations",.false.,'m',"Include massive deformations in modifying the IKKT drift used &
+                  options(7)=option("mass-deformations",.false.,'m',"Include massive deformations in modifying the IKKT drift used &
                                                                     &in the Complex Langevin method. In particular for the boson &
                                                                     &model, a new coupling parameter is added, along with masses &
                                                                     &for the gauge bosons. In the full model with fermions, a &
                                                                     &fermionic mass is added as well.","")
-
                   options(0)=option("help"             ,.false.,'h',"Print this help screen.","")
 
                   do
 
-                     call getopt(options="stacfgmh"       ,&
+                     call getopt(options="taco:fgmh"     ,&
                                 longopts=options         ,&
                                  optchar=option_character,&
                                   optarg=option_argument ,&
@@ -244,9 +261,10 @@
 
                      select case(option_character)
 
-                     case('t'); timestep_is_variable=.true.
+                     case('t'); timestep_is_adaptive=.true.
                      case('a'); start_field_is_noisy=.true.
                      case('c'); configuration_loaded=.true.; call read_version()
+                     case('o'); running_measurements=.true.; call read_version()
                      case('f'); fermions_included_in=.true.
                      case('g'); gauge_cooling_active=.true.
                      case('m'); massive_deformations=.true.
@@ -306,18 +324,24 @@
 
                   base_file_name=trim(adjustl(option_argument))
 
-                  call execute_command_line("cd -- "             //trim(base_path_name))
                   call execute_command_line("mkdir --parents -- "//trim(data_path_name))
 
-!                 call read_time_parameters()
-!                 call read_field_parameters()
-
                   base_file_name=trim(data_path_name)//base_file_name
+
+                  call date_and_time(values=time_stamp)
+
+                  base_file_name=trim(base_path_name)//"."//trim(time_stamp(1))&
+                                                     //"-"//trim(time_stamp(2))&
+                                                     //"-"//trim(time_stamp(3))&
+                                                     //"."//trim(time_stamp(5))&
+                                                     //":"//trim(time_stamp(6))&
+                                                     //":"//trim(time_stamp(7))
 
                   seed_file_name=base_file_name//".seed";!write(*,"(a)") seed_file_name
                   time_file_name=base_file_name//".time";!write(*,"(a)") time_file_name
                   conf_file_name=base_file_name//".conf";!write(*,"(a)") conf_file_name
                   meas_file_name=base_file_name//".meas";!write(*,"(a)") meas_file_name
+                  save_file_name=base_file_name//".save";!write(*,"(a)") meas_file_name
 
 
         end subroutine read_options_and_arguments!
