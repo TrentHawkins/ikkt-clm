@@ -31,10 +31,6 @@
             real(KK),public::time_skip=+.00000e+0_KK
             real(KK),public::time_step=+.00000e+0_KK
 
-!           type(time(KK))::auto
-!           type(time(KK))::skip
-!           type(time(KK))::life
-
             type(clock(KK))::auto
             type(clock(KK))::skip
             type(clock(KK))::life
@@ -44,12 +40,12 @@
             public::load_monte_carlo_K
             public::save_monte_carlo_K
 
-            private::read_time_parameters
+            private:: read_time_parameters
+            private::check_time_parameters
 
             public::agnostically_adapt_time_step
 
             public::print_time_K
-            public::print_step_K
 
 
             interface make_monte_carlo
@@ -76,72 +72,49 @@
 
         end interface agnostically_adapt_time_step
 
-            interface print_time
+            interface print
 
                module procedure print_time_K
 
-        end interface print_time
-
-            interface print_step
-
-               module procedure print_step_K
-
-        end interface print_step
+        end interface print
 
 
       contains
 
 
-            subroutine make_monte_carlo_K()
+            subroutine make_monte_carlo_K(start_control)
 
 
                   implicit none
+
+
+                  real(KK),intent_in
 
 
                   call read_time_parameters()
 
                   call make_seed()
 
-!                 if(auto_save_field_conf) then
+                  if(auto_save_field_conf) auto=clock(              )
+                  if(measure_time_skipped) skip=clock(              )
+                                           step=clock(time=time_step)
 
-!                    call auto%make_time(life_time,auto_save)
+                  if(timestep_is_adaptive) then
 
-!                    if(measure_time_skipped) then
+                     life=clock(control=start_control)
 
-!                       call skip%make_time(auto_save,time_skip)
-!                       call life%make_time(time_skip,time_step)
+                  else
 
-!                    else
-
-!                       call life%make_time(auto_save,time_step)
-
-!             end    if!measure_time_skipped
-
-!                 else
-
-!                    if(measure_time_skipped) then
-
-!                       call skip%make_time(life_time,time_skip)
-!                       call life%make_time(time_skip,time_step)
-
-!                    else
-
-!                       call life%make_time(life_time,time_step)
-
-!             end    if!measure_time_skipped
-
-!             end if!auto_save_field_conf
-
-                                           life=clock(         )
-                  if(auto_save_field_conf) auto=clock(         )
-                  if(measure_time_skipped) skip=clock(         )
-                                           step=clock(time_step)
+                     life=clock(                     )
 
 
-        end subroutine make_monte_carlo_K!
+              end if!timestep_is_adaptive
 
 
-            subroutine load_monte_carlo_K()
+        end subroutine make_monte_carlo_K!start_control
+
+
+            subroutine load_monte_carlo_K(file_name)
 
 
                   implicit none
@@ -154,41 +127,11 @@
 
                   call load_seed()
 
-                   open(newunit=unit,file=time_file_name)
+                   open(newunit=unit,file=trim(file_name))
 
-                                                            read(unit,*)
-                                                            read(unit,*)
-                                                            read(unit,*)
-
-!                 if(auto_save_field_conf) then
-
-!                    call auto%load_time(life_time,auto_save); read(unit,*)
-
-!                    if(measure_time_skipped) then
-
-!                       call skip%load_time(auto_save,time_skip); read(unit,*)
-!                       call life%load_time(time_skip,time_step); read(unit,*)
-
-!                    else
-
-!                       call life%load_time(auto_save,time_step); read(unit,*)
-
-!             end    if!measure_time_skipped
-
-!                 else
-
-!                    if(measure_time_skipped) then
-
-!                       call skip%load_time(life_time,time_skip); read(unit,*)
-!                       call life%load_time(time_skip,time_step); read(unit,*)
-
-!                    else
-
-!                       call life%load_time(life_time,time_step); read(unit,*)
-
-!             end    if!measure_time_skipped
-
-!             end if!auto_save_field_conf
+                                                                   read(unit,*)
+                                                                   read(unit,*)
+                                                                   read(unit,*)
 
                                            call  read(unit,life); life_time&
                                                                  =life_time+time(life)
@@ -202,11 +145,12 @@
 
                   else
 
-                     step=clock(time_step)
+                     step=clock(time=time_step)
 
               end if!timestep_is_adaptive
 
-                  close(        unit                    )
+
+                  close(        unit                     )
 
 
         end subroutine load_monte_carlo_K!
@@ -225,16 +169,12 @@
 
                    open(newunit=unit,file=time_file_name)
 
-                                                                 write(unit,*) "LAST TIME-STAMP OF SIMULATION"
-                                                                 write(unit,*) "___________","___________","___________",&
-                                                                               "___________","___________","___________",&
-                                                                               "___________","___________","___________",&
-                                                                               "___________","___________","___________"
-                                                                 write(unit,*)
-
- !                if(auto_save_field_conf) call auto%save_time(); write(unit,*) " configuration auto-save time scale"
- !                if(measure_time_skipped) call skip%save_time(); write(unit,*) " measurment    time-skip      scale"
- !                                         call life%save_time(); write(unit,*) "               time-step           "
+                                                                  write(unit,*) "LAST TIME-STAMP OF SIMULATION"
+                                                                  write(unit,*) "___________","___________","___________",&
+                                                                                "___________","___________","___________",&
+                                                                                "___________","___________","___________",&
+                                                                                "___________","___________","___________"
+                                                                  write(unit,*)
 
                                            call write(unit,life); write(unit,*) " simulation"
                   if(auto_save_field_conf) call write(unit,auto); write(unit,*) " auto-saved configurations"
@@ -265,6 +205,15 @@
                    read(*,   *               )  time_step
                   write(*,"(2a)",advance="no")                                 t_normal
                   write(*,   *               )
+
+
+        end subroutine read_time_parameters!
+
+
+            subroutine check_time_parameters()
+
+
+                  implicit none
 
 
                   if(time_skip>time_step*10) then
@@ -300,7 +249,7 @@
               end if!time_skip>time_step*10
 
 
-        end subroutine read_time_parameters!
+        end subroutine check_time_parameters!
 
 
            subroutine agnostically_adapt_time_step_K(exp_control_step)
@@ -322,40 +271,22 @@
         end subroutine agnostically_adapt_time_step_K!exp_control_step
 
 
-            subroutine print_time_K(unit,tag,time)
+            subroutine print_time_K(unit,time,tag)
 
 
                   implicit none
 
 
-                  integer        ,intent(inout)::unit
-                  character(*   ),intent(inout)::tag
-                  type(clock(KK)),intent(inout)::time
+                  integer        ,intent(inout)         ::unit
+                  type(clock(KK)),intent(in   )         ::time
+                  character(*   ),intent(in   ),optional::tag
 
 
-                  call write(unit,size(tag),tag )
-                  call write(unit,          time)
+                  if(present(tag)) call write(unit,tag )
+                                   call write(unit,time)
 
 
-        end subroutine print_time_K!unit,tag,time
-
-
-            subroutine print_step_K(unit,tag,step)
-
-
-                  implicit none
-
-
-                  integer        ,intent(inout)::unit
-                  character(   *),intent(inout)::tag
-                  type(clock(KK)),intent(inout)::step
-
-
-                  call write(unit,size(tag),tag )
-                  call write(unit,          step)
-
-
-        end subroutine print_step_K!unit,tag,step
+        end subroutine print_time_K!unit,time,tag
 
 
   end module monte_carlo

@@ -35,7 +35,7 @@
                   implicit none
 
 
-                  integer,intent(inout)::record_size,jack_bins
+                  integer,intent(in   )::record_size,jack_bins
 
                   real(KK),dimension(0:record_size-1),intent(in  )::record_values
 
@@ -82,7 +82,7 @@
                   implicit none
 
 
-                  integer,intent(inout)::record_size,jack_bins
+                  integer,intent(in   )::record_size,jack_bins
 
                   real(KK),dimension(0:record_size-1),intent(in  )::record_values
 
@@ -153,7 +153,7 @@
                   implicit none
 
 
-                  integer,intent(inout)::record_size,jack_bins
+                  integer,intent(in   )::record_size,jack_bins
 
                   real(KK),dimension(0:record_size-1),intent(in  )::record_values
                   real(KK),dimension(0:record_size-1),intent(in  )::record_weights
@@ -207,7 +207,7 @@
                   implicit none
 
 
-                  integer,intent(inout)::record_size,jack_bins
+                  integer,intent(in   )::record_size,jack_bins
 
                   real(KK),dimension(0:record_size-1),intent(in  )::record_values
                   real(KK),dimension(0:record_size-1),intent(in  )::record_weights

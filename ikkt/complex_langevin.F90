@@ -63,6 +63,8 @@
             public::make_noise
             public::drift_norm
 
+            private::read_field_parameters
+
 
       contains
 
@@ -157,7 +159,7 @@
                      if(massive_deformations) then
 
                         drift(:,:,mu)&
-                       =drift(:,:,mu)-boson_mass(mu)*a(:,:,mu)*boson_epsilon*inner_degrees_of_freedom
+                       =drift(:,:,mu)-boson_mass(mu)*a(:,:,mu)*boson_mass_factor*inner_degrees_of_freedom
 
               end    if!massive_deformations
 
@@ -253,6 +255,165 @@
         end function drift_norm!
 
 
+            subroutine print_observables(unit)
+
+
+                  implicit none
+
+
+                  integer,intent(inout)::unit
+
+                  integer::mu
+
+
+                  call print_time(unit,life,"DT"); call print_time              (unit,step); write(unit,*)
+                  call print_time(unit,life,"CG"); call print_conjugate_gradient(unit     ); write(unit,*)
+                  call print_time(unit,life,"GC"); call print_gauge_cooling     (unit     ); write(unit,*)
+                                                                                             write(unit,*)
+
+
+        end subroutine print_observables!unit
+
+
+            subroutine  read_field_parameters()
+
+
+                  implicit none
+
+
+                  integer::mu
+
+!                 character(*)::temp_file_name
+
+
+                  write(*,"(2a)",advance="no") "inner_degrees_of_freedom: ",t_yellow
+                   read(*,   *               )  inner_degrees_of_freedom
+                  write(*,"( a)",advance="no")                              t_normal
+                  write(*,"(2a)",advance="no") "boson_degrees_of_freedom: ",t_yellow
+                   read(*,   *               )  boson_degrees_of_freedom
+                  write(*,"( a)",advance="no")                              t_normal
+
+                                                   fermi_degrees_of_freedom=2 &
+                                                **(boson_degrees_of_freedom/2 &
+                                                                           -1)
+                                           n     = inner_degrees_of_freedom-1
+                                           d     = boson_degrees_of_freedom-1
+                                           p     = fermi_degrees_of_freedom-1
+                                           n_size= inner_degrees_of_freedom&
+                                                 * inner_degrees_of_freedom
+                                           a_size= boson_degrees_of_freedom* n_size
+                                           f_size= fermi_degrees_of_freedom*(n_size-1)
+
+!                 write(temp_file_name,"(2(a2,i2.2))") ":n",inner_degrees_of_freedom,&
+!                                                      ":d",boson_degrees_of_freedom
+
+!                 conf_file_name&
+!                =conf_file_name//trim(temp_file_name)
+
+!                 if(fermions_included_in) then
+
+!                    write(temp_file_name,"(a2,i2.2)") ":p",inner_degrees_of_freedom
+
+!                    conf_file_name&
+!                   =conf_file_name//trim(temp_file_name)
+
+!             end if!fermions_included_in
+
+                  write(*,   *               )
+
+                  if(massive_deformations) then
+
+                     write(*,"(2a)",advance="no") "boson_mass_factor: ",t_yellow
+                      read(*,   *               )  boson_mass_factor
+                     write(*,"( a)",advance="no")                       t_normal
+
+!                    write(temp_file_name,"(a2,f4.2,a2)") ":b",boson_mass_factor,":m"
+
+!                    conf_file_name&
+!                   =conf_file_name//trim(temp_file_name)
+
+                     write(*,   *               )
+
+                     if(allocated(boson_mass)) deallocate(boson_mass)
+                                                 allocate(boson_mass(0:boson_degrees_of_freedom-1))
+
+                     do mu=0,boson_degrees_of_freedom-1,+1
+
+                        write(*,"(a,i2.2,2a)",advance="no") "boson_mass[",mu+1,"]: ",t_yellow
+                         read(*,          *               )  boson_mass(  mu    )
+                        write(*,"(        a)",advance="no")                          t_normal
+
+!                       write(temp_file_name,"(sp,f4.1)") log2(boson_mass(mu))
+
+!                       conf_file_name&
+!                      =conf_file_name//trim(temp_file_name)
+
+              end    do!mu=0,boson_degrees_of_freedom-1,+1
+
+                     write(*,          *               )
+
+                     if(fermions_included_in) then
+
+                        write(*,"(2a)",advance="no") "fermi_mass: ",t_yellow
+                         read(*,   *               )  fermi_mass
+                        write(*,"( a)",advance="no")                t_normal
+
+!                       write(temp_file_name,"(a2,f4.2)") ":f",fermi_mass
+
+!                       conf_file_name&
+!                      =conf_file_name//trim(temp_file_name)
+
+                        write(*,   *               )
+
+              end    if!fermions_included_in
+
+              end if!massive_deformations
+
+                  if(allocated(a)) deallocate(a)
+                                     allocate(a(0:inner_degrees_of_freedom-1,&
+                                                0:inner_degrees_of_freedom-1,&
+                                                0:boson_degrees_of_freedom-1))
+
+                  if(fermions_included_in) then
+
+#                    ifdef OPTIMAL
+
+                     if(allocated(f)) deallocate(f)
+                                        allocate(f(0:inner_degrees_of_freedom-1,&
+                                                   0:inner_degrees_of_freedom-1,&
+                                                   0:fermi_degrees_of_freedom-1))
+
+#                    else
+
+                     if(allocated(f)) deallocate(f)
+                                        allocate(f(0:f_size-1))
+
+                     if(allocated(m_eigenvalues_)) deallocate(m_eigenvalues_)
+                                                     allocate(m_eigenvalues_(0:f_size-1))
+
+                     if(allocated( m )) deallocate( m )
+                                          allocate( m (0:f_size-1,&
+                                                       0:f_size-1))
+                     if(allocated(cm )) deallocate(cm )
+                                          allocate(cm (0:f_size-1,&
+                                                       0:f_size-1))
+                     if(allocated(cmm)) deallocate(cmm)
+                                          allocate(cmm(0:f_size-1,&
+                                                       0:f_size-1))
+                     if(allocated( ma)) deallocate( ma)
+                                          allocate( ma(0:f_size-1,&
+                                                       0:f_size-1,0:inner_degrees_of_freedom-1,&
+                                                                  0:inner_degrees_of_freedom-1,&
+                                                                  0:boson_degrees_of_freedom-1))
+
+#                 endif
+
+              end if!fermions_included_in
+
+
+        end subroutine  read_field_parameters!
+
+
             subroutine eject_complex_langevin()
 
 
@@ -263,7 +424,7 @@
                   call eject_constants()
 
                   if(allocated(drift)) deallocate(drift)
-                  if(allocated(drift)) deallocate(noise)
+                  if(allocated(noise)) deallocate(noise)
 
 
         end subroutine eject_complex_langevin

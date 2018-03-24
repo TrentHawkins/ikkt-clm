@@ -260,7 +260,7 @@
 
 
 !                 integer       ,intent(inout)::unit
-!                 type(time(KK)),intent(inout)::this
+!                 type(time(KK)),intent(in   )::this
 
 
 !                 call write(unit,this%m_current_time)

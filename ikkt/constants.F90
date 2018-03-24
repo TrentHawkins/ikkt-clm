@@ -2,8 +2,8 @@
 #     define CONSTANTS_F90
 
 #     include "../system/precision.F90"
-#     include "../main/mathematical_constants.F90"
 
+#     include "../tensor/mathematical_constants.F90"
 #     include "../tensor/tensor.F90"
 
 
@@ -57,7 +57,7 @@
                   implicit none
 
 
-                  integer,intent(inout)::size
+                  integer,intent(in   )::size
 
                   integer::gamma_size
 
@@ -74,7 +74,7 @@
                   implicit none
 
 
-                  integer,intent(inout)::size
+                  integer,intent(in   )::size
 
 
                   if(allocated(delta)) return
@@ -94,7 +94,7 @@
                   implicit none
 
 
-                  integer,intent(inout)::size
+                  integer,intent(in   )::size
 
 
                   allocate(gamma(0:gamma_size(size)-1,&
@@ -149,7 +149,7 @@
                   implicit none
 
 
-                  integer,intent(inout)::size
+                  integer,intent(in   )::size
 
                   integer::mu,nu
 
@@ -186,7 +186,7 @@
                   implicit none
 
 
-                  integer,intent(inout)::size
+                  integer,intent(in   )::size
 
                   real(KK)::determinant_degree
 
@@ -214,8 +214,8 @@
                   implicit none
 
 
-                  integer,intent(inout)::inner_size
-                  integer,intent(inout)::boson_size
+                  integer,intent(in   )::inner_size
+                  integer,intent(in   )::boson_size
 
 
                   call make_delta     (inner_size)

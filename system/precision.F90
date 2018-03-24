@@ -51,11 +51,11 @@
 #     define  COMPLEXA3                   "(   2(x,a24     ))"
 #     define  COMPLEXA4                   "(   2(x,a44     ))"
 
-!     define TOLERANCE0 .e-04
-#     define TOLERANCE1 .e-01
-#     define TOLERANCE2 .e-01
-#     define TOLERANCE3 .e-05
-#     define TOLERANCE4 .e-20
+!     define TOLERANCE0     .10000e-4
+#     define TOLERANCE1     .10000e-1
+#     define TOLERANCE2     .10000e-1
+#     define TOLERANCE3     .10000e-5
+#     define TOLERANCE4 .100000000e-20
 
 #     define         KK         08
 #     define          K          3

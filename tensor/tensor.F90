@@ -73,8 +73,6 @@
 
         end interface operator(.z.)
 
-            interface operator
-
             interface operator(.commutation.)
 
                module procedure matrix_matrix_matrix_commutation_K
@@ -92,12 +90,6 @@
                module procedure matrix_trace_K
 
         end interface trace
-
-            interface trace_piece
-
-               module procedure matrix_trace_piece_K
-
-        end interface trace_piece
 
             interface determinant
 
@@ -189,7 +181,7 @@
 
 
                   complex(KK),dimension(0:                  ,&
-                                        0:                  ),intent(inout)::this
+                                        0:                  ),intent(in   )::this
                   complex(KK),dimension(0:size(this,dim=1)-1)              ::that
 
                   integer::index
@@ -211,8 +203,8 @@
                   implicit none
 
 
-                  integer    ,                    intent(inout)::size
-                  complex(KK),                    intent(inout)::factor
+                  integer    ,                    intent(in   )::size
+                  complex(KK),                    intent(in   )::factor
                   complex(KK),dimension(0:size-1,&
                                         0:size-1)              ::that
 
@@ -238,7 +230,7 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                  ),intent(inout)::this
+                  complex(KK),dimension(0:                  ),intent(in   )::this
                   complex(KK),dimension(0:size(this,dim=1)-1,&
                                         0:size(this,dim=1)-1)              ::that
 
@@ -264,8 +256,8 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(inout)::vector0
-                  complex(KK),dimension(0:size(vector0,dim=1)-1),intent(inout)::vector1
+                  complex(KK),dimension(0:                     ),intent(in   )::vector0
+                  complex(KK),dimension(0:size(vector0,dim=1)-1),intent(in   )::vector1
                   complex(KK)                                                 ::scalar_
 
 
@@ -289,19 +281,19 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(inout)::vector0
+                  complex(KK),dimension(0:                     ),intent(in   )::vector0
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix1
+                                        0:                     ),intent(in   )::matrix1
                   complex(KK),dimension(0:size(matrix1,dim=2)-1)              ::vector_
 
 
 #                 ifndef BLAS
 
-                  vector_=matmul(      vector0 ,matrix1)
+                  vector_=matmul(vector0,matrix1)
 
 #                 else
 
-                  call gemv(matrix1,      vector0 ,vector_,trans='T')
+                  call gemv(matrix1,vector0,vector_,trans='T')
 
 #              endif
 
@@ -316,14 +308,14 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
-                  complex(KK),dimension(0:size(matrix0,dim=2)-1),intent(inout)::vector1
+                                        0:                     ),intent(in   )::matrix0
+                  complex(KK),dimension(0:size(matrix0,dim=2)-1),intent(in   )::vector1
                   complex(KK),dimension(0:size(matrix0,dim=1)-1)              ::vector_
 
 
 #                 ifndef BLAS
 
-                  vector_=matmul(matrix0 ,vector1)
+                  vector_=matmul(matrix0,vector1)
 
 #                 else
 
@@ -342,9 +334,9 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )::matrix0
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix1
+                                        0:                     ),intent(in   )::matrix1
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix1,dim=2)-1)              ::matrix_
 
@@ -369,8 +361,8 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(inout)::vector0
-                  complex(KK),dimension(0:                     ),intent(inout)::vector1
+                  complex(KK),dimension(0:                     ),intent(in   )::vector0
+                  complex(KK),dimension(0:                     ),intent(in   )::vector1
                   complex(KK),dimension(0:size(vector0,dim=1)   &
                                          *size(vector1,dim=1)-1)              ::vector_
 
@@ -400,9 +392,9 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )::matrix0
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix1
+                                        0:                     ),intent(in   )::matrix1
                   complex(KK),dimension(0:size(matrix0,dim=1)   &
                                          *size(matrix1,dim=1)-1,&
                                         0:size(matrix0,dim=2)   &
@@ -442,8 +434,8 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(inout)::vector0
-                  complex(KK),dimension(0:size(vector0,dim=1)-1),intent(inout)::vector1
+                  complex(KK),dimension(0:                     ),intent(in   )::vector0
+                  complex(KK),dimension(0:size(vector0,dim=1)-1),intent(in   )::vector1
                   complex(KK)                                                 ::scalar_
 
 
@@ -467,9 +459,9 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(inout)::vector0
+                  complex(KK),dimension(0:                     ),intent(in   )::vector0
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix1
+                                        0:                     ),intent(in   )::matrix1
                   complex(KK),dimension(0:size(matrix1,dim=2)-1)              ::vector_
 
 
@@ -494,8 +486,8 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
-                  complex(KK),dimension(0:size(matrix0,dim=2)-1),intent(inout)::vector1
+                                        0:                     ),intent(in   )::matrix0
+                  complex(KK),dimension(0:size(matrix0,dim=2)-1),intent(in   )::vector1
                   complex(KK),dimension(0:size(matrix0,dim=1)-1)              ::vector_
 
 
@@ -520,9 +512,9 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )::matrix0
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix1
+                                        0:                     ),intent(in   )::matrix1
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix1,dim=2)-1)              ::matrix_
 
@@ -547,8 +539,8 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(inout)::vector0
-                  complex(KK),dimension(0:                     ),intent(inout)::vector1
+                  complex(KK),dimension(0:                     ),intent(in   )::vector0
+                  complex(KK),dimension(0:                     ),intent(in   )::vector1
                   complex(KK),dimension(0:size(vector0,dim=1)   &
                                          *size(vector1,dim=1)-1)              ::vector_
 
@@ -578,9 +570,9 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )::matrix0
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix1
+                                        0:                     ),intent(in   )::matrix1
                   complex(KK),dimension(0:size(matrix0,dim=1)   &
                                          *size(matrix1,dim=1)-1,&
                                         0:size(matrix0,dim=2)   &
@@ -621,9 +613,9 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )::matrix0
                   complex(KK),dimension(0:size(matrix0,dim=2)-1,&
-                                        0:size(matrix0,dim=1)-1),intent(inout)::matrix1
+                                        0:size(matrix0,dim=1)-1),intent(in   )::matrix1
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix1,dim=2)-1)              ::matrix_
 
@@ -642,9 +634,9 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )::matrix0
                   complex(KK),dimension(0:size(matrix0,dim=2)-1,&
-                                        0:size(matrix0,dim=1)-1),intent(inout)::matrix1
+                                        0:size(matrix0,dim=1)-1),intent(in   )::matrix1
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix1,dim=2)-1)              ::matrix_
 
@@ -663,7 +655,7 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )::matrix0
                   complex(KK)                                                 ::scalar_
 
                   integer::index
@@ -685,30 +677,6 @@
         end function matrix_trace_K!matrix0
 
 
-            function matrix_trace_piece_K(matrix0) result(scalar_)
-
-
-                  implicit none
-
-
-                  complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
-                  complex(KK)                                                 ::scalar_
-
-                  real(KK):: real_vector_matrix0(0:size(matrix0,dim=1)-1)
-                  real(KK)::aimag_vector_matrix0(0:size(matrix0,dim=1)-1)
-
-
-                   real_vector_matrix0= real(vector(matrix0))
-                  aimag_vector_matrix0=aimag(vector(matrix0))
-
-                  scalar_=cmplx(sort_sum( real_vector_matrix0),&
-                                sort_sum(aimag_vector_matrix0),kind=KK)
-
-
-        end function matrix_trace_piece_K!matrix0
-
-
             recursive function matrix_determinant_K(matrix0) result(scalar_)
 
 
@@ -716,7 +684,7 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )::matrix0
                   complex(KK)                                                 ::scalar_
 
                   integer::k
@@ -752,12 +720,12 @@
 
 
                         complex(KK),dimension(0:                     ,&
-                                              0:                     ),intent(inout)::matrix0
+                                              0:                     ),intent(in   )::matrix0
                         complex(KK),dimension(0:size(matrix0,dim=1)-2,&
                                               0:size(matrix0,dim=2)-2)              ::matrix_
 
-                        integer,intent(inout)::i0
-                        integer,intent(inout)::j0
+                        integer,intent(in   )::i0
+                        integer,intent(in   )::j0
                         integer              ::i
                         integer              ::j
 
@@ -766,7 +734,8 @@
 
                            do i=0,size(matrix_,dim=1)-1,+1
 
-                              matrix_(i,j)=matrix0(mod(i0+1+i,size(matrix0,dim=1)),mod(j0+j+1,size(matrix0,dim=2)))*sign(i0+j0)
+                              matrix_(i,j)=matrix0(mod(i0+1+i,size(matrix0,dim=1)),&
+                                                   mod(j0+j+1,size(matrix0,dim=2)))*sign(i0+j0)
 
                     end    do!i=0,size(matrix_,dim=1)-1,+1
 
@@ -782,7 +751,7 @@
                         implicit none
 
 
-                        integer,intent(inout)::exponent
+                        integer,intent(in   )::exponent
                         integer              ::sign
 
 
@@ -802,7 +771,7 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )::matrix0
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix0,dim=2)-1)              ::matrix_
 
@@ -831,7 +800,7 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )::matrix0
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix0,dim=2)-1)              ::matrix_
 
@@ -875,7 +844,7 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )::matrix0
                   complex(KK),dimension(0:size(matrix0,dim=1)-1,&
                                         0:size(matrix0,dim=2)-1)              ::matrix_
 
@@ -917,11 +886,11 @@
                   implicit none
 
 
-                  complex(KK)                                   ,intent(inout)::scalar0
+                  complex(KK)                                   ,intent(in   )::scalar0
                   real(   KK)                                                 ::scalar_
 
 
-                  scalar_=           conjg(scalar0)* scalar0
+                  scalar_=         conjg(scalar0)*scalar0
 
 
         end function scalar_norm_squared_K!scalar0
@@ -933,12 +902,11 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(inout)::vector0
+                  complex(KK),dimension(0:                     ),intent(in   )::vector0
                   real(   KK)                                                 ::scalar_
 
 
-                  scalar_=real(  sum(conjg(vector0)* vector0))
-!                 scalar_=real(            vector0.c.vector0)
+                  scalar_=real(sum(conjg(vector0)*vector0))
 
 
         end function vector_norm_squared_K!vector0
@@ -951,12 +919,11 @@
 
 
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )::matrix0
                   real(   KK)                                                 ::scalar_
 
 
-                  scalar_=real(  sum(conjg(matrix0)* matrix0))
-!                 scalar_=real(trace(      matrix0.c.matrix0))
+                  scalar_=real(sum(conjg(matrix0)*matrix0))
 
         end function matrix_norm_squared_K!matrix0
 
@@ -967,13 +934,13 @@
                   implicit none
 
 
-                  complex(KK),dimension(0:                     ),intent(inout)::vector0
+                  complex(KK),dimension(0:                     ),intent(in   )::vector0
                   complex(KK),dimension(0:size(vector0,dim=1)-1,&
-                                        0:size(vector0,dim=1)-1),intent(inout)::matrix0
+                                        0:size(vector0,dim=1)-1),intent(in   )::matrix0
                   real(   KK)                                                 ::scalar_
 
 
-                  scalar_=real(vector0.c.(matrix0.o.vector0))
+                  scalar_=real(conjg(vector0).o.matrix0.o.vector0)
 
 
         end function vector_matrix_norm_squared_K!vector0,matrix0
@@ -1019,6 +986,33 @@
 
                   matrix0(size(matrix0,dim=1)-1,size(matrix0,dim=2)-1)&
                  =matrix0(size(matrix0,dim=1)-1,size(matrix0,dim=2)-1)-trace(matrix0)
+
+
+            contains
+
+
+                  function trace_piece(matrix0) result(scalar_)
+
+
+                        implicit none
+
+
+                        complex(KK),dimension(0:                     ,&
+                                              0:                     ),intent(in   )::matrix0
+                        complex(KK)                                                 ::scalar_
+
+                        real(KK):: real_vector_matrix0(0:size(matrix0,dim=1)-1)
+                        real(KK)::aimag_vector_matrix0(0:size(matrix0,dim=1)-1)
+
+
+                         real_vector_matrix0= real(vector(matrix0))
+                        aimag_vector_matrix0=aimag(vector(matrix0))
+
+                        scalar_=cmplx(sort_sum( real_vector_matrix0),&
+                                      sort_sum(aimag_vector_matrix0),kind=KK)
+
+
+              end function trace_piece!matrix0
 
 
         end subroutine make_matrix_traceless_K!matrix0
@@ -1159,115 +1153,198 @@
         end subroutine matrix_random_number_K!matrix0
 
 
-            subroutine  read_vector_K(unit,vector0)
+            subroutine  read_vector_K(unit,vector0,iostat)
 
 
                   implicit none
 
 
-                  integer    ,                                   intent(inout)::unit
-                  complex(KK),dimension(0:                     ),intent(inout)::vector0
+                  integer    ,                                   intent(inout)         ::unit
+                  complex(KK),dimension(0:                     ),intent(inout)         ::vector0
+                  integer    ,                                  ,intent(  out),optional::iostat
 
                   integer::i
 
 
-                  do i=0,size(vector0,dim=1)-1,+1
+                  if(present(iostat)) then
 
-                      read(unit,format_tensor_K) vector0(i)
+                     do i=0,size(vector0,dim=1)-1,+1
 
-              end do!i=0,size(vector0,dim=1)-1,+1
+                         read(unit,format_tensor_K,iostat=iostat,end=110) vector0(i)
 
-                   read(unit,*)
+              end    do!i=0,size(vector0,dim=1)-1,+1
+
+                      read(unit,*,iostat=iostat=110)
+
+              110    return
+
+                  else
+
+                     do i=0,size(vector0,dim=1)-1,+1
+
+                         read(unit,format_tensor_K) vector0(i)
+
+              end    do!i=0,size(vector0,dim=1)-1,+1
+
+                      read(unit,*)
+
+              end if!present(iostat)
 
 
-        end subroutine  read_vector_K!unit,vector0
+        end subroutine  read_vector_K!unit,vector0,iostat
 
 
-            subroutine  read_matrix_K(unit,matrix0)
+            subroutine  read_matrix_K(unit,matrix0,iostat)
 
 
                   implicit none
 
 
-                  integer    ,                                   intent(inout)::unit
+                  integer    ,                                   intent(inout)         ::unit
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(inout)         ::matrix0
+                  integer    ,                                  ,intent(  out),optional::iostat
 
                   integer::i,j
 
 
-                  do j=0,size(matrix0,dim=2)-1,+1
+                  if(present(iostat)) then
 
-                     do i=0,size(matrix0,dim=1)-1,+1
+                     do j=0,size(matrix0,dim=2)-1,+1
 
-                         read(unit,format_tensor_K) matrix0(i,j)
+                        do i=0,size(matrix0,dim=1)-1,+1
 
-              end    do!i=0,size(matrix0,dim=1)-1,+1
+                            read(unit,format_tensor_K,iostat=iostat,end=112) matrix0(i,j)
+
+              end       do!i=0,size(matrix0,dim=1)-1,+1
+
+                         read(unit,*,iostat=iostat,end=112)
+
+              end    do!j=0,size(matrix0,dim=2)-1,+1
+
+                      read(unit,*,iostat=iostat,end=112)
+
+              112    return
+
+                  else
+
+                     do j=0,size(matrix0,dim=2)-1,+1
+
+                        do i=0,size(matrix0,dim=1)-1,+1
+
+                            read(unit,format_tensor_K) matrix0(i,j)
+
+              end       do!i=0,size(matrix0,dim=1)-1,+1
+
+                         read(unit,*)
+
+              end    do!j=0,size(matrix0,dim=2)-1,+1
 
                       read(unit,*)
 
-              end do!j=0,size(matrix0,dim=2)-1,+1
-
-                   read(unit,*)
+              end if!present(iostat)
 
 
-        end subroutine  read_matrix_K!unit,matrix0
+        end subroutine  read_matrix_K!unit,matrix0,iostat
 
 
-            subroutine write_vector_K(unit,vector0)
+            subroutine write_vector_K(unit,vector0,iostat)
 
 
                   implicit none
 
 
-                  integer    ,                                   intent(inout)::unit
-                  complex(KK),dimension(0:                     ),intent(inout)::vector0
+                  integer    ,                                   intent(inout)         ::unit
+                  complex(KK),dimension(0:                     ),intent(in   )         ::vector0
+                  integer    ,                                  ,intent(  out),optional::iostat
 
-                  integer::i
-
-
-                  do i=0,size(vector0,dim=1)-1,+1
-
-                     write(unit,format_tensor_K) vector0(i)
-
-              end do!i=0,size(vector0,dim=1)-1,+1
-
-                  write(unit,*)
+                  integer::i                   read(unit,format_average_K,advance="no") this%m_weight
+                   read(unit,format_average_K,advance="no") this%m_value
 
 
-        end subroutine write_vector_K!unit,vector0
+
+                  if(present(iostat)) then
+
+                     do i=0,size(vector0,dim=1)-1,+1
+
+                        write(unit,format_tensor_K,iostat=iostat,end=111) vector0(i)
+
+              end    do!i=0,size(vector0,dim=1)-1,+1
+
+                     write(unit,*,iostat=iostat,end=111)
+
+              111    return
+
+                  else
+
+                     do i=0,size(vector0,dim=1)-1,+1
+
+                        write(unit,format_tensor_K) vector0(i)
+
+              end    do!i=0,size(vector0,dim=1)-1,+1
+
+                     write(unit,*)
+
+              end if!present(io                   read(unit,format_average_K,advance="no") this%m_weight
+                   read(unit,format_average_K,advance="no") this%m_value
 
 
-            subroutine write_matrix_K(unit,matrix0)
+        end subroutine write_vector_K!unit,vector0,iostat
+
+
+            subroutine write_matrix_K(unit,matrix0,iostat)
 
 
                   implicit none
 
 
-                  integer    ,                                   intent(inout)::unit
+                  integer    ,                                   intent(inout)         ::unit
                   complex(KK),dimension(0:                     ,&
-                                        0:                     ),intent(inout)::matrix0
+                                        0:                     ),intent(in   )         ::matrix0
+                  integer    ,                                  ,intent(  out),optional::iostat
 
                   integer::i
                   integer::j
 
 
-                  do j=0,size(matrix0,dim=2)-1,+1
+                  if(present(iostat)) then
 
-                     do i=0,size(matrix0,dim=1)-1,+1
+                     do j=0,size(matrix0,dim=2)-1,+1
 
-                        write(unit,format_tensor_K) matrix0(i,j)
+                        do i=0,size(matrix0,dim=1)-1,+1
 
-              end    do!i=0,size(matrix0,dim=1)-1,+1
+                           write(unit,format_tensor_K,iostat=iostat,end=113) matrix0(i,j)
+
+              end       do!i=0,size(matrix0,dim=1)-1,+1
+
+                        write(unit,*,iostat=iostat,end=113)
+
+              end    do!j=0,size(matrix0,dim=2)-1,+1
+
+                     write(unit,*,iostat=iostat,end=113)
+
+              113    return
+
+                  else
+
+                     do j=0,size(matrix0,dim=2)-1,+1
+
+                        do i=0,size(matrix0,dim=1)-1,+1
+
+                           write(unit,format_tensor_K) matrix0(i,j)
+
+              end       do!i=0,size(matrix0,dim=1)-1,+1
+
+                        write(unit,*)
+
+              end    do!j=0,size(matrix0,dim=2)-1,+1
 
                      write(unit,*)
 
-              end do!j=0,size(matrix0,dim=2)-1,+1
-
-                  write(unit,*)
+              end if!present(iostat)
 
 
-        end subroutine write_matrix_K!unit,matrix0
+        end subroutine write_matrix_K!unit,matrix0,iostat
 
 
   end module tensor_type

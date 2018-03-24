@@ -49,20 +49,17 @@
                   implicit none
 
 
-                  complex(KK),dimension( :               ),intent(inout)::b
+                  complex(KK),dimension( :               ),intent(in   )::b
                   complex(KK),dimension(0:size(b,dim=1)-1,&
-                                        0:size(b,dim=1)-1),intent(inout)::a
+                                        0:size(b,dim=1)-1),intent(in   )::a
                   complex(KK),dimension(0:size(b,dim=1)-1),intent(inout)::x
-
-                  integer,intent(inout)::iterations
 
                   complex(KK),dimension(0:size(b,dim=1)-1)::r
                   complex(KK),dimension(0:size(b,dim=1)-1)::p
+                  complex(KK),dimension(0:size(b,dim=1)-1)::dx
 
                   real(KK)::cb
                   real(KK)::ca
-
-                  real(KK)::dx
 
                   real(KK)::norm_r_old
                   real(KK)::norm_r_new
@@ -104,24 +101,21 @@
         end subroutine conjugate_gradient_K!a,b,x,iterations
 
 
-            subroutine print_conjugate_gradient(unit,tag)
+            subroutine print_conjugate_gradient(unit)
 
 
                   implicit none
 
 
-                  integer     ,intent(inout)::unit
-                  character(*),intent(inout)::tag
+                  integer,intent(inout)::unit
 
-
-                  call write(unit,size(tag),tag)
 
                   write(unit,format_iterations,advance="no") iterations
                   write(unit,format_error_K   ,advance="no") error
-                  write(unit,format_error_K   ,advance="no") tolerance
+                  write(unit,format_error_K                ) tolerance
 
 
-        end subroutine print_conjugate_gradient!unit,tag
+        end subroutine print_conjugate_gradient!unit
 
 
   end module conjugate_gradient_method

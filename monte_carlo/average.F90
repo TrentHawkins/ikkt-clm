@@ -189,8 +189,8 @@
 
 
                   type(average(KK)),intent(inout)         ::this
-                  real(        KK ),intent(inout),optional::weight
-                  real(        KK ),intent(inout),optional::value
+                  real(        KK ),intent(in   ),optional::weight
+                  real(        KK ),intent(in   ),optional::value
 
 
                   if(present(weight)) then
@@ -247,8 +247,8 @@
                   implicit none
 
 
-                  real(        KK ),intent(inout),optional::weight
-                  real(        KK ),intent(inout),optional::value
+                  real(        KK ),intent(in   ),optional::weight
+                  real(        KK ),intent(in   ),optional::value
                   type(average(KK))                       ::that
 
 
@@ -297,14 +297,14 @@
                   implicit none
 
 
-                  real(KK),dimension(               :               ),intent(inout)::weights
-                  real(KK),dimension(lbound(weights):ubound(weights)),intent(inout)::values
+                  real(KK),dimension(                     :                     ),intent(inout)::weights
+                  real(KK),dimension(lbound(weights,dim=1):ubound(weights,dim=1)),intent(inout)::values
 
                   type(average(KK))::weighted
 
 
-                  weighted%weight(sum(weights       )                 )
-                  weighted%value (sum(weights*values)/weight(weighted))
+                  call weighted%weight(sum(weights       )                 )
+                  call weighted%value (sum(weights*values)/weight(weighted))
 
 
         end function average_value_weight_K!values,weights
@@ -349,7 +349,7 @@
 
 
                type(average(KK)),intent(inout)::average0
-               real(        KK ),intent(inout)::   real1
+               real(        KK ),intent(in   )::   real1
 
 
                average0%m_weight=real1
@@ -364,8 +364,8 @@
                   implicit none
 
 
-                  real(        KK ),intent(inout)::   real1
-                  type(average(KK)),intent(inout)::average2
+                  real(        KK ),intent(in   )::   real1
+                  type(average(KK)),intent(in   )::average2
                   type(average(KK))              ::average_
 
 
@@ -382,8 +382,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  real(        KK ),intent(inout)::   real2
+                  type(average(KK)),intent(in   )::average1
+                  real(        KK ),intent(in   )::   real2
                   type(average(KK))              ::average_
 
 
@@ -400,8 +400,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  type(average(KK)),intent(inout)::average2
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
                   type(average(KK))              ::average_
 
 
@@ -429,7 +429,7 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average0
+                  type(average(KK)),intent(in   )::average0
                   type(average(KK))              ::average_
 
 
@@ -449,8 +449,8 @@
                   implicit none
 
 
-                  real(        KK ),intent(inout)::   real1
-                  type(average(KK)),intent(inout)::average2
+                  real(        KK ),intent(in   )::   real1
+                  type(average(KK)),intent(in   )::average2
                   type(average(KK))              ::average_
 
 
@@ -467,8 +467,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  real(        KK ),intent(inout)::   real2
+                  type(average(KK)),intent(in   )::average1
+                  real(        KK ),intent(in   )::   real2
                   type(average(KK))              ::average_
 
 
@@ -485,8 +485,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  type(average(KK)),intent(inout)::average2
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
                   type(average(KK))              ::average_
 
 
@@ -514,7 +514,7 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average0
+                  type(average(KK)),intent(in   )::average0
                   type(average(KK))              ::average_
 
 
@@ -558,8 +558,8 @@
                   implicit none
 
 
-                  real(        KK ),intent(inout)::   real1
-                  type(average(KK)),intent(inout)::average2
+                  real(        KK ),intent(in   )::   real1
+                  type(average(KK)),intent(in   )::average2
                   type(average(KK))              ::average_
 
 
@@ -579,8 +579,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  real(        KK ),intent(inout)::   real2
+                  type(average(KK)),intent(in   )::average1
+                  real(        KK ),intent(in   )::   real2
                   type(average(KK))              ::average_
 
 
@@ -600,8 +600,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  type(average(KK)),intent(inout)::average2
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
                   real(        KK )              ::   real_
 
 
@@ -618,8 +618,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  real(        KK ),intent(inout)::   real2
+                  type(average(KK)),intent(in   )::average1
+                  real(        KK ),intent(in   )::   real2
                   type(average(KK))              ::average_
 
 
@@ -639,8 +639,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  type(average(KK)),intent(inout)::average2
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
                   real(        KK )              ::   real_
 
 
@@ -673,8 +673,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::this
-                  real(        KK ),intent(inout)::weight
+                  type(average(KK)),intent(in   )::this
+                  real(        KK ),intent(in   )::weight
 
                   logical::is_equal_to
 
@@ -699,8 +699,8 @@
                   implicit none
 
 
-                  real(        KK ),intent(inout)::   real1
-                  type(average(KK)),intent(inout)::average2
+                  real(        KK ),intent(in   )::   real1
+                  type(average(KK)),intent(in   )::average2
 
                   logical::real_average_equal_to
 
@@ -717,8 +717,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  real(        KK ),intent(inout)::   real2
+                  type(average(KK)),intent(in   )::average1
+                  real(        KK ),intent(in   )::   real2
 
                   logical::average_real_equal_to
 
@@ -735,8 +735,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  type(average(KK)),intent(inout)::average2
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
 
                   logical::average_average_equal_to
 
@@ -761,8 +761,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::this
-                  real(        KK ),intent(inout)::weight
+                  type(average(KK)),intent(in   )::this
+                  real(        KK ),intent(in   )::weight
 
                   logical::is_less_than_or_equal_to
 
@@ -787,8 +787,8 @@
                   implicit none
 
 
-                  real(        KK ),intent(inout)::   real1
-                  type(average(KK)),intent(inout)::average2
+                  real(        KK ),intent(in   )::   real1
+                  type(average(KK)),intent(in   )::average2
 
                   logical::real_average_less_than_or_equal_to
 
@@ -805,8 +805,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  real(        KK ),intent(inout)::   real2
+                  type(average(KK)),intent(in   )::average1
+                  real(        KK ),intent(in   )::   real2
 
                   logical::average_real_less_than_or_equal_to
 
@@ -823,8 +823,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  type(average(KK)),intent(inout)::average2
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
 
                   logical::average_average_less_than_or_equal_to
 
@@ -849,8 +849,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::this
-                  real(        KK ),intent(inout)::weight
+                  type(average(KK)),intent(in   )::this
+                  real(        KK ),intent(in   )::weight
 
                   logical::is_less_than
 
@@ -875,8 +875,8 @@
                   implicit none
 
 
-                  real(        KK ),intent(inout)::   real1
-                  type(average(KK)),intent(inout)::average2
+                  real(        KK ),intent(in   )::   real1
+                  type(average(KK)),intent(in   )::average2
 
                   logical::real_average_less_than
 
@@ -893,8 +893,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  real(        KK ),intent(inout)::   real2
+                  type(average(KK)),intent(in   )::average1
+                  real(        KK ),intent(in   )::   real2
 
                   logical::average_real_less_than
 
@@ -911,8 +911,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  type(average(KK)),intent(inout)::average2
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
 
                   logical::average_average_less_than
 
@@ -937,8 +937,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::this
-                  real(        KK ),intent(inout)::weight
+                  type(average(KK)),intent(in   )::this
+                  real(        KK ),intent(in   )::weight
 
                   logical::is_not_equal_to
 
@@ -963,8 +963,8 @@
                   implicit none
 
 
-                  real(        KK ),intent(inout)::   real1
-                  type(average(KK)),intent(inout)::average2
+                  real(        KK ),intent(in   )::   real1
+                  type(average(KK)),intent(in   )::average2
 
                   logical::real_average_not_equal_to
 
@@ -981,8 +981,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  real(        KK ),intent(inout)::   real2
+                  type(average(KK)),intent(in   )::average1
+                  real(        KK ),intent(in   )::   real2
 
                   logical::average_real_not_equal_to
 
@@ -999,8 +999,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  type(average(KK)),intent(inout)::average2
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
 
                   logical::average_average_not_equal_to
 
@@ -1025,8 +1025,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::this
-                  real(        KK ),intent(inout)::weight
+                  type(average(KK)),intent(in   )::this
+                  real(        KK ),intent(in   )::weight
 
                   logical::is_greater_than_or_equal_to
 
@@ -1051,8 +1051,8 @@
                   implicit none
 
 
-                  real(        KK ),intent(inout)::   real1
-                  type(average(KK)),intent(inout)::average2
+                  real(        KK ),intent(in   )::   real1
+                  type(average(KK)),intent(in   )::average2
 
                   logical::real_average_greater_than_or_equal_to
 
@@ -1069,8 +1069,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  real(        KK ),intent(inout)::   real2
+                  type(average(KK)),intent(in   )::average1
+                  real(        KK ),intent(in   )::   real2
 
                   logical::average_real_greater_than_or_equal_to
 
@@ -1087,8 +1087,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  type(average(KK)),intent(inout)::average2
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
 
                   logical::average_average_greater_than_or_equal_to
 
@@ -1113,8 +1113,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::this
-                  real(        KK ),intent(inout)::weight
+                  type(average(KK)),intent(in   )::this
+                  real(        KK ),intent(in   )::weight
 
                   logical::is_greater_than
 
@@ -1139,8 +1139,8 @@
                   implicit none
 
 
-                  real(        KK ),intent(inout)::   real1
-                  type(average(KK)),intent(inout)::average2
+                  real(        KK ),intent(in   )::   real1
+                  type(average(KK)),intent(in   )::average2
 
                   logical::real_average_greater_than
 
@@ -1157,8 +1157,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  real(        KK ),intent(inout)::   real2
+                  type(average(KK)),intent(in   )::average1
+                  real(        KK ),intent(in   )::   real2
 
                   logical::average_real_greater_than
 
@@ -1175,8 +1175,8 @@
                   implicit none
 
 
-                  type(average(KK)),intent(inout)::average1
-                  type(average(KK)),intent(inout)::average2
+                  type(average(KK)),intent(in   )::average1
+                  type(average(KK)),intent(in   )::average2
 
                   logical::average_average_greater_than
 
@@ -1195,38 +1195,62 @@
         end function average_average_greater_than_K!average1,average2
 
 
-            subroutine  read_average_K(unit,this)
+            subroutine  read_average_K(unit,this,iostat)
 
 
                   implicit none
 
 
-                  integer          ,intent(inout)::unit
-                  type(average(KK)),intent(inout)::this
+                  integer          ,intent(inout)         ::unit
+                  type(average(KK)),intent(inout)         ::this
+                  integer          ,intent(  out),optional::iostat
 
 
-                   read(unit,format_average_K,advance="no") this%m_weight
-                   read(unit,format_average_K,advance="no") this%m_value
+                  if(present(iostat)) then
+
+                      read(unit,format_average_K,advance="no",iostat=iostat,end=116) this%m_weight
+                      read(unit,format_average_K,advance="no",iostat=iostat,end=116) this%m_value
+
+              116    return
+
+                  else
+
+                      read(unit,format_average_K,advance="no") this%m_weight
+                      read(unit,format_average_K,advance="no") this%m_value
+
+              end if!present(iostat)
 
 
-        end subroutine  read_average_K!unit,this
+        end subroutine  read_average_K!unit,this,iostat
 
 
-            subroutine write_average_K(unit,this)
+            subroutine write_average_K(unit,this,iostat)
 
 
                   implicit none
 
 
-                  integer          ,intent(inout)::unit
-                  type(average(KK)),intent(inout)::this
+                  integer          ,intent(inout)         ::unit
+                  type(average(KK)),intent(in   )         ::this
+                  integer          ,intent(  out),optional::iostat
 
 
-                  write(unit,format_average_K,advance="no") this%m_weight
-                  write(unit,format_average_K,advance="no") this%m_value
+                  if(present(iostat)) then
+
+                     write(unit,format_average_K,advance="no",iostat=iostat,end=117) this%m_weight
+                     write(unit,format_average_K,advance="no",iostat=iostat,end=117) this%m_value
+
+              117    return
+
+                  else
+
+                     write(unit,format_average_K,advance="no") this%m_weight
+                     write(unit,format_average_K,advance="no") this%m_value
+
+              end if!present(iostat)
 
 
-        end subroutine write_average_K!unit,this
+        end subroutine write_average_K!unit,this,iostat
 
 
   end module average_type

@@ -13,14 +13,13 @@
 !     You may need the option "-mcmodel=medium" if the stored arrays are too large, which conflicts with the "-fast" option.
 !     Later when the optimized version using commutators is fixed, it will not be necessary, as the fermion matrix is bypassed.
 
-#     include "../main/mathematical_constants.F90"
-
 #     include "../system/getopts.F90"
 #     include "../system/signals.F90"
 #     include "../system/text_format.F90"
 #     include "../system/precision.F90"
 #     include "../system/version.F90"
 
+!     include "../tensor/mathematical_constants.F90"
 !     include "../tensor/tensor.F90"
 
 !     include "../monte_carlo/random_number_generator.F90"
@@ -46,7 +45,7 @@
 !     include "../ikkt/fields.F90"
 !     include "../ikkt/gauge_cooling.F90"
 #     include "../ikkt/complex_langevin.F90"
-!     include "../ikkt/observables.F90"
+#     include "../ikkt/observables.F90"
 
 !     define BLAS
 !     define OPTIMAL
@@ -82,7 +81,7 @@
 !           use::fields
             use::complex_langevin
             use::gauge_cooling
-!           use::observables
+            use::observables
 
 
             implicit none
@@ -322,11 +321,9 @@
 
               end select!case(status)
 
-                  base_file_name=trim(adjustl(option_argument))
-
                   call execute_command_line("mkdir --parents -- "//trim(data_path_name))
 
-                  base_file_name=trim(data_path_name)//base_file_name
+                  base_file_name=trim(data_path_name)//trim(adjustl(option_argument))
 
                   call date_and_time(values=time_stamp)
 
@@ -337,11 +334,11 @@
                                                      //":"//trim(time_stamp(6))&
                                                      //":"//trim(time_stamp(7))
 
-                  seed_file_name=base_file_name//".seed";!write(*,"(a)") seed_file_name
-                  time_file_name=base_file_name//".time";!write(*,"(a)") time_file_name
-                  conf_file_name=base_file_name//".conf";!write(*,"(a)") conf_file_name
-                  meas_file_name=base_file_name//".meas";!write(*,"(a)") meas_file_name
-                  save_file_name=base_file_name//".save";!write(*,"(a)") meas_file_name
+                  seed_file_name=trim(base_file_name)//".seed"!; write(*,"(a)") seed_file_name
+                  time_file_name=trim(base_file_name)//".time"!; write(*,"(a)") time_file_name
+                  conf_file_name=trim(base_file_name)//".conf"!; write(*,"(a)") conf_file_name
+                  meas_file_name=trim(base_file_name)//".meas"!; write(*,"(a)") meas_file_name
+                  save_file_name=trim(base_file_name)//".save"!; write(*,"(a)") meas_file_name
 
 
         end subroutine read_options_and_arguments!

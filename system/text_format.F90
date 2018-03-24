@@ -47,32 +47,35 @@
       contains
 
 
-            subroutine write_tag(unit,text_width,text)
+            subroutine write_tag(unit,text)
 
 
                   implicit none
 
 
                   integer     ,intent(inout)::unit
-                  integer     ,intent(inout)::text_width
-                  character(*),intent(inout)::text
+                  character(*),intent(in   )::text
+
+                  integer::text_width
 
 
-                  write(unit,"(a<text_width>,x)",advance="no") text
+                  text_width=len(trim(text))
+
+                  write(unit,"(a<text_width>)",advance="no") text
 
 
-        end subroutine write_tag!unit,text_width,text
+        end subroutine write_tag!unit,text
 
 
-            subroutine write_par(unit,text_width,text_width,text)
+            subroutine write_par(unit,text_width,text)
 
 
                   implicit none
 
 
                   integer     ,intent(inout)::unit
-                  integer     ,intent(inout)::text_width
-                  character(*),intent(inout)::text
+                  integer     ,intent(in   )::text_width
+                  character(*),intent(in   )::text
 
                   integer::c0
                   integer::c1

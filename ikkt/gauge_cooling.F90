@@ -28,8 +28,8 @@
             character(*),parameter,private::           format_minimization=INTEGERG2
             character(*),parameter,private::text_field_format_minimization=INTEGERA2
 
-            character(*),parameter,private::           format_gauge_cooling_K=COMPLEXGK
-            character(*),parameter,private::text_field_format_gauge_cooling_K=COMPLEXAK
+            character(*),parameter,private::           format_gauge_cooling_K=REALGK
+            character(*),parameter,private::text_field_format_gauge_cooling_K=REALAK
 
             real(KK),parameter,private::cooling_tolerance=TOLERANCEK
 
@@ -37,6 +37,7 @@
             real(KK),private::mid_alpha=TOLERANCEK*10
             real(KK),private::max_alpha=TOLERANCEK*100
 
+            integer ,private::iterations
             real(KK),private::alpha_min
 
             logical,public::gauge_cooling_active=.false.
@@ -53,7 +54,7 @@
 
             public::apply_cooling
 
-            public::print_guided_hermiticity_norm
+!           public::print_guided_hermiticity_norm
             public::print_gauge_cooling
 
 
@@ -98,7 +99,7 @@
                   implicit none
 
 
-                  real(KK),intent(inout)::alpha
+                  real(KK),intent(in   )::alpha
 
                   complex(KK),dimension(0:inner_degrees_of_freedom-1,&
                                         0:inner_degrees_of_freedom-1)::h_diagonalized
@@ -140,7 +141,7 @@
                   implicit none
 
 
-                  real(KK),intent(inout)::alpha
+                  real(KK),intent(in   )::alpha
 
                   real(KK)::guided_hermiticity_norm
 
@@ -188,7 +189,7 @@
 
                   real(KK)::min_hermiticity_norm
 
-                  integer::mu
+                  integer::mu!,unit
 
 
                   call make_cooler()
@@ -200,9 +201,13 @@
                                              mid_alpha,&
                                              max_alpha,guided_hermiticity_norm,cooling_tolerance,alpha_min,iterations)
 
-                   open(newunit=mu,file="hermiticity.norm.minimum")
-                  write(        mu,                 format_gauge_cooling_K) alpha_min,min_hermiticity_norm
-                  close(        mu)
+!                  open(newunit=unit,file="hermiticity.norm.minimum")
+
+!                 write(unit,format_gauge_cooling_K,advance="no") alpha_min
+!                 write(unit,format_gauge_cooling_K,advance="no") min_hermiticity_norm
+!                 write(unit,                     *             )
+
+!                 close(        unit                                )
 
                   do mu=0,boson_degrees_of_freedom-1,+1
 
@@ -214,53 +219,55 @@
         end subroutine apply_cooling!
 
 
-            subroutine print_guided_hermiticity_norm(step_100)
+!           subroutine print_guided_hermiticity_norm(step_100)
+
+
+!                 implicit none
+
+
+!                 integer,intent(in   )::step_100
+
+!                 integer::unit,i,steps
+
+!                 real(KK)::step
+
+!                 steps=(nint(max_alpha/min_alpha)+1)*step_100;step=min_alpha/step_100
+
+!                  open(newunit=unit,file="hermiticity.norm")
+
+!                 do i=0,steps-1,+1
+
+!                    write(unit,format_gauge_cooling_K,advance="no") step*i
+!                    write(unit,format_gauge_cooling_K,advance="no") guided_hermiticity_norm(step*i)
+!                    write(unit,                     *             )
+
+!             end do!i=0,steps-1,+1
+
+!                 write(unit,format_gauge_cooling_K,advance="no") step*i
+!                 write(unit,format_gauge_cooling_K,advance="no") guided_hermiticity_norm(max_alpha)
+!                 write(unit,                     *             )
+
+!                 close(        unit                        )
+
+
+!       end subroutine print_guided_hermiticity_norm!step_100
+
+
+            subroutine print_gauge_cooling(unit)
 
 
                   implicit none
 
 
-                  integer,intent(inout)::step_100
+                  integer,intent(inout)::unit
 
-                  integer::unit,i,steps
-
-                  real(KK)::step
-
-                  steps=(nint(max_alpha/min_alpha)+1)*step_100;step=min_alpha/step_100
-
-                   open(newunit=unit,file="hermiticity.norm")
-
-                  do i=0,steps-1,+1
-
-                     write(unit,format_gauge_cooling_K) step*i,guided_hermiticity_norm(step*i)
-
-              end do!i=0,steps-1,+1
-
-                  write(unit,format_gauge_cooling_K) step*i,guided_hermiticity_norm(max_alpha)
-
-                  close(        unit                        )
-
-
-        end subroutine print_guided_hermiticity_norm!step_100
-
-
-            subroutine print_gauge_cooling(unit,tag)
-
-
-                  implicit none
-
-
-                  integer     ,intent(inout)::unit
-                  character(*),intent(inout)::tag
-
-
-                  call write(unit,size(tag),tag)
 
                   write(unit,format_minimization   ,advance="no") iterations
-                  write(unit,format_gauge_cooling_K,advance="no") alpha_min,hermiticity_norm()
+                  write(unit,format_gauge_cooling_K,advance="no") alpha_min
+                  write(unit,format_gauge_cooling_K,advance="no") hermiticity_norm()
 
 
-        end subroutine pring_gauge_cooling!unit,tag
+        end subroutine print_gauge_cooling!unit
 
 
             subroutine eject_gauge_cooler()

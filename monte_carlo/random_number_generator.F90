@@ -2,9 +2,13 @@
 #     define RANDOM_NUMBER_GENERATOR_F90
 
 #     include "../system/precision.F90"
+#     include "../system/text_format.F90"
 
 
       module random_number_generator
+
+
+            use::text_formatting
 
 
             implicit none
@@ -23,6 +27,10 @@
             public::save_seed
 
             private::prepare_seed
+
+            public:: read_seed
+            public::write_seed
+            public::print_seed
 
 
       contains
@@ -46,32 +54,36 @@
                   implicit none
 
 
+                  character(*),intent(in   )::file_name
+
                   integer::unit
 
 
                   call prepare_seed()
                   call random_seed(put=seed)
 
-                   open(newunit=unit,file=seed_file_name)
+                   open(newunit=unit,file=trim(file_name))
 
                    read(unit,          *)
                    read(unit,          *)
                    read(unit,          *)
                    read(unit,format_seed) seed
 
-                  close(        unit                    )
+                  close(        unit                     )
 
                   if(allocated(seed)) deallocate(seed)
 
 
-        end subroutine load_seed!
+        end subroutine load_seed!file_name
 
 
-            subroutine save_seed()
+            subroutine save_seed(file_name)
 
 
                   implicit none
 
+
+                  character(*),intent(in   )::file_name
 
                   integer::unit
 
@@ -79,7 +91,7 @@
                   call prepare_seed()
                   call random_seed(get=seed)
 
-                   open(newunit=unit,file=seed_file_name)
+                   open(newunit=unit,file=trim(file_name))
 
                   write(unit,          *) "LAST RANDOM NUMBER GENERATOR SEED"
                   write(unit,          *) "___________","___________","___________","___________","___________","___________",&
@@ -87,12 +99,12 @@
                   write(unit,          *)
                   write(unit,format_seed) seed
 
-                  close(        unit                    )
+                  close(        unit                     )
 
                   if(allocated(seed)) deallocate(seed)
 
 
-        end subroutine save_seed!
+        end subroutine save_seed!file_name
 
 
             subroutine prepare_seed()
@@ -119,6 +131,73 @@
 
 
         end subroutine prepare_seed!
+
+
+            subroutine  read_seed(unit,iostat)
+
+
+                  implicit none
+
+
+                  integer,intent(inout)::unit
+
+                  integer::index
+
+
+                  if(allocated(seed)) then
+
+                     do index=1,size(seed),+1
+
+                         read(unit,format_seed,advance="no") seed(index)
+
+              end    do!index=1,size(seed),+1
+
+              end if!allocated(seed)
+
+
+        end subroutine  read_seed!unit,iostat
+
+
+            subroutine write_seed(unit,iostat)
+
+
+                  implicit none
+
+
+                  integer,intent(inout)::unit
+
+                  integer::index
+
+
+                  if(allocated(seed)) then
+
+                     do index=1,size(seed),+1
+
+                        write(unit,format_seed,advance="no") seed(index)
+
+              end    do!index=1,size(seed),+1
+
+              end if!allocated(seed)
+
+
+        end subroutine write_seed!unit,iostat
+
+
+            subroutine print_seed(unit,tag)
+
+
+                  implicit none
+
+
+                  integer        ,intent(inout)         ::unit
+                  character(*   ),intent(in   ),optional::tag
+
+
+                  if(present(tag)) call write     (unit,tag )
+                                   call write_seed(unit)
+
+
+        end subroutine print_seed!unit,tag
 
 
   end module random_number_generator

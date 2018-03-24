@@ -227,13 +227,13 @@
    (( period = ${#life_time[@]} \
              * ${#time_skip[@]} \
              * ${#time_step[@]} * ${#inner_degrees_of_freedom[@]} \
-                                   * ${#boson_degrees_of_freedom[@]} ))
+                                * ${#boson_degrees_of_freedom[@]} ))
 
 
       if   [[ "${switch}" =~ "--mass-deformations" ]]
       then
 
-         declare -a boson_epsilon ; printf "\033[0mboson_epsilon: \033[33m" ; read -a boson_epsilon
+         declare -a boson_mass_factor ; printf "\033[0mboson_mass_factor: \033[33m" ; read -a boson_mass_factor
 
          echo -e "\033[0m"
 
@@ -241,7 +241,7 @@
 
          echo -e "\033[0m"
 
-      (( period *= ${#boson_epsilon[@]} ))
+      (( period *= ${#boson_mass_factor[@]} ))
 
          if   [[ "${switch}" =~ "--fermions-included" ]]
          then
@@ -283,10 +283,10 @@
                      if   [[ "${switch}" =~ "--mass-deformations" ]]
                      then
 
-                        for    b_mass in ${boson_epsilon[@]}
+                        for    b_mass in ${boson_mass_factor[@]}
                         do
 
-                           printf "% 15.8e boson_epsilon" ${b_mass} >> "${input}"
+                           printf "% 15.8e boson_mass_factor" ${b_mass} >> "${input}"
 
                            for    mu in ${!boson_degrees_of_freedom[@]}
                            do
@@ -321,7 +321,7 @@
 
                            fi # [[ "${switch}" =~ "--fermions-included" ]]
 
-                        done # b_mass in ${boson_epsilon[@]}
+                        done # b_mass in ${boson_mass_factor[@]}
 
                      else
 

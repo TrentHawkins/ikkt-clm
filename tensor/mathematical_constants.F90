@@ -16,6 +16,10 @@
                                                    +.00000e+0_KK)
             complex(KK),parameter,public::im_unit=(+.00000e+0_KK,&
                                                    +.10000e+1_KK)
+            complex(KK),parameter,public::re_half=(+.50000e+0_KK,&
+                                                   +.00000e+0_KK)
+            complex(KK),parameter,public::im_half=(+.00000e+0_KK,&
+                                                   +.50000e+0_KK)
 
             real(KK),parameter,public::pi    =acos(-.10000e+1_KK)
 
