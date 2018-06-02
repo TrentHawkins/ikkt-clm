@@ -1,5 +1,5 @@
-#     ifndef SIGNALS_F90
-#     define SIGNALS_F90
+#     ifndef SYSTEM_SIGNALS_F90
+#     define SYSTEM_SIGNALS_F90
 
 !            SIGHUP     Term    Hangup detected on controlling terminal or death of controlling process
 !            SIGINT     Term    Interrupt from keyboard

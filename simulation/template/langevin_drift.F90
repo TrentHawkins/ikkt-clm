@@ -1,35 +1,34 @@
-#     ifndef COMPLEX_LANGEVIN_F90
-#     define COMPLEX_LANGEVIN_F90
+#     ifndef SIMULATION_TEMPLATE_LANGEVIN_DRIFT_F90
+#     define SIMULATION_TEMPLATE_LANGEVIN_DRIFT_F90
 
-#     include "../system/precision.F90"
+#     include "system/precision.F90"
 
-#     include "../tensor/tensor.F90"
+#     include "tools/tensor/tensor.F90"
 
-#     include "../monte_carlo/monte_carlo.F90"
-
-#     include "../ikkt/constants.F90"
-#     include "../ikkt/fields.F90"
+#     include "simulation/constants.F90"
+#     include "simulation/fields.F90"
 
 #     ifndef OPTIMAL
 
-#     include "../tools/conjugate_gradient.F90"
+#     include "tools/conjugate_gradient.F90"
 
 #     else
 
-#     include "../ikkt/optimal_toolset.F90"
-#     include "../ikkt/conjugate_gradient.F90"
+#     include "simulation/ikkt/optimal_toolset.F90"
+#     include "simulation/conjugate_gradient.F90"
 
 #  endif
 
-#     include "../ikkt/gauge_cooling.F90"
+!     Find & Replace (NOT case-sensitive) "template_" with the name of your own drift term. For example: "boson_", "mass_", e.t.c.
+!     Include your own libraries here. Do not forget the relevant USE statements for any modules that reside in said libraries.
+
+#
 
 
-      module complex_langevin
+      module template_langevin_drift
 
 
             use::tensor_type
-
-            use::monte_carlo
 
             use::conjugate_gradient_method
 
@@ -50,90 +49,15 @@
 
             complex(KK),dimension( :                          ,&
                                    :                          ,&
-                                   :                          ),allocatable,public::drift
-            complex(KK),dimension( :                          ,&
-                                   :                          ,&
-                                   :                          ),allocatable,public::noise
+                                   :                          ),allocatable,public::drift_template
 
-            public::boot_langevin
-            public::langevin_step
-            public::wrap_langevin
+            public::make_drift_template
+            public::norm_drift_template
 
-            public::make_drift
-            public::make_noise
-            public::drift_norm
-
-            private::read_field_parameters
+            private::read_field_template_parameters
 
 
       contains
-
-
-            subroutine boot_langevin()
-
-
-                  implicit none
-
-
-                  if(configuration_loaded) then
-
-                     call load_monte_carlo()
-                     call load_fields()
-
-                  else
-
-                     call make_monte_carlo()
-                     call make_fields()
-
-              end if!configuration_loaded
-
-                  call make_constants(inner_degrees_of_freedom,&
-                                      boson_degrees_of_freedom)
-
-                  if(allocated(drift)) deallocate(drift)
-                                         allocate(drift(0:inner_degrees_of_freedom-1,&
-                                                        0:inner_degrees_of_freedom-1,&
-                                                        0:boson_degrees_of_freedom-1))
-                  if(allocated(noise)) deallocate(noise)
-                                         allocate(noise(0:inner_degrees_of_freedom-1,&
-                                                        0:inner_degrees_of_freedom-1,&
-                                                        0:boson_degrees_of_freedom-1))
-
-
-        end subroutine boot_langevin!
-
-
-            subroutine langevin_step()
-
-
-                  implicit none
-
-
-                  call make_drift()
-                  call make_noise()
-
-                  a&
-                 =a+drift*     time(step) &
-                   +noise*sqrt(time(step))
-
-                  if(gauge_cooling_active) call apply_cooling()
-                  if(timestep_is_adaptive) call agnostically_adapt_time_step(drift_norm())
-
-
-        end subroutine langevin_step!
-
-
-            subroutine wrap_langevin()
-
-
-                  implicit none
-
-
-                  call save_monte_carlo()
-                  call save_fields()
-
-
-        end subroutine wrap_langevin!
 
 
             subroutine make_drift()
@@ -183,7 +107,7 @@
 
                               drift(i,j,mu)&
                              =drift(i,j,mu)&
-                             +determinant_degree(boson_degrees_of_freedom)*(fermi_noise(.10000e+1_KK).c.ma(:,:,i,j,mu).o.f(:))
+                             +determinant_factor(boson_degrees_of_freedom)*(fermi_noise(.10000e+1_KK).c.ma(:,:,i,j,mu).o.f(:))
 
               end          do!i=0,inner_degrees_of_freedom-1,+1
 
@@ -196,7 +120,7 @@
                      call conjugate_gradient(a,cmv(a,fermi_noise(.10000e+1_KK)),f)
 
                      drift&
-                    =drift-determinant_degree(boson_degrees_of_freedom)*umav(fermi_noise(.10000e+1_KK),f)
+                    =drift-determinant_factor(boson_degrees_of_freedom)*umav(fermi_noise(.10000e+1_KK),f)
 
 #              endif
 
@@ -211,68 +135,6 @@
 
 
         end subroutine make_drift!
-
-
-            subroutine make_noise()
-
-
-                  implicit none
-
-
-                  integer::mu
-
-
-                  noise=boson_noise(.20000e+1_KK)
-
-
-        end subroutine make_noise!
-
-
-            function drift_norm()
-
-
-                  implicit none
-
-
-                  real(KK)::drift_norm
-
-                  integer::mu
-
-
-                  drift_norm=+.00000e+0_KK
-
-                  do mu=1,boson_degrees_of_freedom-1,+1
-
-                     drift_norm&
-                    =drift_norm+norm(drift(:,:,mu))
-
-              end do!mu= ,boson_degrees_of_freedom-1,+1
-
-                       drift_norm&
-                 =sqrt(drift_norm/a_size)
-
-
-        end function drift_norm!
-
-
-            subroutine print_observables(unit)
-
-
-                  implicit none
-
-
-                  integer,intent(inout)::unit
-
-                  integer::mu
-
-
-                  call print_time(unit,life,"DT"); call print_time              (unit,step); write(unit,*)
-                  call print_time(unit,life,"CG"); call print_conjugate_gradient(unit     ); write(unit,*)
-                  call print_time(unit,life,"GC"); call print_gauge_cooling     (unit     ); write(unit,*)
-                                                                                             write(unit,*)
-
-
-        end subroutine print_observables!unit
 
 
             subroutine  read_field_parameters()
@@ -414,23 +276,7 @@
         end subroutine  read_field_parameters!
 
 
-            subroutine eject_complex_langevin()
-
-
-                  implicit none
-
-
-                  call eject_gauge_cooler()
-                  call eject_constants()
-
-                  if(allocated(drift)) deallocate(drift)
-                  if(allocated(noise)) deallocate(noise)
-
-
-        end subroutine eject_complex_langevin
-
-
-  end module complex_langevin
+  end module drift_langevin_template
 
 
 #  endif

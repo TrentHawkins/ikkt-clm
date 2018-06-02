@@ -1,5 +1,5 @@
-#     ifndef   INSERT_SORT_F90
-#     define   INSERT_SORT_F90
+#     ifndef   TOOLS_INSERT_SORT_F90
+#     define   TOOLS_INSERT_SORT_F90
 
 #     include "../system/precision.F90"
 
@@ -13,53 +13,40 @@
       contains
 
 
-            subroutine sort_one(list,n)
+            recursive subroutine sort(list,n,mask)
 
 
                   implicit none
 
 
-                  real(KK),dimension(:),intent(inout)::list
-                  real(KK)                           ::temp
+                  complex(KK),dimension(0: ),intent(inout)::list
+                  complex(KK)                             ::temp
+                  real   (KK)                             ::mask; external mask
 
-                  integer,intent(in)::n
-                  integer           ::i
+                  integer,optional::n
+                  integer         ::i
 
+
+                  if(n>size(list).or..not.present(n)) &
+                     n=size(list)
 
                   temp=list(n);i=n-1
 
-                  do while((i.ge.0).and.(list(i).gt.temp))
+                  if(n>0) then
 
-                     list(i+1)=list(i);i=i-1
+                     call sort(list,n-1,mask)
 
-              end do!while((i.ge.0).and.(list(i).gt.temp))
+                     do while((i.ge.0).and.(mask(list(i)).gt.mask(temp)))
+
+                        list(i+1)=list(i);i=i-1
+
+              end    do!while((i.ge.0).and.(mask(list(i)).gt.mask(temp)))
 
                   list(i+1)=temp
 
+              end if!n>0
 
-        end subroutine sort_one!list,n
-
-
-            subroutine sort(list)
-
-
-                  implicit none
-
-
-                  real(KK),dimension(:),intent(inout)::list
-                  real(KK)                           ::temp
-
-                  integer::n
-
-
-                  do n=lbound(list,dim=1),ubound(list,dim=1),+1
-
-                     call sort_one(list,n)
-
-              end do!n=lbound(list,dim=1),ubound(list,dim=1),+1
-
-
-        end subroutine sort!list
+        end           subroutine sort!list,n,mask
 
 
             recursive function sort_sum(list) result(list_sum)
@@ -80,7 +67,7 @@
                   else
 
                      temp_sum=sort_sum(list(lbound(list,dim=1):ubound(list,dim=1)-1))
-                     list_sum=temp_sum+(list(ubound(list,dim=1))-temp_sum)/real(size(list),kind=KK)
+                     list_sum=        (list(ubound(list,dim=1))-temp_sum)/real(size(list),kind=KK)
 
               end if!size(list)==1
 

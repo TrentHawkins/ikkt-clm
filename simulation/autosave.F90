@@ -1,12 +1,12 @@
-#     ifndef AUTOSAVE_F90
-#     define AUTOSAVE_F90
+#     ifndef SIMULATION_AUTOSAVE_F90
+#     define SIMULATION_AUTOSAVE_F90
 
 #     include "../system/precision.F90"
 #     include "../system/text_format.F90"
 
 #     include "../monte_carlo/monte_carlo.F90"
 
-#     include "../ikkt/fields.F90"
+#     include "../simulation/fields.F90"
 
 
       module autosaving

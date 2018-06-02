@@ -1,11 +1,11 @@
-#     ifndef OPTIMAL_TOOLSET_F90
-#     define OPTIMAL_TOOLSET_F90
+#     ifndef SIMULATION_OPTIMAL_TOOLSET_F90
+#     define SIMULATION_OPTIMAL_TOOLSET_F90
 
-#     include "../system/precision.F90"
+#     include "system/precision.F90"
 
-#     include "../tensor/tensor.F90"
+#     include "tools/tensor/tensor.F90"
 
-#     include "../ikkt/fields.F90"
+#     include "simulation/fields.F90"
 
 
       module optimal_toolset

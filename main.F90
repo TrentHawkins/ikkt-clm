@@ -13,39 +13,40 @@
 !     You may need the option "-mcmodel=medium" if the stored arrays are too large, which conflicts with the "-fast" option.
 !     Later when the optimized version using commutators is fixed, it will not be necessary, as the fermion matrix is bypassed.
 
-#     include "../system/getopts.F90"
-#     include "../system/signals.F90"
-#     include "../system/text_format.F90"
-#     include "../system/precision.F90"
-#     include "../system/version.F90"
+#     include "system/getopts.F90"
+#     include "system/signals.F90"
+#     include "system/text_format.F90"
+#     include "system/precision.F90"
+#     include "system/version.F90"
 
-!     include "../tensor/mathematical_constants.F90"
-!     include "../tensor/tensor.F90"
+!     include "tools/constants.F90"
+!     include "tools/insert_sort.F90"
+!     include "tools/brent_minimization.F90"
+!     include "tools/tensor/tensor.F90"
+!     include "tools/tensor.operations.F90"
+!     include "tools/tensor.procedures.F90"
 
-!     include "../monte_carlo/random_number_generator.F90"
-!     include "../monte_carlo/average.F90"
-!     include "../monte_carlo/time.F90"
-#     include "../monte_carlo/monte_carlo.F90"
-
-!     include "../tools/insert_sort.F90"
-!     include "../tools/brent_minimization.F90"
+!     include "monte_carlo/random_number_generator.F90"
+!     include "monte_carlo/average/average.F90"
+!     include "monte_carlo/average.operations.F90"
+#     include "monte_carlo/monte_carlo.F90"
 
 #     ifdef OPTIMAL
 
-!     include "../ikkt/conjugate_gradient.F90"
-!     include "../ikkt/optimal_toolset.F90"
+!     include "simulation/conjugate_gradient.F90"
+!     include "simulation/ikkt/optimal_toolset.F90"
 
 #     else
 
-!     include "../tools/conjugate_gradient.F90"
+!     include "tools/conjugate_gradient.F90"
 
 #  endif
 
-!     include "../ikkt/constants.F90"
-!     include "../ikkt/fields.F90"
-!     include "../ikkt/gauge_cooling.F90"
-#     include "../ikkt/complex_langevin.F90"
-#     include "../ikkt/observables.F90"
+!     include "simulation/constants.F90"
+!     include "simulation/fields.F90"
+!     include "simulation/gauge_cooling.F90"
+#     include "simulation/complex_langevin.F90"
+#     include "simulation/observables.F90"
 
 !     define BLAS
 !     define OPTIMAL

@@ -1,22 +1,22 @@
 #     ifndef OBSERVABLES_F90
 #     define OBSERVABLES_F90
 
-#     include "../system/precision.F90"
+#     include "system/precision.F90"
 
-#     include "../tensor/mathematical_constants.F90"
-#     include "../tensor/tensor.F90"
+#     include "tools/constants.F90"
+#     include "tools/tensor/tensor.F90"
 
-#     include "../monte_carlo/time.F90"
+#     include "monte_carlo/time.F90"
 
-#     include "../ikkt/fields.F90"
+#     include "simulation/fields.F90"
 
 #     ifdef OPTIMAL
 
-#     include "../ikkt/optimal_toolset.F90"
+#     include "simulation/ikkt/optimal_toolset.F90"
 
 #  endif
 
-#     include "../ikkt/complex_langevin.F90"
+#     include "simulation/complex_langevin.F90"
 
 
       module observables
@@ -153,7 +153,7 @@
 !                 complex(KK)::fermi_action
 
 
-!                 fermi_action=determinant_degree(boson_degrees_of_freedom)*sum(log(m_eigenvalues_))
+!                 fermi_action=determinant_factor(boson_degrees_of_freedom)*sum(log(m_eigenvalues_))
 
 
 !       end function fermi_action!

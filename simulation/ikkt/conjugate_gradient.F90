@@ -1,13 +1,13 @@
-#     ifndef CONJUGATE_GRADIENT_F90
-#     define CONJUGATE_GRADIENT_F90
+#     ifndef SIMULATION_IKKT_CONJUGATE_GRADIENT_F90
+#     define SIMULATION_IKKT_CONJUGATE_GRADIENT_F90
 
-#     include "../system/precision.F90"
-#     include "../system/text_format.F90"
+#     include "system/precision.F90"
+#     include "system/text_format.F90"
 
-#     include "../tensor/tensor.F90"
+#     include "tools/tensor/tensor.F90"
 
-#     include "../ikkt/fields.F90"
-#     include "../ikkt/optimal_toolset.F90"
+#     include "simulation/ikkt/fields.F90"
+#     include "simulation/ikkt/optimal_toolset.F90"
 
 
       module conjugate_gradient_method

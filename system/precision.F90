@@ -1,5 +1,5 @@
-#     ifndef PRECISION_F90
-#     define PRECISION_F90
+#     ifndef SYSTEM_PRECISION_F90
+#     define SYSTEM_PRECISION_F90
 
 #     define CHAR 1023
 
@@ -51,6 +51,18 @@
 #     define  COMPLEXA3                   "(   2(x,a24     ))"
 #     define  COMPLEXA4                   "(   2(x,a44     ))"
 
+!     define  GENERICG0                   "(sp,*(x,e08.04e0))"
+#     define  GENERICG1                   "(sp,*(x,e10.05e1))"
+#     define  GENERICG2                   "(sp,*(x,e15.09e2))"
+#     define  GENERICG3                   "(sp,*(x,e24.17e3))"
+#     define  GENERICG4                   "(sp,*(x,e44.36e4))"
+
+!     define  GENERICA0                   "(   *(x,a08     ))"
+#     define  GENERICA1                   "(   *(x,a10     ))"
+#     define  GENERICA2                   "(   *(x,a15     ))"
+#     define  GENERICA3                   "(   *(x,a24     ))"
+#     define  GENERICA4                   "(   *(x,a44     ))"
+
 !     define TOLERANCE0     .10000e-4
 #     define TOLERANCE1     .10000e-1
 #     define TOLERANCE2     .10000e-1
@@ -68,6 +80,9 @@
 
 #     define  COMPLEXGK  COMPLEXG3
 #     define  COMPLEXAK  COMPLEXA3
+
+#     define  GENERICGK  GENERICG3
+#     define  GENERICAK  GENERICA3
 
 #     define TOLERANCEK TOLERANCE3
 

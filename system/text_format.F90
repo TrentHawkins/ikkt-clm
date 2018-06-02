@@ -1,5 +1,5 @@
-#     ifndef TEXT_FORMAT_F90
-#     define TEXT_FORMAT_F90
+#     ifndef SYSTEM_TEXT_FORMAT_F90
+#     define SYSTEM_TEXT_FORMAT_F90
 
 
       module text_formatting

@@ -32,7 +32,7 @@ The compiled program takes 1 argument has 7 options:
 The argument is a file base name for use in the various output files.
 
 The program for now queries the total time, average time-step, and average skip-time for measurements. The rest of the constant
-parameters can be found in "./ikkt/fields.F90". They will be moved from there later, compile time constants will go to a new file,
+parameters can be found in "./simulation/fields.F90". They will be moved from there later, compile time constants will go to a new file,
 and the more customizable parameters will also be querried run-time instead too. (TODO)
 
 Jack-knife is a separate program under "./jack_knife/". You compile seperately with:

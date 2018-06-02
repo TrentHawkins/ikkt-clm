@@ -1,18 +1,19 @@
-#     ifndef CONSTANTS_F90
-#     define CONSTANTS_F90
+#     ifndef SIMULATION_CONSTANTS_F90
+#     define SIMULATION_CONSTANTS_F90
 
 #     include "../system/precision.F90"
 
-#     include "../tensor/mathematical_constants.F90"
-#     include "../tensor/tensor.F90"
+#     include "../tools/constants.F90"
+#     include "../tools/tensor/tensor.F90"
 
 
       module constants
 
 
             use::mathematical_constants
-
             use::tensor_type
+            use::tensor_operations
+            use::tensor_procedures
 
 
             implicit none
@@ -25,47 +26,28 @@
                                                                 [[    zero,+im_unit],[-im_unit,    zero]],&
                                                                 [[+re_unit,    zero],[    zero,-re_unit]]]
 
-            complex(KK),allocatable,dimension( : ,&
-                                               : ),public,protected::delta
-            complex(KK),allocatable,dimension( : ,&
-                                               : ,&
-                                               : ),public,protected::gamma,&
-                                                           conjugate_gamma
-            complex(KK),allocatable,dimension( : ,&
-                                               : ,&
-                                               : ,&
-                                               : ),public,protected::gamma_core
+            complex(KK),dimension( :                          ,&
+                                   :                          ),allocatable,public,protected::delta
 
-            private::gamma_size
+            complex(KK),dimension( :                          ,&
+                                   :                          ,&
+                                   :                          ),allocatable,public,protected::gamma,&
+                                                                                    conjugate_gamma
+            complex(KK),dimension( :                          ,&
+                                   :                          ,&
+                                   :                          ,&
+                                   :                          ),allocatable,public,protected::gamma_core
 
-            private::make_delta
             private::make_gamma
             private::make_gamma_core
 
-            public::determinant_degree
+            public::determinant_factor
 
             public:: make_constants
             public::eject_constants
 
 
             contains
-
-
-            function gamma_size(size)
-
-
-                  implicit none
-
-
-                  integer,intent(in   )::size
-
-                  integer::gamma_size
-
-
-                  gamma_size=2**(size/2-1)
-
-
-        end function gamma_size!size
 
 
             subroutine make_delta(size)
@@ -86,6 +68,23 @@
 
 
         end subroutine make_delta!size
+
+
+            function gamma_size(size)
+
+
+                  implicit none
+
+
+                  integer,intent(in   )::size
+
+                  integer::gamma_size
+
+
+                  gamma_size=2**(size/2-1)
+
+
+        end function gamma_size!size
 
 
             subroutine make_gamma(size)
@@ -180,7 +179,7 @@
         end subroutine make_gamma_core!size
 
 
-            function determinant_degree(size)
+            function determinant_factor(size)
 
 
                   implicit none
@@ -188,23 +187,23 @@
 
                   integer,intent(in   )::size
 
-                  real(KK)::determinant_degree
+                  real(KK)::determinant_factor
 
 
                   select case(size)
 
                   case(4,6)
 
-                     determinant_degree=+.10000e+1_KK
+                     determinant_factor=+.10000e+1_KK
 
                   case(10)
 
-                     determinant_degree=+.50000e+0_KK
+                     determinant_factor=+.50000e+0_KK
 
               end select!case(size)
 
 
-        end function determinant_degree!d
+        end function determinant_factor!d
 
 
             subroutine make_constants(inner_size,&
@@ -218,7 +217,6 @@
                   integer,intent(in   )::boson_size
 
 
-                  call make_delta     (inner_size)
                   call make_gamma     (boson_size)
                   call make_gamma_core(boson_size)
 
@@ -235,7 +233,6 @@
                   implicit none
 
 
-                  if(allocated(          delta     )) deallocate(          delta     )
                   if(allocated(          gamma     )) deallocate(          gamma     )
                   if(allocated(conjugate_gamma     )) deallocate(conjugate_gamma     )
                   if(allocated(          gamma_core)) deallocate(          gamma_core)

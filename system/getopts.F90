@@ -1,5 +1,5 @@
-#     ifndef GETOPTS_F90
-#     define GETOPTS_F90
+#     ifndef SYSTEM_GETOPTS_F90
+#     define SYSTEM_GETOPTS_F90
 
 #     include "../system/text_format.F90"
 

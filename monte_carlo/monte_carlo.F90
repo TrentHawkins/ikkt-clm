@@ -1,12 +1,11 @@
-#     ifndef MONTE_CARLO_F90
-#     define MONTE_CARLO_F90
+#     ifndef MONTE_CARLO_MONTE_CARLO_F90
+#     define MONTE_CARLO_MONTE_CARLO_F90
 
 #     include "../system/precision.F90"
 #     include "../system/text_format.F90"
 
 #     include "../monte_carlo/random_number_generator.F90"
-#     include "../monte_carlo/average.F90"
-#     include "../monte_carlo/time.F90"
+#     include "../monte_carlo/average/average.F90"
 
 #     define   clock average
 #     define    time weight
@@ -205,6 +204,8 @@
                    read(*,   *               )  time_step
                   write(*,"(2a)",advance="no")                                 t_normal
                   write(*,   *               )
+
+                  call check_time_parameters()
 
 
         end subroutine read_time_parameters!
