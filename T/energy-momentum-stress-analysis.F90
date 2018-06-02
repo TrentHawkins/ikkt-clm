@@ -50,6 +50,10 @@
             real(KK)::step
 
 
+            call process_energy_momentum_stress(record_name,&
+                                                output_name)
+
+
       contains
 
 
