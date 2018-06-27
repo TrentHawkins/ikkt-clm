@@ -9,6 +9,8 @@
       program main
 
 
+            use::get_options
+
             use::mathematical_constants
 
             use::autocorrelation_time
@@ -47,7 +49,7 @@
 
             do
 
-               read(record_unit,format_jack_single_K,err=100)
+               read(record_unit,format_time_single_K,err=100)
 
                record_size&
               =record_size+1

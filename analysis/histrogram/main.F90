@@ -7,6 +7,8 @@
       program main
 
 
+            use::get_options
+
             use::mathematical_constants
 
 
@@ -152,7 +154,7 @@
 
                      case('h')
 
-                        hist_bins=optarg
+                        read(optarg,*) hist_bins
 
                         default_hist_bins=.false.
 

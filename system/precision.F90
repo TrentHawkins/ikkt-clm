@@ -21,6 +21,12 @@
 #     define  INTEGERA3                   "(    3x,a20   ,5x)"
 !     define  INTEGERA4                   "(    3x,a40   ,6x)"
 
+#     define  INTEGERN0                             04
+#     define  INTEGERN1                             06
+#     define  INTEGERN2                             11
+#     define  INTEGERN3                             20
+!     define  INTEGERN4                             40
+
 !                                     +.____e+     e08.04e0
 !                                    +._____e+_    e10.05e1
 !                                +.340282347e+39   e15.09e2
@@ -63,6 +69,12 @@
 #     define  GENERICA3                   "(   *(x,a24     ))"
 #     define  GENERICA4                   "(   *(x,a44     ))"
 
+#     define  GENERICN0                             08
+#     define  GENERICN1                             10
+#     define  GENERICN2                             15
+#     define  GENERICN3                             24
+!     define  GENERICN4                             44
+
 !     define TOLERANCE0     .10000e-4
 #     define TOLERANCE1     .10000e-1
 #     define TOLERANCE2     .10000e-1
@@ -74,6 +86,7 @@
 
 #     define  INTEGERGK  INTEGERG3
 #     define  INTEGERAK  INTEGERA3
+#     define  INTEGERNK  INTEGERN3
 
 #     define     REALGK     REALG3
 #     define     REALAK     REALA3
@@ -83,6 +96,7 @@
 
 #     define  GENERICGK  GENERICG3
 #     define  GENERICAK  GENERICA3
+#     define  GENERICNK  GENERICN3
 
 #     define TOLERANCEK TOLERANCE3
 

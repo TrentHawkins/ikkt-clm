@@ -7,7 +7,7 @@
       program main
 
 
-            use::getptions
+            use::get_options
 
             use::jack_knife
 
@@ -75,8 +75,9 @@
 
             call jack(jack_bins,record_size,record_data,average,error)
 
-            write(output_unit,format_jack_double_K) average,error
-            write(output_unit,                   *)
+            write(output_unit,format_jack_double_K,advance="no") average,error
+
+            if(outout_unit==6) write(*,*)
 
             deallocate(record_data)
 
@@ -128,7 +129,7 @@
 
                      case('j')
 
-                        jack_bins=int(optarg)
+                        read(optarg,*) jack_bins
 
                         default_jack_bins=.false.
 

@@ -271,16 +271,16 @@
 
                      case default
 
-                        write(*,    *   )
-                        write(*,"(*(a))") "Usage: ",                          t_bold,"BINARY_NAME",     s_bold,&
-                                          " [",                               t_bold,"OPTIONS",         s_bold,&
-                                          "... ] ",                           t_bold,"BASE_OUTPUT_NAME",s_bold
-                        write(*,    *   )
-                        write(*,"(*(a))") "Simulation compiled with ",        t_bold,"-o BINARY_NAME",  s_bold," plus preprocessor."
-                        write(*,"(*(a))") "Simulation file names start with ",t_bold,"BASE_OUTPUT_NAME",s_bold," plus extension."
-                        write(*,    *   )
-                        write(*,"(*(a))") "Mandatory arguments to long options are mandatory for short options too."
-                        write(*,    *   )
+                        write(*,   *)
+                        write(*,1000) "Usage: ",                          t_bold,"BINARY_NAME",     s_bold,&
+                                      " [",                               t_bold,"OPTIONS",         s_bold,&
+                                      "... ] ",                           t_bold,"BASE_OUTPUT_NAME",s_bold
+                        write(*,   *)
+                        write(*,1000) "Simulation compiled with ",        t_bold,"-o BINARY_NAME",  s_bold," plus preprocessor."
+                        write(*,1000) "Simulation file names start with ",t_bold,"BASE_OUTPUT_NAME",s_bold," plus extension."
+                        write(*,   *)
+                        write(*,1000) "Mandatory arguments to long options are mandatory for short options too."
+                        write(*,   *)
 
                         do index=1,size(options)-1,+1
 
@@ -288,13 +288,13 @@
 
               end       do!index=1,size(options)-1,+1
 
-                        write(*,"(*(a))") "All options are optional switches for the simulation with default meaning in"
-                        write(*,"(*(a))") "their absence. If you run simulation via shell script that ports all available"
-                        write(*,"(*(a))") "options, use shell script's name as ",t_bold,"BINARY_NAME",s_bold," instead."
-                        write(*,    *   )
-                        write(*,"(*(a))") "If you wish to measure in every step of the simulation, input zero ",t_bold,&
-                                          "average_skip"                                                       ,s_bold,"."
-                        write(*,    *   )
+                        write(*,1000) "All options are optional switches for the simulation with default meaning in"
+                        write(*,1000) "their absence. If you run simulation via shell script that ports all available"
+                        write(*,1000) "options, use shell script's name as ",t_bold,"BINARY_NAME",s_bold," instead."
+                        write(*,   *)
+                        write(*,1000) "If you wish to measure in every step of the simulation, input zero ",t_bold,&
+                                      "average_skip"                                                       ,s_bold,"."
+                        write(*,   *)
 
                         stop
 
@@ -340,6 +340,9 @@
                   conf_file_name=trim(base_file_name)//".conf"!; write(*,"(a)") conf_file_name
                   meas_file_name=trim(base_file_name)//".meas"!; write(*,"(a)") meas_file_name
                   save_file_name=trim(base_file_name)//".save"!; write(*,"(a)") meas_file_name
+
+
+             1000 format(*(a))
 
 
         end subroutine read_options_and_arguments!

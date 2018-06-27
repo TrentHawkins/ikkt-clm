@@ -482,6 +482,7 @@
 
                   scalar_=real(sum(conjg(matrix0)*matrix0))
 
+
         end function matrix_norm_squared_K!matrix0
 
 

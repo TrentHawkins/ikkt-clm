@@ -13,9 +13,9 @@
             implicit none
 
 
-            integer,parameter::len_name   =  32
-            integer,parameter::len_descr  =1024
-            integer,parameter::len_argname=  32
+            integer,parameter::len_name   =66
+            integer,parameter::len_descr  =4356
+            integer,parameter::len_argname=66
 
             type option
 
@@ -318,17 +318,17 @@
 
                                case(-1)
 
-                           write (error_unit,*) "error: unrecognised option: "//trim(arg)
+                           write(error_unit,*) "error: unrecognised option: "//trim(arg)
 
                                case(-2)
 
                            if(.not.long) then
 
-                              write (error_unit,*) "error: option -"//chr//" requires an argument"
+                              write(error_unit,*) "error: option -"//chr//" requires an argument"
 
                            else
 
-                              write (error_unit,*) "error: option --"//trim(longopts(id)%name)//" requires an argument"
+                              write(error_unit,*) "error: option --"//trim(longopts(id)%name)//" requires an argument"
 
               end          if!.not.long
 

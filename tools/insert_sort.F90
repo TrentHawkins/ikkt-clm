@@ -27,20 +27,20 @@
                   integer         ::i
 
 
-                  if(n>size(list).or..not.present(n)) &
-                     n=size(list)
-
-                  temp=list(n);i=n-1
-
                   if(n>0) then
+
+                     if(n>=size(list).or..not.present(n)) &
+                        n =size(list)-1
+
+                     temp=list(n);i=n-1
 
                      call sort(list,n-1,mask)
 
-                     do while((i.ge.0).and.(mask(list(i)).gt.mask(temp)))
+                     do while((i.ge.0).and.(mask(list(i)).lt.mask(temp)))
 
                         list(i+1)=list(i);i=i-1
 
-              end    do!while((i.ge.0).and.(mask(list(i)).gt.mask(temp)))
+              end    do!while((i.ge.0).and.(mask(list(i)).lt.mask(temp)))
 
                   list(i+1)=temp
 
